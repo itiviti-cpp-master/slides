@@ -251,4 +251,141 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]{Целочисленные литералы}
+  \begin{lstlisting}
+    -1 // -(1)
+
+    31 // decimal
+    037 // octal
+    0x1F // hexadecimal
+    0X1f // hexadecimal
+    0b11111 // binary
+  \end{lstlisting}
+  Тип десятичного литерала -- \lstinline{int}, \lstinline{long}, \lstinline{long long}. \\
+  Типы других баз могут быть беззнаковые.
+  \begin{itemize}
+    \item суффикс \lstinline{u}, \lstinline{U}
+    \item суффикс \lstinline{l}, \lstinline{L}
+    \item суффикс \lstinline{ll}, \lstinline{LL}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Операторы}
+  Оператор -- элемент языка, задающий некоторое вычисление над операндами. Может иметь побочные эффекты и результат.
+
+  \lstinline{a + b}
+
+  Свойства:
+  \begin{itemize}
+    \item арность
+    \item приоритет
+    \item ассоциативность
+  \end{itemize}
+  \begin{lstlisting}
+    a = b = c // a = (b = c)
+    a , b, c // (a , b) , c
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Список операторов и их свойства}
+  \url{https://en.cppreference.com/w/cpp/language/operator_precedence}
+\end{frame}
+
+\begin{frame}[fragile]{Выражения}
+  Операторы $+$ операнды $\implies$ выражения
+
+  \vspace{1em}
+  Первичные выражения
+  \begin{itemize}
+    \item литералы
+    \item идентификаторы
+    \item \lstinline{(} выражение \lstinline{)}
+    \item лямбда-выражения
+    \item выражения свёртки
+  \end{itemize}
+
+  \vspace{1em}
+  Операнд -- первичное выражение или составное выражение.
+\end{frame}
+
+\begin{frame}[fragile]{Инструкции}
+  \[
+    P = S_1 \dotso S_n
+  \]
+  \begin{itemize}
+    \item выражений <\emph{выражение}> \lstinline{;}
+    \item блоки \lstinline|{| <\emph{инструкции}> \lstinline|}|
+    \item ветвлений
+    \item циклов
+    \item переходов
+    \item объявлений
+    \item \lstinline{try} блоки
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Инструкции, наглядно}
+\end{frame}
+
+\begin{frame}[fragile]{Ветвления}
+  \begin{lstlisting}
+    if (err)
+        std::cout << err << std::endl;
+
+    if (x > y) {
+        a = x;
+    } else {
+        a = y;
+    }
+
+    switch (z) {
+        case 'a': return 101;
+        case 'c': return 33;
+        default: return -1;
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Циклы}
+  \begin{lstlisting}
+    for (int i = -10; i < 10; ++i) {
+        a *= i * i;
+    }
+
+    for (const auto & id : x.get_ids()) {
+        std::cout << id << std::endl;
+    }
+
+    while (!q.empty()) {
+        send(q.front());
+        q.pop_front();
+    }
+
+    do {
+        std::cout << "Hello there" << std::endl;
+    } while (false);
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Переходы}
+  \begin{itemize}
+    \item \lstinline{goto} \emph{метка} \lstinline{;}
+    \item \lstinline{break;}
+    \item \lstinline{continue;}
+    \item \lstinline{return} \emph{выражение} \lstinline{;}
+    \item \lstinline{return} \emph{braced init list} \lstinline{;}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Переменные}
+  \emph{список спецификаторов} \emph{список инициализации} \lstinline{;}
+
+  \vspace{1em}
+
+  \emph{список спецификаторов} $\equiv$ [[\emph{спецификатор}]...] \emph{тип}
+
+  \vspace{1em}
+
+  \emph{список инициализаци} $\equiv$ \emph{id} [\lstinline{=} \emph{expr}] [, \emph{id} ...]
+\end{frame}
+
 \end{document}
