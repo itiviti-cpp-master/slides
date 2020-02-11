@@ -262,6 +262,9 @@
     0b11111 // binary
   \end{lstlisting}
   Тип десятичного литерала -- \lstinline{int}, \lstinline{long}, \lstinline{long long}. \\
+  
+  \vspace{1em}
+  
   Типы других баз могут быть беззнаковые.
   \begin{itemize}
     \item суффикс \lstinline{u}, \lstinline{U}
@@ -272,8 +275,12 @@
 
 \begin{frame}[fragile]{Операторы}
   Оператор -- элемент языка, задающий некоторое вычисление над операндами. Может иметь побочные эффекты и результат.
+  
+  \vspace{1em}
 
   \lstinline{a + b}
+  
+  \vspace{2em}
 
   Свойства:
   \begin{itemize}
@@ -324,6 +331,7 @@
 \end{frame}
 
 \begin{frame}{Инструкции, наглядно}
+  \includegraphics[align=c,width=5cm,keepaspectratio]{images/control.png}
 \end{frame}
 
 \begin{frame}[fragile]{Ветвления}
@@ -368,10 +376,10 @@
 
 \begin{frame}[fragile]{Переходы}
   \begin{itemize}
-    \item \lstinline{goto} \emph{метка} \lstinline{;}
-    \item \lstinline{break;}
-    \item \lstinline{continue;}
-    \item \lstinline{return} \emph{выражение} \lstinline{;}
+    \item \lstinline{goto} \emph{метка} \lstinline{;} \vspace{1em}
+    \item \lstinline{break;} \vspace{1em}
+    \item \lstinline{continue;} \vspace{1em}
+    \item \lstinline{return} \emph{выражение} \lstinline{;} \vspace{1em}
     \item \lstinline{return} \emph{braced init list} \lstinline{;}
   \end{itemize}
 \end{frame}
