@@ -149,6 +149,7 @@
     \item операторы и символы пунктуации
     \item иное
   \end{itemize}
+  \vspace{1em}
   \begin{lstlisting}
     a+++++b   // a ++ ++ + b
     a++ + ++b // a ++ + ++ b
@@ -245,11 +246,11 @@
 
 \begin{frame}[fragile]{Литералы}
   \begin{itemize}
-    \item булевские \lstinline{true}, \lstinline{false}
-    \item целочисленные
-    \item дробные
-    \item символьные
-    \item строковые
+    \item булевские \lstinline{true}, \lstinline{false} \vspace{0.5em}
+    \item целочисленные \vspace{0.5em}
+    \item дробные \vspace{0.5em}
+    \item символьные \lstinline{'a'} \vspace{0.5em}
+    \item строковые \lstinline{"Hello\n"} \vspace{0.5em}
     \item \lstinline{nullptr}
   \end{itemize}
 \end{frame}
@@ -264,15 +265,37 @@
     0X1f // hexadecimal
     0b11111 // binary
   \end{lstlisting}
+  
+  \vspace{1em}
+  
   Тип десятичного литерала -- \lstinline{int}, \lstinline{long}, \lstinline{long long}. \\
   
   \vspace{1em}
   
   Типы других баз могут быть беззнаковые.
   \begin{itemize}
-    \item суффикс \lstinline{u}, \lstinline{U}
-    \item суффикс \lstinline{l}, \lstinline{L}
-    \item суффикс \lstinline{ll}, \lstinline{LL}
+    \item суффикс \lstinline{u}, \lstinline{U} $\implies$ \lstinline{unsigned}
+    \item суффикс \lstinline{l}, \lstinline{L} $\implies$ \lstinline{long}
+    \item суффикс \lstinline{ll}, \lstinline{LL} $\implies$ \lstinline{long long}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Дробные литералы}
+  \begin{lstlisting}
+    1e-5 // 10^-5
+    1. // 1.0
+    1.23 // 1.23
+    0x1.2p-1 // 0.5625
+  \end{lstlisting}
+  
+  \vspace{1em}
+  
+  Тип дробного литерала -- \lstinline{double}, либо задаётся суффиксом:
+  
+  \vspace{0.5em}
+  \begin{itemize}
+    \item \lstinline{f} \lstinline{F} $\implies$ \lstinline{float}
+    \item \lstinline{l} \lstinline{L} $\implies$ \lstinline{long double}
   \end{itemize}
 \end{frame}
 
@@ -304,7 +327,7 @@
 \begin{frame}[fragile]{Выражения}
   Операторы $+$ операнды $\implies$ выражения
 
-  \vspace{1em}
+  \vspace{2em}
   Первичные выражения
   \begin{itemize}
     \item литералы
@@ -314,8 +337,28 @@
     \item выражения свёртки
   \end{itemize}
 
-  \vspace{1em}
+  \vspace{1.5em}
   Операнд -- первичное выражение или составное выражение.
+\end{frame}
+
+\begin{frame}{Порядок исполнения}
+  Порядок исполнения выражения -- порядок вычисления подвыражений составного выражения $\implies$ не определён.
+  
+  \vspace{1.5em}
+  
+  $\succ$ <<Упорядочено до>> -- это несимметричное, транзитивное отношение между парой вычислений в рамках одного треда.
+  
+  \vspace{1.5em}
+  
+  A $\succ$ B $\implies$ A полностью завершено до B
+  
+  \vspace{1.5em}
+  
+  $\neg$ A $\succ$ B $\land$ $\neg$ B $\succ$ A $\implies$
+  \begin{itemize}
+    \item A и B разнесены во времени \vspace{0.5em}
+    \item A и B пересекаются во времени
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{Инструкции}
@@ -334,7 +377,7 @@
 \end{frame}
 
 \begin{frame}{Инструкции, наглядно}
-  \includegraphics[align=c,width=5cm,keepaspectratio]{images/control.png}
+  \hspace*{3cm}\includegraphics[align=c,width=5cm,keepaspectratio]{images/control.png}
 \end{frame}
 
 \begin{frame}[fragile]{Ветвления}
@@ -449,7 +492,7 @@
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}{Типы}
+\begin{frame}[fragile]{Типы}
   Объекты, выражения, функции, ... : тип
 
   \vspace{2em}
@@ -461,30 +504,24 @@
   \vspace{1em}
   \begin{lstlisting}
     using T = int;
-    //   ^^^  ^^^
 
     static const int * x;
-    //     ^^^^^^^^^^^
   \end{lstlisting}
 \end{frame}
 
 \begin{frame}{Базовые типы}
   \begin{itemize}
-    \item \lstinline{void}
-    \item \lstinline{std::nullptr_t}
-    \item арифметические
+    \item \lstinline{void} \vspace{0.5em}
+    \item \lstinline{std::nullptr_t} \vspace{0.5em}
+    \item арифметические \vspace{0.5em}
       \begin{itemize}
-        \item дробные
-        \item интегральные
+        \item дробные \vspace{0.5em}
+        \item интегральные \vspace{0.5em}
           \begin{itemize}
-            \item логический
-            \item символьные
-              \begin{itemize}
-                \item узкие \lstinline{char}...
-                \item широкие \lstinline{wchar_t}...
-              \end{itemize}
-            \item знаковые целые \lstinline{int}...
-            \item беззнаковые целые \lstinline{unsigned}...
+            \item логический \vspace{0.5em}
+            \item символьные \lstinline{char}... \vspace{0.5em}
+            \item знаковые целые \lstinline{int}... \vspace{0.5em}
+            \item беззнаковые целые \lstinline{unsigned}... \vspace{0.5em}
           \end{itemize}
       \end{itemize}
   \end{itemize}
@@ -541,7 +578,7 @@
 
 \begin{frame}[fragile]{Требования к дробным числовым типам}
   \centering
-  \begin{tabular}{|C{8em}|C{6em}|C{6em}|}
+  \begin{tabular}{|C{8em}|C{8em}|C{8em}|}
     \hline
     \bfseries Тип & \bfseries Минимальное число точно представимых десятичных цифр & \bfseries Максимально представимое число \\
     \hline
