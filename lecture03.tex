@@ -1,0 +1,181 @@
+\documentclass[unknownkeysallowed,xcolor=table]{beamer}
+ 
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{multirow}
+\usepackage{tikz}
+
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\newcommand{\rarr}{$\rightarrow$}
+ 
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{light-gray}{gray}{0.9}
+
+\lstset{
+      basicstyle=\ttfamily\small,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+      numberstyle=\tiny\color{blue},
+      stringstyle=\color{mymauve},
+      numbers=left,
+      stepnumber=1,
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      literate={~} {\textapprox}{1},
+      language={[11]C++}
+}
+
+\lstnewenvironment{cmdline}
+  {\lstset{
+      basicstyle=\ttfamily\scriptsize,
+      keywordstyle=\color{blue},
+      backgroundcolor=\color{light-gray},
+      language={bash}
+  }}
+  {}
+
+\lstnewenvironment{cmdlinelarge}
+  {\lstset{
+      basicstyle=\ttfamily\small,
+      keywordstyle=\color{blue},
+      backgroundcolor=\color{light-gray},
+      language={bash}
+  }}
+  {}
+
+\makeatletter
+\newcommand{\srcmediumsize}{\@setfontsize{\srcmediumsize}{7pt}{7pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcbigsize}{\@setfontsize{\srcbigsize}{8pt}{8pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2020]
+{ИТМО, весенний семестр 2020}
+ 
+\logo{%
+  \makebox[0.97\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.5cm,keepaspectratio]{itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+ 
+\frame{\titlepage}
+
+%-------------------------------------------------
+\section{Приведение базовых типов}
+
+\begin{frame}[fragile]{Числовые расширения}
+  \[
+    T1 \triangleright T2 \implies \mathbf{value}(1) \equiv \mathbf{value}(2)
+  \]
+  
+  \vspace{1em}
+
+  \begin{itemize}
+    \item \lstinline{signed char}, \lstinline{short} \rarr \lstinline{int} \vspace{1em}
+    \item \lstinline{unsigned char}, \lstinline{unsigned short} \rarr \lstinline{int} или \lstinline{unsigned int} \vspace{1em}
+    \item \lstinline{char} \rarr \lstinline{int} или \lstinline{unsigned int} \vspace{1em}
+    \item \lstinline{float} \rarr \lstinline{double}
+\end{frame}
+
+\begin{frame}[fragile]{Интегральные преобразования}
+  \[
+    \forall T1, T2: T1 \in \mathbb{I}, T2 \in \mathbb{I}, T1 \mapsto T2
+  \]
+
+  \vspace{1em}
+
+  \begin{itemize}
+    \item $T2 \in \mathbb{U}, \mathbf{sizeof}(T1) > \mathbf{sizeof}(T2) \implies$ результат -- младшие биты исходного представления \vspace{1em}
+    \item $T2 \in \mathbb{U}, T1 \in \mathbb{S}, \mathbf{sizeof}(T1) \leq \mathbf{sizeof}(T2) \implies$ результат -- знаковое дополнение \vspace{1em}
+    \item $T2 \in \mathbb{U}, T1 \in \mathbb{U}, \mathbf{sizeof}(T1) \leq \mathbf{sizeof}(T2) \implies$ результат -- дополнение нулями \vspace{1em}
+    \item $T2 \in \mathbb{S}$ и исходное значение помещается в $T2 \implies$ значение не меняется \vspace{1em} \vspace{1em} \vspace{1em} \vspace{1em}
+    \item $T2 \in \mathbb{S}$ и исходное значение \textbf{не} помещается в $T2 \implies$ implementation defined
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Дробные преобразования}
+  \[
+    \forall T1, T2: T1 \in \mathbb{F}, T2 \in \mathbb{F}, T1 \mapsto T2
+  \]
+
+  \vspace{1em}
+
+  \begin{itemize}
+    \item если исходное значение \emph{точно} представимо в целевом типе, оно не меняется \vspace{1em}
+    \item если исходное значение попадает между двумя корректными значениями целевого типа, то результат -- одно из этих значений (implementation defined) \vspace{1em}
+    \item иначе -- \textbf{UB}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Преобразования между дробными и интегральными типами}
+  \begin{itemize}
+    \item дробное $\mapsto$ целое путём отбрасывания дробной части, если целая часть помещается в целевой тип, иначе -- \textbf{UB} \vspace{2em}
+    \item целое $\mapsto$ дробное, возможно, с округлением (implementation defined); если исходное значение слишком велико -- \textbf{UB}
+\end{frame}
+
+\begin{frame}[fragile]{Преобразования с \lstinline{bool}}
+  \[
+    \forall T: T \in \mathbb{I} \lor \mathbb{F} \lor \mathbb{E} \lor \mathbb{P}, T \mapsto \mathtt{bool}
+    \forall T: T \in \mathbb{I} \lor \mathbb{F}, T \mapsto \mathtt{bool}
+  \]
+
+  \vspace{1em}
+
+  Преобразования к \lstinline{bool}
+  \begin{itemize}
+    \item $value \neq 0 \implies$ \lstinline{true} \vspace{1.5em}
+    \item $value = 0 \implies$ \lstinline{false}
+  \end{itemize}
+
+  \vspace{1em}
+  Преобразования из \lstinline{bool}
+  \begin{itemize}
+    \item \lstinline{false} \rarr \lstinline{0} \vspace{1.5em}
+    \item \lstinline{true} \rarr \lstinline{1}
+  \end{itemize}
+\end{frame}
+
+\end{document}
