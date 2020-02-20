@@ -223,14 +223,21 @@
 \end{frame}
 
 \begin{frame}[fragile]{Old-style cast}
-  \centering
-  \begin{tabular}{|c|c|}
-    \lstinline{(T) x} & \lstinline{const_cast<T>(x)} \\
-    \lstinline{(T) x} & \lstinline{static_cast<T>(x)}* \\
-    \lstinline{(T) x} & \lstinline{static_cast}* + \lstinline{const_cast} \\
-    \lstinline{(T) x} & \lstinline{reinterprer_cast<T>(x)} \\
-    \lstinline{(T) x} & \lstinline{reinterprer_cast} + \lstinline{const_cast} \\
-  \end{tabular}
+  \begin{minipage}{.45\textwidth}
+    \begin{itemize}
+      \item \lstinline{(T) x}
+      \item \lstinline{T(x)}
+    \end{itemize}
+  \end{minipage}\hfill
+  \begin{minipage}{.45\textwidth}
+    \begin{itemize}
+      \item \lstinline{const_cast<T>(x)} \vspace{0.5em}
+      \item \lstinline{static_cast<T>(x)}* \vspace{0.5em}
+      \item \lstinline{static_cast}* + \lstinline{const_cast} \vspace{0.5em}
+      \item \lstinline{reinterprer_cast<T>(x)}
+      \item \lstinline{reinterprer_cast} + \lstinline{const_cast}
+    \end{itemize}
+  \end{minipage}
 \end{frame}
 
 %-------------------------------------------------
@@ -238,8 +245,8 @@
 
 \begin{frame}{Объекты}
   \begin{itemize}
-    \item размер (\lstlisting{sizeof})
-    \item выравнивание (\lstlisting{alignof})
+    \item размер (\lstinline{sizeof})
+    \item выравнивание (\lstinline{alignof})
   \end{itemize}
 \end{frame}
 

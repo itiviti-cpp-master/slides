@@ -365,7 +365,7 @@
   
   \vspace{1.5em}
   
-  $\succ$ <<Упорядочено до>> -- это несимметричное, транзитивное отношение между парой вычислений в рамках одного треда.
+  $\succ$ \textbf{``упорядочено до''} -- это несимметричное, транзитивное отношение между парой вычислений в рамках одного треда.
   
   \vspace{2em}
   
@@ -383,34 +383,34 @@
 \begin{frame}{Некоторые правила упорядочивания}
     $F_i \succ F_{i+1}$
 
-    \vspace{1em}
+    \vspace{2em}
 
-    $a op b \implies result(a) \succ result(b)$
+    $a \: \mathbf{op} \: b \implies \mathbf{result}(a) \succ \mathbf{result}(b)$
 
-    \vspace{1em}
+    \vspace{2em}
 
-    $fun(args) \implies args \succ fun$
+    $\mathbf{fun}(args) \implies args \succ fun-eval$
 
-    \vspace{1em}
+    \vspace{2em}
 
     Больше правил: \url{https://en.cppreference.com/w/cpp/language/eval_order}
 
-    \vspace{1em}
+    \vspace{2em}
 
     ``Short-circuit evaluation'' для \emph{встроенных} операторов \lstinline{&&} и \lstinline{||}.
 \end{frame}
 
 \begin{frame}[fragile]{Инструкции}
   \[
-    P = S_1 \dotso S_n
+    P = S_1 \to S_2 \to \dotso S_n
   \]
   \begin{itemize}
-    \item выражений <\emph{выражение}> \lstinline{;}
-    \item блоки \lstinline|{| <\emph{инструкции}> \lstinline|}|
-    \item ветвлений
-    \item циклов
-    \item переходов
-    \item объявлений
+    \item выражений <\emph{выражение}> \lstinline{;} \vspace{0.5em}
+    \item блоки \lstinline|{| <\emph{инструкции}> \lstinline|}| \vspace{0.5em}
+    \item ветвлений \vspace{0.5em}
+    \item циклов \vspace{0.5em}
+    \item переходов \vspace{0.5em}
+    \item объявлений \vspace{0.5em}
     \item \lstinline{try} блоки
   \end{itemize}
 \end{frame}
@@ -470,17 +470,17 @@
 \end{frame}
 
 \begin{frame}[fragile]{Переменные}
-  \emph{список спецификаторов} \emph{список инициализации} \lstinline{;}
+  <\emph{список спецификаторов}> <\emph{список инициализации}> \lstinline{;}
 
-  \vspace{1em}
+  \vspace{1.5em}
 
   \emph{список спецификаторов} $\equiv$ [[\emph{спецификатор}]...] \emph{тип}
 
-  \vspace{1em}
+  \vspace{1.5em}
 
   \emph{список инициализаци} $\equiv$ \emph{id} [\lstinline{=} \emph{expr}] [, \emph{id} ...]
 
-  \vspace{1em}
+  \vspace{2em}
 
   \begin{lstlisting}
     int a;
@@ -560,7 +560,7 @@
         \item дробные \vspace{0.5em}
         \item интегральные \vspace{0.5em}
           \begin{itemize}
-            \item логический \vspace{0.5em}
+            \item логический \lstinline{bool} \vspace{0.5em}
             \item символьные \lstinline{char}... \vspace{0.5em}
             \item знаковые целые \lstinline{int}... \vspace{0.5em}
             \item беззнаковые целые \lstinline{unsigned}... \vspace{0.5em}
