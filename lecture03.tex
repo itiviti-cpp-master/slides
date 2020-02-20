@@ -3,8 +3,8 @@
 \usepackage[T2A,T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
-\usepackage{amsmath}
 \usepackage{listings}
+\usepackage{amsmath}
 \usepackage{url}
 \usepackage{textcomp}
 \usepackage{multirow}
@@ -118,6 +118,7 @@
     \item \lstinline{unsigned char}, \lstinline{unsigned short} \rarr \lstinline{int} или \lstinline{unsigned int} \vspace{1em}
     \item \lstinline{char} \rarr \lstinline{int} или \lstinline{unsigned int} \vspace{1em}
     \item \lstinline{float} \rarr \lstinline{double}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{Интегральные преобразования}
@@ -125,13 +126,13 @@
     \forall T1, T2: T1 \in \mathbb{I}, T2 \in \mathbb{I}, T1 \mapsto T2
   \]
 
-  \vspace{1em}
+  \vspace{0.5em}
 
   \begin{itemize}
-    \item $T2 \in \mathbb{U}, \mathbf{sizeof}(T1) > \mathbf{sizeof}(T2) \implies$ результат -- младшие биты исходного представления \vspace{1em}
-    \item $T2 \in \mathbb{U}, T1 \in \mathbb{S}, \mathbf{sizeof}(T1) \leq \mathbf{sizeof}(T2) \implies$ результат -- знаковое дополнение \vspace{1em}
-    \item $T2 \in \mathbb{U}, T1 \in \mathbb{U}, \mathbf{sizeof}(T1) \leq \mathbf{sizeof}(T2) \implies$ результат -- дополнение нулями \vspace{1em}
-    \item $T2 \in \mathbb{S}$ и исходное значение помещается в $T2 \implies$ значение не меняется \vspace{1em} \vspace{1em} \vspace{1em} \vspace{1em}
+    \item $T2 \in \mathbb{U}, \mathbf{sizeof}(T1) > \mathbf{sizeof}(T2) \implies$ результат -- младшие биты исходного представления \vspace{0.5em}
+    \item $T2 \in \mathbb{U}, T1 \in \mathbb{S}, \mathbf{sizeof}(T1) \leq \mathbf{sizeof}(T2) \implies$ результат -- знаковое дополнение \vspace{0.5em}
+    \item $T2 \in \mathbb{U}, T1 \in \mathbb{U}, \mathbf{sizeof}(T1) \leq \mathbf{sizeof}(T2) \implies$ результат -- дополнение нулями \vspace{0.5em}
+    \item $T2 \in \mathbb{S}$ и исходное значение помещается в $T2 \implies$ значение не меняется \vspace{0.5em}
     \item $T2 \in \mathbb{S}$ и исходное значение \textbf{не} помещается в $T2 \implies$ implementation defined
   \end{itemize}
 \end{frame}
@@ -154,27 +155,91 @@
   \begin{itemize}
     \item дробное $\mapsto$ целое путём отбрасывания дробной части, если целая часть помещается в целевой тип, иначе -- \textbf{UB} \vspace{2em}
     \item целое $\mapsto$ дробное, возможно, с округлением (implementation defined); если исходное значение слишком велико -- \textbf{UB}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{Преобразования с \lstinline{bool}}
   \[
     \forall T: T \in \mathbb{I} \lor \mathbb{F} \lor \mathbb{E} \lor \mathbb{P}, T \mapsto \mathtt{bool}
-    \forall T: T \in \mathbb{I} \lor \mathbb{F}, T \mapsto \mathtt{bool}
+  \]
+
+  \[
+    \forall T: T \in \mathbb{I} \lor \mathbb{F}, \mathtt{bool} \mapsto T
   \]
 
   \vspace{1em}
 
   Преобразования к \lstinline{bool}
   \begin{itemize}
-    \item $value \neq 0 \implies$ \lstinline{true} \vspace{1.5em}
+    \item $value \neq 0 \implies$ \lstinline{true} \vspace{0.5em}
     \item $value = 0 \implies$ \lstinline{false}
   \end{itemize}
 
   \vspace{1em}
   Преобразования из \lstinline{bool}
   \begin{itemize}
-    \item \lstinline{false} \rarr \lstinline{0} \vspace{1.5em}
+    \item \lstinline{false} \rarr \lstinline{0} \vspace{0.5em}
     \item \lstinline{true} \rarr \lstinline{1}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Стандартные арифметические преобразования}
+  \begin{enumerate}
+    \item расширение операндов интегрального типа \vspace{0.5em}
+    \item приведение к общему типу
+      \begin{itemize}
+        \item если один операнд \lstinline{long double}, второй приводится к \lstinline{long double}
+        \item если один операнд \lstinline{double}, второй приводится к \lstinline{double}
+        \item если один операнд \lstinline{float}, второй приводится к \lstinline{float}
+        \item если знаковость одинакова, то подтягивается ранг
+        \item если ранг беззнакового $\geq$ ранга знакового, то знаковый \rarr тип беззнакового
+        \item если тип знакового может представить все значения типа беззнакового, то беззнаковый \rarr тип знакового
+        \item иначе оба \rarr беззнаковый вариант типа знакового
+      \end{itemize}
+  \end{enumerate}
+
+  \vspace{0.5em}
+
+  Ранг: \lstinline{bool} < \lstinline{signed char} < \lstinline{short} < \lstinline{int} < \lstinline{long} < \lstinline{long long}
+\end{frame}
+
+\begin{frame}[fragile]{Унарные плюс и минус}
+  \begin{itemize}
+    \item \lstinline{+x} -- числовое расширение \vspace{2em}
+    \item \lstinline{-x}
+      \begin{itemize}
+        \item числовое расширение \vspace{1em}
+        \item для беззнаковых целых -- $-x = 2^n-x$ \vspace{1em}
+        \item для остальных -- инвертирование знака
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Целочисленное переполнение}
+  \begin{itemize}
+    \item беззнаковая целочисленная арифметика -- по модулю $2^n$ \vspace{2em}
+    \item знаковое переполнение -- \textbf{UB}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Old-style cast}
+  \centering
+  \begin{tabular}{|c|c|}
+    \lstinline{(T) x} & \lstinline{const_cast<T>(x)} \\
+    \lstinline{(T) x} & \lstinline{static_cast<T>(x)}* \\
+    \lstinline{(T) x} & \lstinline{static_cast}* + \lstinline{const_cast} \\
+    \lstinline{(T) x} & \lstinline{reinterprer_cast<T>(x)} \\
+    \lstinline{(T) x} & \lstinline{reinterprer_cast} + \lstinline{const_cast} \\
+  \end{tabular}
+\end{frame}
+
+%-------------------------------------------------
+\section{Объекты}
+
+\begin{frame}{Объекты}
+  \begin{itemize}
+    \item размер (\lstlisting{sizeof})
+    \item выравнивание (\lstlisting{alignof})
   \end{itemize}
 \end{frame}
 
