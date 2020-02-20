@@ -222,6 +222,9 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Контекст преобразования к \lstinline{bool}}
+\end{frame}
+
 \begin{frame}[fragile]{Old-style cast}
   \begin{minipage}{.45\textwidth}
     \begin{itemize}
@@ -244,10 +247,131 @@
 \section{Объекты}
 
 \begin{frame}{Объекты}
+  Характеризуется:
   \begin{itemize}
     \item размер (\lstinline{sizeof})
     \item выравнивание (\lstinline{alignof})
+    \item тип размещения
+    \item размещение
+    \item время жизни
+    \item тип
+    \item значение (возможно, неопределенное)
+    \item имя (не обязательно)
   \end{itemize}
+
+  \vspace{1em}
+
+  \textbf{Не} является объектом: значение, ссылка, функция, не статический член класса, \lstinline{this}.
+\end{frame}
+
+\begin{frame}{Представление объекта}
+  \begin{itemize}
+    \item объектное представление $B_1 \dotso B_n, n = \mathtt{sizeof(T)}$ \vspace{0.5em}
+    \item представление значения $b_1 \dotso b_m, \frac{m}{8} \leq n$
+  \end{itemize}
+
+  \vspace{2em}
+
+  Подобъекты -- члены классов, представления базовых классов в наследнике, элементы массивов.
+
+  \vspace{2em}
+
+  Размер любого полного объекта $\geq 1$.
+
+  \vspace{2em}
+
+  $\forall a, b: L_1 \cap L_2 \implies \mathbf{addr}(a) \neq \mathbf{add}(b)$
+\end{frame}
+
+\begin{frame}{Типы размещения}
+  \begin{itemize}
+    \item автоматический \vspace{1em}
+    \item статический \vspace{1em}
+    \item тред-локальный \vspace{1em}
+    \item динамический
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Размещение и инициализация}
+  \begin{lstlisting}
+    int a = 9, aa;
+    thread_local double b = 0.5;
+    C c(1, 2);
+
+    void f()
+    {
+      static C cc;
+      thread_local double d = -1.5;
+      {
+        ...
+        int e = 101;
+        ...
+      }
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Временные объекты}
+  \begin{itemize}
+    \item автоматическое размещение в рамках исполнения выражения \vspace{0.5em}
+    \item удаляются в конце исполнения полного выражения \vspace{0.5em}
+    \item порядок удаления = обратный порядок создания \vspace{0.5em}
+    \item время жизни может быть продлено ссылкой
+  \end{itemize}
+
+  \vspace{1em}
+
+  \begin{lstlisting}
+    x = process(std::string("a = b + c").substr(4, 5));
+  \end{lstlisting}
+\end{frame}
+
+%-------------------------------------------------
+\section{Выражения}
+
+\begin{frame}[fragile]{Невычисляемый контекст}
+  \begin{itemize}
+    \item \lstinline{typeid} \vspace{1em}
+    \item \lstinline{sizeof} \vspace{1em}
+    \item \lstinline{noexcept} \vspace{1em}
+    \item \lstinline{decltype}
+  \end{itemize}
+  \begin{lstlisting}
+    decltype(a + b) c = a + b;
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Контекст игнорирования результата}
+  \begin{itemize}
+    \item инструкция выражения \vspace{1em}
+    \item левый операнд \lstinline{,} \vspace{1em}
+    \item приведение к типу \lstinline{void}
+  \end{itemize}
+  \begin{lstlisting}
+    a + b;
+    f();
+    x = f(), g();
+    auto y = f(), g(); // error
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Константные выражения}
+\end{frame}
+
+\begin{frame}{Категории значений}
+  \includegraphics[width = \textwidth,align=c,keepaspectratio]{images/value_categories.png}
+\end{frame}
+
+%-------------------------------------------------
+\section{Сложные инструкции}
+
+\begin{frame}[fragile]{Ветвления}
+\end{frame}
+
+\begin{frame}[fragile]{switch}
+\end{frame}
+
+\begin{frame}[fragile]{Циклы}
 \end{frame}
 
 \end{document}
