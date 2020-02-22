@@ -222,7 +222,14 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Контекст преобразования к \lstinline{bool}}
+\begin{frame}[fragile]{Контекст преобразования к \lstinline{bool}}
+  \begin{itemize}
+    \item условие \lstinline{if}, \lstinline{while}, \lstinline{for} \vspace{1em}
+    \item операнды встроенных \lstinline{!}, \lstinline{&&}, \lstinline{||} \vspace{1em}
+    \item первый операнд \lstinline{?:} \vspace{1em}
+    \item предикат \lstinline{static_assert} \vspace{1em}
+    \item выражение в \lstinline{noexcept}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{Old-style cast}
@@ -356,22 +363,388 @@
 \end{frame}
 
 \begin{frame}[fragile]{Константные выражения}
+  \begin{lstlisting}
+    char str[50];
+
+    const std::size_t size = 50;
+    std::array<int, size * 10> arr;
+  \end{lstlisting}
 \end{frame}
 
 \begin{frame}{Категории значений}
   \includegraphics[width = \textwidth,align=c,keepaspectratio]{images/value_categories.png}
 \end{frame}
 
+\begin{frame}[fragile]{Пример материализации}
+  \begin{lstlisting}
+    const int a = 2 + 3;
+
+    const int & b = 2 + 3;
+  \end{lstlisting}
+\end{frame}
+
 %-------------------------------------------------
 \section{Сложные инструкции}
 
 \begin{frame}[fragile]{Ветвления}
+  \lstinline{if} [\lstinline{constexpr}] \lstinline{(} [\emph{иниц.}] \emph{условие} \lstinline{)} \emph{инструкция}
+
+  \vspace{0.5em}
+
+  \lstinline{if} [\lstinline{constexpr}] \lstinline{(} [\emph{иниц.}] \emph{условие} \lstinline{)} \emph{инструкция} \lstinline{else} \emph{инструкция}
+
+  \vspace{0.5em}
+
+  \begin{itemize}
+    \item \emph{иниц.}
+      \begin{itemize}
+        \item инструкция выражения \vspace{0.5em}
+        \item инструкция объявления \vspace{1em}
+      \end{itemize}
+    \item \emph{условие}
+      \begin{itemize}
+        \item выражение, приводимое к \lstinline{bool} \vspace{0.5em}
+        \item объявление единственной переменной
+      \end{itemize}
+  \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{switch}
+\begin{frame}[fragile]{Примеры ветвлений}
+  \begin{lstlisting}
+    int a = f();
+    if (a) return x;
+
+    if (int a = f(); a)
+      return x;
+
+    int a;
+    if (a = f(); a) {
+      return x;
+    }
+
+    if (int a = f()) {
+      return x;
+    }
+
+    if (T t; !t.empty()) return y;
+
+    if (const std::string a = get_line(); std::size_t b = a.size()) {
+      std::cout << a << ":" << b << std::endl;
+    }
+  \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Циклы}
+\begin{frame}[fragile]{Примеры \lstinline{constexpr} ветвлений}
+  \begin{lstlisting}
+    auto f()
+    {
+      if constexpr (true) {
+        return "Hi!";
+      } else {
+        return 101;
+      }
+    }
+
+    template <class T>
+    std::string f(const T & t)
+    {
+      if constexpr (std::is_same_v<T, std::string>) {
+        return t.substr(3, 4);
+      } else {
+        return std::to_string(t);
+      }
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\lstinline{switch}}
+  \lstinline{switch (} [\emph{иниц.}] \emph{условие} \lstinline{)} \emph{инструкция}
+
+  \vspace{0.5em}
+
+  \begin{itemize}
+    \item \emph{иниц.}
+      \begin{itemize}
+        \item инструкция выражения \vspace{0.5em}
+        \item инструкция объявления \vspace{1em}
+      \end{itemize}
+    \item \emph{условие}
+      \begin{itemize}
+        \item выражение, неявно приводимое к интегральному типу или \lstinline{enum} \vspace{0.5em}
+        \item объявление единственной переменной
+      \end{itemize}
+  \end{itemize}
+
+  \vspace{1em}
+
+  В инструкции разрешены метки \lstinline{case} и \lstinline{default}, а \lstinline{break} имеет специальное значение.
+\end{frame}
+
+\begin{frame}[fragile]{Примеры \lstinline{switch}}
+  \begin{lstlisting}
+    int a = f();
+    switch (a) {
+      case 11: [[fallthrough]];
+      case 3+5:
+        ++x;
+        y = a;
+        break;
+    }
+
+    switch (int a = f()) {
+      case 11: [[fallthrough]];
+      case 8: { ++x; y = a; } break;
+    }
+
+    switch(int a = f(); a) {
+      case 8: [[fallthrough]];
+      case 11: ++x; y = a; break;
+    }
+
+    switch (std::string s = get_line(); s.size());
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Объявления и тело \lstinline{switch}}
+  \begin{lstlisting}
+    switch (x) {
+      case 31: {
+        int a = x * 20;
+        std::cout << a;
+        break;
+      }
+      case 99: {
+        const auto l = get_line;
+        std::cout << l;
+      }
+      break;
+    }
+
+    switch (x) {
+      case 31:
+        int a = x * 20;
+        std::cout << a;
+        break;
+      default:            // error
+        std::cout << x;
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Ещё более странные вещи с \lstinline{switch}
+  \begin{lstlisting}
+    void g(const std::size_t count, char * to, const char * from)
+    {
+      std::size_t n = (count + 7) / 8;
+      switch (count % 8) }
+      case 0: do {  *to = *from++; [[fallthrough]];
+      case 7:       *to = *from++; [[fallthrough]];
+      case 6:       *to = *from++; [[fallthrough]];
+      case 5:       *to = *from++; [[fallthrough]];
+      case 4:       *to = *from++; [[fallthrough]];
+      case 3:       *to = *from++; [[fallthrough]];
+      case 2:       *to = *from++; [[fallthrough]];
+      case 1:       *to = *from++;
+              } while (--n);
+      }
+    }
+  \end{lstlisting}
+  \url{https://en.wikipedia.org/wiki/Duff's_device}
+\end{frame}
+
+\begin{frame}[fragile]{Цикл \lstinline{while}}
+  \lstinline{while (} \emph{условие} \lstinline{)} \emph{инструкция}
+
+  \vspace{1em}
+
+  \begin{itemize}
+    \item \emph{условие}
+      \begin{itemize}
+        \item выражение, приводимое к \lstinline{bool} \vspace{0.5em}
+        \item объявление единственной переменной
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Примеры \lstinline{while}}
+  \begin{lstlisting}
+    while (!q.empty()) {
+      std::cout << q.front() << std::endl;
+      q.pop_front();
+    }
+
+    while (int a = f()) {
+      std::cout << a << std::endl;
+    }
+
+    while (x)
+      int y = 111;
+    std::cout << y << std::endl; // error
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Цикл \lstinline{do while}}
+  \lstinline{do} \emph{инструкция} \lstinline{while (} \emph{условие} \lstinline{);}
+
+  \vspace{1em}
+
+  \begin{lstlisting}
+    do x++; while (x);
+
+    do {
+      int a = f();
+      x = a % 2;
+    } while (x > 5);
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Цикл \lstinline{for}}
+  \lstinline{for (} \emph{иниц.} [\emph{условие}] \lstinline{;} \emph{итер.} \lstinline{)} \emph{инструкция}
+
+  \vspace{0.5em}
+
+  \begin{itemize}
+    \item \emph{иниц.}
+      \begin{itemize}
+        \item инструкция выражения \vspace{0.5em}
+        \item инструкция объявления \vspace{1em}
+      \end{itemize}
+    \item \emph{условие}
+      \begin{itemize}
+        \item выражение, приводимое к \lstinline{bool} \vspace{0.5em}
+        \item объявление единственной переменной \vspace{1em}
+      \end{itemize}
+    \item \emph{итер.}
+      \begin{itemize}
+        \item выражение
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Примеры с \lstinline{for}}
+  \begin{lstlisting}
+    for (;;) {
+      std::cout << "Forever failure" << std::endl;
+    }
+
+    for (; !q.empty(); ) {
+      std::cout << q.front() << std::endl;
+      q.pop_front();
+    }
+
+    for (int i = 0; i < f(); ++i) {
+      if (i % 2) {
+        std::cout << "Odd" << std::endl;
+        continue;
+      }
+      std::cout << "Even" << std::endl;
+    }
+
+    for (int i = 0, end = f(); i < end; ++i) {
+      // ...
+    }
+  \end{lstlisting}
+\end{frame}
+
+%-------------------------------------------------
+\section{Функции}
+
+\begin{frame}{Функции}
+  \begin{itemize}
+    \item имя \vspace{0.5em}
+    \item тип возвращаемого значения \vspace{0.5em}
+    \item список аргументов \vspace{0.5em}
+    \item тип \lstinline{ret(params)} \vspace{0.5em}
+    \item тело
+  \end{itemize}
+
+  \vspace{1em}
+
+  \begin{itemize}
+    \item объявление -- задание типа и связывание с именем \vspace{0.5em}
+    \item определение -- задание тела и связывание с именем
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Форма объявления функции}
+  \emph{T имя} \lstinline{(} \emph{параметры} \lstinline{);}
+
+  \vspace{1em}
+
+  \lstinline{auto} \emph{имя} \lstinline{(} \emph{параметры} \lstinline{)} \lstinline{->} \emph{T} \lstinline{;}
+
+  \vspace{2em}
+
+  \begin{lstlisting}
+    int a = 5, f();
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Объявление аргументов}
+  \emph{параметры} : $p_1, \dotso , p_n$
+
+  \vspace{1em}
+
+  \begin{itemize}
+    \item \lstinline{type name} \vspace{0.5em}
+    \item \lstinline{type name = init} \vspace{0.5em}
+    \item \lstinline{type} \vspace{0.5em}
+    \item \lstinline{type = init}
+  \end{itemize}
+
+  \vspace{1em}
+
+  Variadic functions
+  \begin{lstlisting}
+    int printf(const char * fmt, ...);
+    int print(...);
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Примеры объявлений функций}
+  \begin{lstlisting}
+    // declare the same function of type void(int, char *)
+    void bar(const int x, char[]);
+    void bar(const volatile int x, char[3]);
+    void bar(int x, char * p);
+
+    void g(int, int);
+    void g(int, int = 5);
+    void g(int = 1, int);
+    void g(int, int = 5); // error
+
+    int a = 1;
+    int f(int = a);
+    void b()
+    {
+      g(); // calls g(1, 5)
+      a = 2;
+      {
+        int a = 3;
+        f(); // calls f(2)
+      }
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Определение функции}
+  \emph{объявление} \emph{тело}
+
+  \vspace{1em}
+
+  \begin{itemize}
+    \item блок \vspace{0.7em}
+    \item try блок \vspace{0.7em}
+    \item \lstinline{= delete} \vspace{0.7em}
+    \item \lstinline{= default}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Инструкция \lstinline{return}}
+  \begin{itemize}
+    \item \lstinline{return} \emph{выражение} \lstinline{;} \vspace{1em}
+    \item \lstinline|return {| \emph{список инициализации} \lstinline|};|
+  \end{itemize}
 \end{frame}
 
 \end{document}
