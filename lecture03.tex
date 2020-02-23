@@ -410,7 +410,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Примеры ветвлений}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     int a = f();
     if (a) return x;
 
@@ -428,7 +428,7 @@
 
     if (T t; !t.empty()) return y;
 
-    if (const std::string a = get_line(); std::size_t b = a.size()) {
+    if (auto a = g(); std::size_t b = a.size()) {
       std::cout << a << ":" << b << std::endl;
     }
   \end{lstlisting}
@@ -481,7 +481,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Примеры \lstinline{switch}}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     int a = f();
     switch (a) {
       case 11: [[fallthrough]];
@@ -506,7 +506,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Объявления и тело \lstinline{switch}}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     switch (x) {
       case 31: {
         int a = x * 20;
@@ -531,8 +531,8 @@
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Ещё более странные вещи с \lstinline{switch}
-  \begin{lstlisting}
+\begin{frame}[fragile]{Ещё более странные вещи с \lstinline{switch}}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     void g(const std::size_t count, char * to, const char * from)
     {
       std::size_t n = (count + 7) / 8;
@@ -622,7 +622,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Примеры с \lstinline{for}}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     for (;;) {
       std::cout << "Forever failure" << std::endl;
     }
@@ -702,7 +702,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Примеры объявлений функций}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     // declare the same function of type void(int, char *)
     void bar(const int x, char[]);
     void bar(const volatile int x, char[3]);
