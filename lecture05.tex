@@ -9,7 +9,6 @@
 \usepackage{textcomp}
 \usepackage{multirow}
 \usepackage{tikz}
-\usepackage{beramono}
 
 \setbeamertemplate{navigation symbols}{}
 
@@ -184,32 +183,36 @@
     {
       A a;
       C c = C();
-      std::cout << sizeof(a) << " : " << sizeof(b1) << " : " << sizeof(c) << std::endl;
+      std::cout << sizeof(a) << ":" << sizeof(b1) << ":" << sizeof(c) << std::endl;
       std::cout << C().value() << std::endl;
     }
   \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]{Область видимости класса}
-  \begin{lstlisting}[moredelim={**[is][\btHL<1>]{@1}{@}}]
+  \begin{lstlisting}[
+      moredelim={**[is][\btHL<1>]{@1}{@}},
+      moredelim={**[is][\btHL<2>]{@2}{@}},
+      moredelim={**[is][\btHL<3>]{@3}{@}},
+      moredelim={**[is][\btHL<4>]{@4}{@}},
+      moredelim={**[is][\btHL<5>]{@5}{@}}
+    ]
     struct S {
       struct T {
-        int z = @110 * n@;
+        int z = @510 * n@;
         int baz();
       };
-      int foo(int x) noexcept(@1n > 100@) {
-        @1return x * n;@
-      }
-      void bar(int y = @1n@);
-      int z = @13 * n@;
+      int foo(int x) noexcept(@4n > 100@)
+      { @2return x * n;@ }
+      void bar(int y @3= n@);
+      int z = @53 * n@;
       static const int n = 101;
-      @1
-      char str[n];
-    @};
+      @1char str[n];@
+    };
     int S::T::baz()
-    { @1return z * 3;@ }
+    { @2return z * 3;@ }
     void S::bar(int y)
-    { @1z *= y;@ }
+    { @2z *= y;@ }
   \end{lstlisting}
 \end{frame}
 

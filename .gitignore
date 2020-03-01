@@ -1,1 +1,9 @@
-.lecture02.tex.swp
+.*.swp
+*.vrb
+*.toc
+*.gz
+*.snm
+*.out
+*.nav
+*.log
+*.aux
