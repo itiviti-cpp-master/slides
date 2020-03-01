@@ -1,0 +1,306 @@
+\documentclass[unknownkeysallowed,xcolor=table]{beamer}
+ 
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{beramono}
+
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\newcommand{\rarr}{$\rightarrow$}
+ 
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{light-gray}{gray}{0.9}
+
+\lstset{
+      basicstyle=\ttfamily\small,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+      numberstyle=\tiny\color{blue},
+      stringstyle=\color{mymauve},
+      numbers=left,
+      stepnumber=1,
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      literate={~} {\textapprox}{1},
+      language={[11]C++}
+}
+
+\lstnewenvironment{cmdline}
+  {\lstset{
+      basicstyle=\ttfamily\scriptsize,
+      keywordstyle=\color{blue},
+      backgroundcolor=\color{light-gray},
+      language={bash}
+  }}
+  {}
+
+\lstnewenvironment{cmdlinelarge}
+  {\lstset{
+      basicstyle=\ttfamily\small,
+      keywordstyle=\color{blue},
+      backgroundcolor=\color{light-gray},
+      language={bash}
+  }}
+  {}
+
+\makeatletter
+\newcommand{\srcmediumsize}{\@setfontsize{\srcmediumsize}{7pt}{7pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcbigsize}{\@setfontsize{\srcbigsize}{8pt}{8pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+\makeatletter
+\newenvironment<>{btHighlight}[1][]
+{\begin{onlyenv}#2\begingroup\tikzset{bt@Highlight@par/.style={#1}}\begin{lrbox}{\@tempboxa}}
+{\end{lrbox}\bt@HL@box[bt@Highlight@par]{\@tempboxa}\endgroup\end{onlyenv}}
+
+\newcommand<>\btHL[1][]{%
+  \only#2{\begin{btHighlight}[#1]\bgroup\aftergroup\bt@HL@endenv}%
+}
+\def\bt@HL@endenv{%
+  \end{btHighlight}%
+  \egroup
+}
+\newcommand{\bt@HL@box}[2][]{%
+  \tikz[#1]{%
+    \pgfpathrectangle{\pgfpoint{1pt}{0pt}}{\pgfpoint{\wd #2}{\ht #2}}%
+    \pgfusepath{use as bounding box}%
+    \node[anchor=base west, fill=orange!30,outer sep=0pt,inner xsep=1pt, inner ysep=0pt, rounded corners=3pt, minimum height=\ht\strutbox+1pt,#1]{\raisebox{1pt}{\strut}\strut\usebox{#2}};
+  }%
+}
+\makeatother
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2020]
+{ИТМО, весенний семестр 2020}
+ 
+\logo{%
+  \makebox[0.97\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.5cm,keepaspectratio]{itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+ 
+\frame{\titlepage}
+
+%-------------------------------------------------
+\section{Структуры и классы}
+
+\begin{frame}{Структуры и классы}
+  \begin{itemize}
+    \item задаёт новый тип в программе \vspace{1em}
+    \item может иметь члены:
+      \begin{itemize}
+        \item поля данных \vspace{0.5em}
+        \item методы (функции \vspace{0.5em})
+        \item типы \vspace{0.5em}
+        \item псевдонимы типов \vspace{0.5em}
+        \item члены вложенных нестрогих \lstinline{enum} \vspace{0.5em}
+        \item шаблоны \vspace{1em}
+      \end{itemize}
+    \item можно наследовать от других классов
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Определение}
+  \begin{itemize}
+    \item \emph{класс имя} \lstinline|{| \emph{члены} \lstinline|}|
+    \item \emph{класс имя} \lstinline{:} \emph{список наследования} \lstinline|{| \emph{члены} \lstinline|}|
+  \end{itemize}
+
+  \vspace{1em}
+
+  где
+  \begin{itemize}
+    \item \emph{класс} -- это ключевое слово \lstinline{class} или \lstinline{struct} \vspace{0.5em}
+    \item \emph{имя} -- идентификатор \vspace{0.5em}
+    \item \emph{члены} -- объявление членов класса \vspace{0.5em}
+    \item \emph{список наследования} -- \emph{base1, ..., baseN}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Примеры определений классов}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+    struct A {};
+
+    struct B
+    {
+      A a;
+      int b;
+      char c;
+    } b1, b2;
+
+    class C
+    {
+      const std::size_t n = 0;
+    public:
+      std::size_t value() const
+      { return n; }
+    };
+
+    int main()
+    {
+      A a;
+      C c = C();
+      std::cout << sizeof(a) << " : " << sizeof(b1) << " : " << sizeof(c) << std::endl;
+      std::cout << C().value() << std::endl;
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Область видимости класса}
+  \begin{lstlisting}[moredelim={**[is][\btHL<1>]{@1}{@}}]
+    struct S {
+      struct T {
+        int z = @110 * n@;
+        int baz();
+      };
+      int foo(int x) noexcept(@1n > 100@) {
+        @1return x * n;@
+      }
+      void bar(int y = @1n@);
+      int z = @13 * n@;
+      static const int n = 101;
+      @1
+      char str[n];
+    @};
+    int S::T::baz()
+    { @1return z * 3;@ }
+    void S::bar(int y)
+    { @1z *= y;@ }
+  \end{lstlisting}
+\end{frame}
+
+%-------------------------------------------------
+\section{Enum}
+
+%-------------------------------------------------
+\section{Полные и неполные типы}
+
+\begin{frame}[fragile]{Полные и неполные типы}
+  Полный тип -- определение известно.
+
+  \vspace{1em}
+
+  Неполный тип:
+  \begin{itemize}
+    \item предварительное объявление класса \vspace{0.5em}
+    \item \lstinline{enum} до момента определения его типа реализации \vspace{0.5em}
+    \item \lstinline{void} \vspace{0.5em}
+    \item ...
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Необходимость полного типа}
+  Требуется знать полный тип \lstinline{T} к моменту:
+
+  \vspace{1em}
+  \begin{itemize}
+    \item вызов функции, возвращающей \lstinline{T} \vspace{0.5em}
+    \item объявление переменной типа \lstinline{T} \vspace{0.5em}
+    \item объявление нестатического поля типа \lstinline{T} \vspace{0.5em}
+    \item явное или неявное преобразование к \lstinline{T} \vspace{0.5em}
+    \item обращение к членам класса типа \lstinline{T} \vspace{0.5em}
+    \item использование \lstinline{T} как родителя объявляемого класса \vspace{0.5em}
+    \item ...
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Примеры неполных типов}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+    class C;
+
+    void f(const C *); // OK
+    C g(); // OK
+
+    auto c = g(); // error
+    auto x = C::get(); // error
+    C cc; // error
+
+    struct S
+    {
+      C & c; // OK;
+      C cc; // error
+    };
+
+    enum E {
+      A,
+      B = sizeof(E), // error
+      C
+    };
+
+    enum class EE {
+      A,
+      B = sizeof(EE), // OK
+      C
+    };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Opaque enum declaration}
+  \begin{lstlisting}
+    enum A : int;
+
+    enum class B;
+
+    enum class C : unsigned;
+
+    A get_a()
+    {
+      return static_cast<A>(10); // potential UB
+    }
+
+    B a_to_b(const A a)
+    {
+      return static_cast<B>(a); // potential UB
+    }
+  \end{lstlisting}
+\end{frame}
+
+%-------------------------------------------------
+\section{Некоторые классы стандартной библиотеки}
+
+
+\end{document}
