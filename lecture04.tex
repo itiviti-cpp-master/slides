@@ -107,6 +107,7 @@
 \section{Единицы трансляции}
 
 \begin{frame}{Единица трансляции}
+  \includegraphics[align=c,width=11cm,keepaspectratio]{images/translation_unit.png}
 \end{frame}
 
 \begin{frame}[fragile]{Объявление и определение}
@@ -206,7 +207,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{\lstinline{inline}}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     inline void f()
     {
       // ...
@@ -354,7 +355,7 @@
     #elif defined(_MSC_VER)
     // MSVC
     #else
-    #error "Unsupported compiler"
+    #  error "Unsupported compiler"
     #endif
   \end{lstlisting}
 \end{frame}
@@ -437,7 +438,7 @@
 
 \begin{frame}[fragile]{Заголовочные файлы}
   \textbf{a.h}:
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     int max(int a, int b);
     inline const double pi = 3.14;
   \end{lstlisting}
@@ -445,7 +446,7 @@
   \vspace{0.5em}
 
   \textbf{a.cpp}:
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     void f() {}
     #include "a.h"
     #include "a.h"
@@ -455,7 +456,7 @@
   \vspace{0.5em}
 
   \textbf{a.i}:
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     void f() {}
     int max(int a, int b);
     inline const double pi = 3.14;
