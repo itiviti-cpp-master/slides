@@ -1,0 +1,509 @@
+\documentclass[unknownkeysallowed]{beamer}
+ 
+\usepackage [T2A,T1] {fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{url}
+
+\setbeamertemplate{navigation symbols}{}
+
+\lstnewenvironment{cmdline}
+  {\lstset{basicstyle=\ttfamily,keywordstyle=\color{blue},
+           language={bash}}}
+  {}
+  
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{pblue}{rgb}{0.1, 0.2, 0.8}
+
+\lstnewenvironment{cpp}
+  {\lstset{
+      basicstyle=\ttfamily,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+      numberstyle=\tiny\color{blue},
+      stringstyle=\color{mymauve},
+      language={[11]C++}}
+    }
+  {}
+  
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+  
+\lstset{
+      basicstyle=\ttfamily\srcsize,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+      numberstyle=\tiny\color{blue},
+      stringstyle=\color{mymauve},
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      language={[11]C++}
+}
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2019]
+{ИТМО, весенний семестр 2019}
+ 
+\logo{%
+  \makebox[0.95\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.1cm,keepaspectratio]{itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%-------------------------------------------------
+
+\section{Организационная информация}
+
+\begin{frame}{Github репозиторий}
+
+Зарегистрироваться на \href{https://github.com/}{https://github.com/} \vspace{3em}
+
+Послать свой Github профиль Олегу Доронину \href{mailto:dorooleg@niuitmo.ru}{dorooleg@niuitmo.ru} \vspace{3em}
+
+Вики курса: \href{https://github.com/itiviti-cpp/wiki/wiki}{https://github.com/itiviti-cpp/wiki/wiki}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Текст, выражения, инструкции}
+
+\begin{frame}{Первичная обработка текста}
+
+  \begin{enumerate}
+    \item Преобразование бинарного файла в последовательность символов
+    \item Склейка ``многострочных'' строк
+    \item Разбиение на комментарии, пробельные символы и токены предварительной обработки:
+      \begin{itemize}
+        \item Имена заголовочных файлов
+        \item Идентификаторы
+        \item Предварительные токены чисел
+        \item Символьные и строковые литералы
+        \item Операторы и символы пунктуации
+        \item Прочие символы
+      \end{itemize}
+    \item Удаление комментариев
+    \item Препроцессинг
+    \item Склейка соседних строковых литералов
+  \end{enumerate}
+  
+\end{frame}
+
+\begin{frame}[fragile]{Примеры первичной обработки}
+
+  \begin{cpp}
+    #include <iostream> // include basic IO
+    #define MOO(x) \
+      struct x \
+      { \
+      }
+    MOO(a);
+    MOO(b);
+    /*
+     *   Multi line comment
+     *
+     */
+    call("String" "to" "be" "concatenated");
+  \end{cpp}
+
+\end{frame}
+
+\begin{frame}{Идентификаторы}
+
+  \begin{itemize}
+    \item Идентификатор - последовательность букв, цифр и символов подчеркивания произвольной длины
+    \item Не может начинаться с цифры
+    \item Чувствителен к регистру
+    \item Может использоваться для объявления сущностей, но идентификаторы:
+      \begin{itemize}
+        \item совпадающие с ключевыми словами -- зарезервированы
+        \item содержащие двойное подчеркивание -- зарезервированы
+        \item начинающиеся с подчеркивания за которым следует заглавная буква -- зарезервированы
+        \item начинающиеся с подчеркивания -- зарезервированы в глобальном пространстве имен
+      \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Выражения}
+
+Выражение - последовательность операторов и операндов, представляющее некоторое вычисление.\vspace{1em}
+
+Может производить результат и побочные эффекты.\vspace{1em}
+
+Выражение характеризуется типом и категорией значения.\vspace{1em}
+
+Категории значения:
+\begin{enumerate}
+  \item lvalue
+  \item prvalue
+  \item xvalue
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Категории значения}
+
+\begin{enumerate}
+  \item lvalue - функция или объект \vspace{1em}
+  \item xvalue - ссылка на объект, время жизни которого истекает \vspace{1em}
+  \item glvalue - lvalue или xvalue \vspace{1em}
+  \item rvalue - xvalue, временный объект, часть временного объекта или значение, не связанное с объектом \vspace{1em}
+  \item prvalue - rvalue, не являющееся xvalue \vspace{1em}
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Порядок выполнения}
+
+\url{https://en.cppreference.com/w/cpp/language/eval_order}
+
+\end{frame}
+
+\begin{frame}[fragile]{Инструкции}
+
+\begin{itemize}
+
+  \item Инструкция-выражение -- выражение, завершенное \lstinline[basicstyle=\ttfamily\small]{;}
+  
+  \item Блоки -- последовательность инструкций, заключенная в \lstinline[basicstyle=\ttfamily\small]| { } |
+  
+  \item Ветвления и множественный выбор
+    \begin{lstlisting}[basicstyle=\ttfamily\small]
+      if
+      switch ([init statement] condition) block
+    \end{lstlisting}
+
+  \item Циклы
+    \begin{lstlisting}[basicstyle=\ttfamily\small]
+      while (condition) body
+      do body while (condition);
+      for (decl : init) body
+      for
+    \end{lstlisting}
+
+  \item Объявления
+  
+  \item Try блоки
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Объявления переменных}
+
+Структура инструкции объявления:
+\begin{enumerate}
+  \item Уточняющий спецификатор: \lstinline[basicstyle=\ttfamily\small]{inline, constexpr, static, ...}
+  \item Спецификация типа: \lstinline[basicstyle=\ttfamily\small]{int, const char *, auto, ...}
+  \item Список объявлений через запятую, каждое состоит из
+    \begin{itemize}
+      \item Идентификатор
+      \item Инициализация
+        \begin{itemize}
+          \item \lstinline[basicstyle=\ttfamily\small]{( ... )}
+          \item \lstinline[basicstyle=\ttfamily\small]{= expression}
+          \item \lstinline[basicstyle=\ttfamily\small]|{ initializer list }|
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+
+В простейших случаях область видимости имени - блок, функция, пространство имен.
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Наглядный пример}
+
+\begin{frame}{Постановка задачи}
+
+\underline{Дано:}\\
+Сложность действия $D$, дайспул $A$.\\
+\vspace{1em}
+\underline{Модель успеха:}\\
+Для каждого брошенного кубика с выпавшим значением $V$ результат броска определяется как
+\[
+R =
+\begin{cases}
+  \text{Успех, если $V \ge D$}\\
+  \text{Неудача, если $1 < V < D$}\\
+  \text{Провал, если $V = 1$}\\
+\end{cases}
+\]
+Исход действия, если $S$ - сумма успехов, $B$ - сумма провалов:
+\[
+O =
+\begin{cases}
+  \text{Успех, если $S > 0$ и $S > B$}\\
+  \text{Критический провал, если $S = 0$ и $B > 0$}\\
+  \text{Неудача, в иных случаях}
+\end{cases}
+\]
+  
+\end{frame}
+
+\begin{frame}{Постановка задачи, продолжение}
+
+\underline{Вычислить:}\\ \vspace{0.5em}
+Для всех сложностей от 4 до 10 и дайспулов от 1 до 10\vspace{0.5em}
+\begin{enumerate}
+  \item Вероятность критического провала\vspace{0.5em}
+  \item Вероятность неудачи\vspace{0.5em}
+  \item Вероятность успеха\vspace{0.5em}
+  \item Вероятности для каждого возможного числа успехов\vspace{0.5em}
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Необходимые элементы}
+
+\begin{enumerate}
+  \item Генератор псевдослучайных чисел с равномерным распределением
+  \item Типы данных: целые положительные, дробные
+  \item Циклы, ветвления
+  \item Задание параметров (количество экспериментов)
+  \item Вывод результатов
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}[fragile]{Генератор псевдослучайных чисел}
+
+\lstinputlisting[firstline=6,lastline=6]{examples/monte_carlo.cpp}
+\lstinputlisting[firstline=83,lastline=102]{examples/monte_carlo.cpp}
+\lstinputlisting[firstline=128,lastline=135]{examples/monte_carlo.cpp}
+
+\end{frame}
+
+\begin{frame}[fragile]{Разбор аргументов командной строки}
+
+\lstinputlisting[firstline=2,lastline=3]{examples/monte_carlo.cpp}
+\lstinputlisting[firstline=101,lastline=126]{examples/monte_carlo.cpp}
+\lstinputlisting[firstline=134,lastline=135]{examples/monte_carlo.cpp}
+
+\end{frame}
+
+\begin{frame}[fragile]{Использованные элементы}
+
+\begin{enumerate}
+
+\item Типы данных
+
+\begin{itemize}
+  \item Целые \lstinline[basicstyle=\ttfamily\small]{int, unsigned, unsigned long}
+  \item Строковые \lstinline[basicstyle=\ttfamily\small]{char *}
+  \item Спецификатор констант \lstinline[basicstyle=\ttfamily\small]{const}
+\end{itemize}
+
+\item Операторы
+
+\begin{itemize}
+  \item Сравнения \lstinline[basicstyle=\ttfamily\small]{==, !=, <, >, <=, >=}
+  \item Логические \lstinline[basicstyle=\ttfamily\small]{&&, ||}
+  \item Присваивания \lstinline[basicstyle=\ttfamily\small]{=}
+  \item Инкремента и декремента \lstinline[basicstyle=\ttfamily\small]{++, --}
+\end{itemize}
+
+\item Цикл
+\begin{lstlisting}[basicstyle=\ttfamily\small]
+for (init statement; condition; next) body
+\end{lstlisting}
+
+\item Ветвление
+\begin{lstlisting}[basicstyle=\ttfamily\small]
+if ( [init statement] condition ) statement-true
+if ( [init statement] condition ) statement-true else statement-false
+\end{lstlisting}
+
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}[fragile]{Проведение каждого вида экспериментов}
+
+\lstinputlisting[firstline=11,lastline=18]{examples/monte_carlo.cpp}
+\lstinputlisting[firstline=70,lastline=81]{examples/monte_carlo.cpp}
+
+\end{frame}
+
+\begin{frame}[fragile]{Основной цикл экспериментов}
+
+\lstinputlisting[firstline=20,lastline=60, basicstyle=\ttfamily\srcsmallsize]{examples/monte_carlo.cpp}
+
+\end{frame}
+
+\begin{frame}[fragile]{Вычисление вероятностей}
+
+\lstinputlisting[firstline=61,lastline=68, basicstyle=\ttfamily\footnotesize]{examples/monte_carlo.cpp}
+
+\end{frame}
+
+\begin{frame}[fragile]{Использованные элементы}
+
+\begin{enumerate}
+
+\item Типы данных
+
+\begin{itemize}
+  \item Дробные \lstinline[basicstyle=\ttfamily\small]{double}
+  \item Массивы \lstinline[basicstyle=\ttfamily\small]{std::array<T, N>} требует \lstinline[basicstyle=\ttfamily\small]{#include <array>}
+\end{itemize}
+
+\item Операторы
+
+\begin{itemize}
+  \item Операция с присвоением \lstinline[basicstyle=\ttfamily\small]{+=, -=, *=, /=, %=, &=, |=, ^=, <<=, >>=}
+  \item Доступ к элементу по индексу \lstinline[basicstyle=\ttfamily\small]{[]}
+\end{itemize}
+
+\item Алгоритм accumulate
+\begin{lstlisting}[basicstyle=\ttfamily\small]
+std::accumulate(Iterator begin, Iterator end, T init) -> T;
+\end{lstlisting}
+
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}[fragile]{Примеры результатов}
+
+Число прогонов: 100
+\begin{lstlisting}[basicstyle=\ttfamily\srcsize]
+Difficulty: 6, ability: 1, Total: 1, Botch: 0.08, Failure: 0.41, Total success: 0.51, 1 successes: 0.51
+Difficulty: 6, ability: 2, Total: 1, Botch: 0.07, Failure: 0.19, Total success: 0.74, 1 successes: 0.45, 2 successes: 0.29
+Difficulty: 6, ability: 3, Total: 1, Botch: 0.04, Failure: 0.2, Total success: 0.76, 1 successes: 0.32, 2 successes: 0.33, 3 successes: 0.11
+Difficulty: 6, ability: 4, Total: 1, Botch: 0.02, Failure: 0.13, Total success: 0.85, 1 successes: 0.25, 2 successes: 0.3, 3 successes: 0.21, 4 successes: 0.09
+\end{lstlisting}
+
+Число прогонов: 100000
+\begin{lstlisting}[basicstyle=\ttfamily\srcsize]
+Difficulty: 6, ability: 1, Total: 1, Botch: 0.09812, Failure: 0.39921, Total success: 0.50267, 1 successes: 0.50267
+Difficulty: 6, ability: 2, Total: 1, Botch: 0.08731, Failure: 0.26173, Total success: 0.65096, 1 successes: 0.40115, 2 successes: 0.24981
+Difficulty: 6, ability: 3, Total: 1, Botch: 0.06057, Failure: 0.19948, Total success: 0.73995, 1 successes: 0.31613, 2 successes: 0.30038, 3 successes: 0.12344
+Difficulty: 6, ability: 4, Total: 1, Botch: 0.03678, Failure: 0.16127, Total success: 0.80195, 1 successes: 0.24723, 2 successes: 0.29147, 3 successes: 0.20126, 4 successes: 0.06199
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Примеры результатов, продолжение}
+
+\begin{lstlisting}[basicstyle=\ttfamily\srcsize]
+Difficulty: 9, ability: 1, Total: 1, Botch: 0.100079, Failure: 0.699833, Total success: 0.200089, 1 successes: 0.200089
+Difficulty: 9, ability: 2, Total: 1, Botch: 0.149929, Failure: 0.529866, Total success: 0.320205, 1 successes: 0.280211, 2 successes: 0.0399946
+Difficulty: 9, ability: 3, Total: 1, Botch: 0.169026, Failure: 0.432979, Total success: 0.397995, 1 successes: 0.305919, 2 successes: 0.0840565, 3 successes: 0.0080193
+Difficulty: 9, ability: 4, Total: 1, Botch: 0.169729, Failure: 0.377569, Total success: 0.452702, 1 successes: 0.307932, 2 successes: 0.120798, 3 successes: 0.0223816, 4 successes: 0.0015909
+Difficulty: 9, ability: 5, Total: 1, Botch: 0.159743, Failure: 0.346425, Total success: 0.493832, 1 successes: 0.299783, 2 successes: 0.148219, 3 successes: 0.0399207, 4 successes: 0.0055922, 5 successes: 0.000317
+Difficulty: 9, ability: 6, Total: 1, Botch: 0.14468, Failure: 0.328686, Total success: 0.526634, 1 successes: 0.28734, 2 successes: 0.167781, 3 successes: 0.0581719, 4 successes: 0.0119481, 5 successes: 0.0013281, 6 successes: 6.55e-05
+Difficulty: 9, ability: 7, Total: 1, Botch: 0.127266, Failure: 0.318702, Total success: 0.554032, 1 successes: 0.273871, 2 successes: 0.180831, 3 successes: 0.0754381, 4 successes: 0.0202182, 5 successes: 0.0033358, 6 successes: 0.0003238, 7 successes: 1.45e-05
+Difficulty: 9, ability: 8, Total: 1, Botch: 0.110265, Failure: 0.31263, Total success: 0.577105, 1 successes: 0.260438, 2 successes: 0.188735, 3 successes: 0.0909919, 4 successes: 0.0296128, 5 successes: 0.0063708, 6 successes: 0.0008812, 7 successes: 7.22e-05, 8 successes: 3e-06
+Difficulty: 9, ability: 9, Total: 1, Botch: 0.0938176, Failure: 0.308309, Total success: 0.597873, 1 successes: 0.247572, 2 successes: 0.19368, 3 successes: 0.104544, 4 successes: 0.039455, 5 successes: 0.0104714, 6 successes: 0.0019022, 7 successes: 0.0002323, 8 successes: 1.53e-05, 9 successes: 5e-07
+Difficulty: 9, ability: 10, Total: 1, Botch: 0.0791378, Failure: 0.305126, Total success: 0.615736, 1 successes: 0.235399, 2 successes: 0.195354, 3 successes: 0.115828, 4 successes: 0.0496338, 5 successes: 0.0154408, 6 successes: 0.0034679, 7 successes: 0.0005549, 8 successes: 5.4e-05, 9 successes: 3.3e-06, 10 successes: 0
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Базовые типы данных}
+
+\begin{itemize}
+  \item Пустой
+    \lstinline[basicstyle=\ttfamily\small]{void}
+  \item Логический
+    \lstinline[basicstyle=\ttfamily\small]{bool}
+  \item Целые
+    \begin{itemize}
+      \item \lstinline[basicstyle=\ttfamily\small]{short}
+      \item \lstinline[basicstyle=\ttfamily\small]{int}
+      \item \lstinline[basicstyle=\ttfamily\small]{long}
+      \item \lstinline[basicstyle=\ttfamily\small]{unsigned long long}
+    \end{itemize}
+  \item Символы
+    \begin{itemize}
+      \item \lstinline[basicstyle=\ttfamily\small]{char}
+      \item \lstinline[basicstyle=\ttfamily\small]{unsigned char}
+    \end{itemize}
+  \item Дробные
+    \begin{itemize}
+      \item \lstinline[basicstyle=\ttfamily\small]{float}
+      \item \lstinline[basicstyle=\ttfamily\small]{double}
+      \item \lstinline[basicstyle=\ttfamily\small]{long double} (обычно 80 бит)
+    \end{itemize}
+  \item Строковые
+    \begin{itemize}
+      \item \lstinline[basicstyle=\ttfamily\small]{char *}
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Литералы}
+
+Литералы -- это представление иммутабельных \emph{значений} в коде.
+
+\begin{itemize}
+
+  \item Целочисленные: \lstinline[basicstyle=\ttfamily\small]{10, 077, 0xC, 0b1011}\\
+  Всегда положительны. Необязательный суффикс может уточнить тип:
+    \begin{itemize}
+      \item \lstinline[basicstyle=\ttfamily\small]{u / U} - беззнаковый тип
+      \item \lstinline[basicstyle=\ttfamily\small]{l / L} - \lstinline[basicstyle=\ttfamily\small]{long}
+      \item \lstinline[basicstyle=\ttfamily\small]{ll / LL} - \lstinline[basicstyle=\ttfamily\small]{long long}
+      \item комбинация размера и беззнаковости
+    \end{itemize}
+    
+  \item Символьные \lstinline[basicstyle=\ttfamily\small]{'a', '\n'}
+  
+  \item Дробные: \lstinline[basicstyle=\ttfamily\small]{0.0, 11., 3e5, 123.45e-11, .1E3, 0x1.p3}
+  
+  \item Строковые: \lstinline[basicstyle=\ttfamily\small]{"abc\nDEF"}
+  
+  \item Логические: \lstinline[basicstyle=\ttfamily\small]{true, false}
+  
+  \item Нулевой указатель: \lstinline[basicstyle=\ttfamily\small]{nullptr}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Операторы и их приоритет}
+
+\url{https://en.cppreference.com/w/cpp/language/operator_precedence}
+
+\end{frame}
+
+\end{document}

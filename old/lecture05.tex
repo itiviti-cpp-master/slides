@@ -1,0 +1,933 @@
+\documentclass[unknownkeysallowed,xcolor=table]{beamer}
+ 
+\usepackage [T2A,T1] {fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{multirow}
+
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\lstnewenvironment{cmdline}
+  {\lstset{basicstyle=\ttfamily\scriptsize,keywordstyle=\color{blue},
+           language={bash}}}
+  {}
+  
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{pblue}{rgb}{0.1, 0.2, 0.8}
+
+\newcommand{\rarr}{$\rightarrow$}
+
+\lstset{
+      basicstyle=\ttfamily\small,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+      numberstyle=\tiny\color{blue},
+      stringstyle=\color{mymauve},
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      literate={~} {\textapprox}{1},
+      language={[11]C++}
+}
+
+\makeatletter
+\newcommand{\srcmediumsize}{\@setfontsize{\srcmediumsize}{7pt}{7pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcbigsize}{\@setfontsize{\srcbigsize}{8pt}{8pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2019]
+{ИТМО, весенний семестр 2019}
+ 
+\logo{%
+  \makebox[0.97\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.5cm,keepaspectratio]{new_itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%-------------------------------------------------
+
+\section{Указатели и ссылки}
+
+\begin{frame}[fragile]{Указатели}
+
+Указатель -- это специальный тип, производный от другого типа, чьё значение является одним из:
+
+\vspace{0.7em}
+
+\begin{itemize}
+  \item указателем на объект или функцию (представляет собой адрес в памяти функции или первого байта объекта) \vspace{0.5em}
+  \item указателем на после объекта (представляет адрес в памяти на первый байт, следующий за объектом) \vspace{0.5em}
+  \item нулевым указателем \vspace{0.5em}
+  \item неопределенным
+\end{itemize}
+
+\vspace{1.5em}
+
+\emph{специф-ия типа [имя класса]} \lstinline{*} \emph{[cv-квалиф-ор] декларатор} 
+
+\end{frame}
+
+\begin{frame}[fragile]{Примеры объявлений}
+
+\begin{lstlisting}
+int * a;
+
+const double * b;
+
+char ** c;
+
+void (*d)(int);
+
+int A::* e;
+
+void (B::* f)(int);
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Реализация указателей}
+
+Размер указателя -- зависит от платформы/реализации.
+
+\vspace{2em}
+
+С т.з. языка значение указателя и адрес в памяти, которое оно представляет -- не эквивалентные вещи.
+
+\vspace{2em}
+
+Указатель связан не с конкретным объектом, а с местом его хранения. Период существования места хранения определяется типом размещения (автоматический, статический, тред-локальный, динамический), за пределами периода существования места хранения значение указателя на него является неопределенным.
+
+\end{frame}
+
+\begin{frame}{Значения указателей}
+
+Разыменование или освобождение неопределенного указателя является UB, любое другое использование неопределенного указателя является поведением, зависящим от реализации.
+
+\vspace{2em}
+
+Нулевой указатель - это специальное значение указателям конкретного типа, служащее для указания отсутствия сущности, на которую указатель ссылается. Разыменование нулевого указателя -- UB.
+
+\end{frame}
+
+\begin{frame}[fragile]{std::nullptr\_t}
+
+\begin{center}
+\lstinline{std::nullptr_t} $\Leftrightarrow$ \lstinline{nullptr}
+\end{center}
+
+\vspace{1em}
+
+\begin{itemize}
+  \item \lstinline{std::nullptr_t} -- не является указателем
+  \item \lstinline{nullptr} -- неявно приводится к нулевому указателю любого типа
+\end{itemize}
+
+\begin{lstlisting}
+int * x = nullptr; // null pointer to int
+const C * c = nullptr; // null pointer to const C
+void * u = nullptr; // null pointer to void
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Указатели на объекты}
+Значение указателя на объект можно получить с помощью оператора взятия адреса:
+
+\begin{lstlisting}
+A a;
+A * p_a = &a;
+A ** pp_a = &p_a;
+struct S { int n; }
+S s;
+int * p_i = &s.n;
+\end{lstlisting}
+
+Разыменование указателя: оператор разыменования \lstinline{*} возвращает lvalue выражение, идентифицирующее объект, на который указывает разыменованный указатель.
+
+\begin{lstlisting}
+A a;
+A * p_a = &a;
+*p_a = A();
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Разыменование указателей сложных типов}
+
+Оператор \lstinline{->} используется для упрощения доступа к членам сложных типов через указатель на значение типа и эквивалентен последовательному разыменованию и затем доступу к элементу:
+
+\vspace{1em}
+
+\begin{lstlisting}
+A a;
+A * p_a = &a;
+
+p_a->foo();
+(*p_a).foo();
+a.foo();
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Указатели на экземпляры классов и наследование}
+
+\begin{lstlisting}
+class A {};
+class B {};
+class C : public A, public B {};
+
+C c;
+A * a = &c;
+B * b = &c;
+C * c_from_a = static_cast<C *>(a);
+C * c_from_b = static_cast<C *>(b);
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Указатели на экземпляры классов и наследование, ограничения}
+
+\begin{lstlisting}
+class D : A, B {};
+class E : public A, public C {};
+class F : public B {};
+
+D d;
+A * a_from_d = &d; // compilation error
+
+E e;
+C * c_from_e = &e;
+A * a_from_e = &e; // compilation error
+
+C c;
+B * b_from_c = &c;
+F * f_from_b = static_cast<F *>(b_from_c); // wrong, but compiles
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Безтиповые указатели}
+
+Возможен указатель на \lstinline{void} (в т.ч. cv-квалифицированный). Это безтиповый указатель, к которому неявно приводятся обычные указатели. Обратная операция приведения должна быть явной (\lstinline{static_cast}).
+
+\vspace{2em}
+
+\begin{lstlisting}
+struct S {};
+S s;
+const void * p = &s;
+const S * ps = static_cast<const S *>(p);
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Указатели на функции}
+
+Выражение, идентифицирующее функцию, неявно приводится к указателю на функцию. Указатель на функцию может непосредственно являться левым операндом оператора функционального вызова.
+
+\vspace{1em}
+
+\begin{lstlisting}
+double foo(int, char);
+double (*p) (int, char) = foo;
+double (*pp) (int, char) = &foo;
+
+assert(p == pp);
+p(x, y);
+(*p)(x, y);
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Указатели на нестатические методы}
+
+\begin{lstlisting}
+struct S {
+    bool check(int, char);
+};
+
+bool (S::* p) (int, char) = *S::check;
+
+int i = 0;
+char c = 'a';
+S s, *ps = &s;
+bool x = (s.*p) (i, c);
+bool y = (ps->*p)(i, c);
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Указатели на нестатические методы, продолжение}
+
+\begin{lstlisting}
+struct A {
+    int get_n(char);
+};
+struct B : A {
+    bool empty();
+};
+int (A::*pa) (char) = &A::get_n;
+int (B::*pb) (char) = pa;
+A a;
+B b;
+(a.*pa)('a');
+(b.*pb)('b');
+bool (B::*eb) () = &B::empty;
+bool (A::*ea) () = static_cast<bool (A::*) ()>(eb);
+(b.*ea) (); // OK
+(a.*ea) (); // UB
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Указатели на нестатические поля}
+
+Аналогично указателям на нестатические методы (включая вопросы наследования):
+
+\vspace{0.7em}
+
+\begin{lstlisting}
+struct A { int n; };
+
+int A::* p = &A::n;
+A a{101};
+A * pa = &a;
+
+int x = a.*p; // 101
+int y = pa->*p; // 101
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Массивы}
+
+Массивы -- агрегаты, состоящие из конечного числа элементов одного типа.
+Занимают непрерывную область в памяти.
+Элементы массива считаются его подобъектами.
+
+\vspace{0.5em}
+
+\begin{lstlisting}
+int x[10];
+const char str[] = "Hello"; // implicit size
+\end{lstlisting}
+
+\vspace{1em}
+
+Элементы массива нумеруются с 0, доступ к ним возможен через оператор индекса:
+
+\vspace{0.5em}
+
+\begin{lstlisting}
+for (int i = 0; i < 10; ++i) {
+    x[i] = i;
+}
+\end{lstlisting}
+
+\vspace{0.5em}
+
+Массив неявно преобразуется к указателю на первый элемент массива.
+
+\end{frame}
+
+\begin{frame}[fragile]{Ограничения массивов}
+
+Массив, как целое -- иммутабелен, хотя его элементы можно менять, если их тип -- не \lstinline{const}.
+
+\vspace{1.5em}
+
+Массивы неопределенной длины являются неполным типом:
+
+\vspace{1em}
+
+\begin{lstlisting}
+extern int x[];
+\end{lstlisting}
+
+\vspace{1em}
+
+Массивы нельзя возвращать из функций.
+
+\vspace{1em}
+
+Размер объекта массива:
+
+\begin{lstlisting}
+int x[10];
+size_t n = sizeof(x) / sizeof(x[0]); // 10
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Арифметика указателей}
+
+Указатели могут выступать операндами некоторых арифметических операций, при этом указатель на отдельный объект считается указателем на элемент массива единичной длины.
+
+\vspace{1em}
+
+Допустимые операции:
+
+\vspace{0.5em}
+
+\begin{itemize}
+  \item сложение -- указатель и целое число (в любом порядке)
+  \item вычитание -- указатель (слева) и целое число
+  \item вычитание двух указателей одного типа
+  \item инкремент
+  \item декремент
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Правила арифметики указателей: указатель и число}
+
+Если $P$ -- указатель на $i$ элемент массива $x$, то
+
+\vspace{0.5em}
+
+$P + n \Leftrightarrow x[i + n]$ \\ \vspace{0.5em}
+$n + P \Leftrightarrow x[i + n]$ \\ \vspace{0.5em}
+$P - n \Leftrightarrow x[i-n]$
+
+\vspace{1em}
+
+Результат $x[j]$ -- должен быть корректным элементом массива, либо элементом после последнего.
+
+\end{frame}
+
+\begin{frame}[fragile]{Правила арифметики указателей: вычитание указателей}
+
+Оба указателя должны быть одного типа не считая cv-квалификаторов.
+
+\vspace{1em}
+
+Если $P$ -- указатель на $i$ элемент массива $x$, а $Q$ -- указатель на $j$ элемент массива $x$, то
+
+\vspace{1em}
+
+$P - Q = i - j$
+
+\vspace{1em}
+
+Результирующее значение имеет тип \lstinline{std::ptrdiff_t}.
+
+\vspace{2em}
+
+Любые другие арифметические операции над указателями -- UB.
+
+\end{frame}
+
+\begin{frame}[fragile]{Ссылки}
+
+Ссылка -- это ассоциация (``связывание'') имени с каким-либо объектом или функцией, псевдоним.
+Реализация ссылок в стандарте не оговорена.
+
+\vspace{2em}
+
+Объявление:
+
+\vspace{0.7em}
+
+\emph{спецификация типа} \lstinline{&} \emph{декларатор}
+
+\vspace{0.5em}
+
+\emph{спецификация типа} \lstinline{&&} \emph{декларатор}
+
+\vspace{1em}
+
+\begin{lstlisting}
+int x;
+int & rx = x;
+int && rrx = 55;
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Ограничения ссылок}
+
+\begin{itemize}
+  \item обязательная инициализация \vspace{0.5em}
+  \item иммутабельность \vspace{0.5em}
+  \item не является объектом и не имеет своего значения \vspace{0.5em}
+  \item всегда указывает на какой-то объект или функцию \vspace{0.5em}
+  \item невозможность cv-квалификации \vspace{0.5em}
+  \item необязательность наличия размера \vspace{0.5em}
+  \item время жизни эквивалентно области видимости
+\end{itemize}
+
+\vspace{0.5em}
+
+Если время жизни объекта закончится раньше времени жизни ссылки, ссылка становится ``висящей'' и её использование является UB.
+
+\end{frame}
+
+\begin{frame}[fragile]{Ограничения ссылок, примеры}
+
+\begin{lstlisting}
+X & x; // error
+void & v; // error
+X & x[3]; // error
+X &* px; // error
+X & & xx; // error
+
+X & foo() { X x; return x; }
+X & x = foo(); // dangling reference
+X y = x; // UB
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Типы ссылок и их связывание}
+
+\begin{itemize}
+  \item lvalue и rvalue \vspace{0.5em}
+  \item \lstinline{const} и не-\lstinline{const}
+\end{itemize}
+
+\vspace{1em}
+
+\begin{itemize}
+  \item lvalue ссылка связывается с lvalue выражением \vspace{0.5em}
+  \item \lstinline{const} lvalue ссылка связывается с lvalue или xvalue \vspace{0.5em}
+  \item rvalue ссылка связывается с xvalue
+\end{itemize}
+
+\vspace{1em}
+
+\lstinline{auto &&} -- будет выведена в самую подходящую ссылку.
+
+\end{frame}
+
+\begin{frame}[fragile]{Продление времени жизни временного объекта}
+
+Если временный объект или его подобъект связывается со ссылкой, его время жизни продлевается на время жизни ссылки.
+
+\vspace{2em}
+
+Исключения:
+\begin{itemize}
+  \item временный объект в инструкции return, если функция возвращает ссылку, разрушается в конце исполнения инструкции \vspace{1em}
+  \item временный объект, связывающийся со ссылкой внутри выражения (например, к ссылочному параметру функции в выражении её вызова), разрушается в конце исполнения полного выражения.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Продление времени жизни временного объекта, примеры}
+
+\begin{lstlisting}
+const int & a = 1 + 2; // extended
+int && a = 2 + 3; // extended
+const int & l = std::array<int, 3>{1, 2, 3}[1]; // extended
+
+const double & bar() {
+    return 0.5 * 1.5;
+}
+const double & d = bar(); // dangling reference
+
+const std::string & pass(const std::string & s) {
+    return s; // OK
+}
+const std::string & s = pass("hello");
+std::cout << s; // error, dangling reference
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Схлопывание ссылок}
+
+Допускается путём манипуляций над псевдонимами типов и шаблонами получать ссылку на ссылку, в этом случае применяются правила ``схлопывания'' ссылок (reference collapsing) и результатом всегда является обычная ссылка:
+
+\vspace{2em}
+
+\begin{center}
+\begin{tabular}{ c c | c }
+  \hline
+    \multicolumn{2}{c|}{$+$} & $=$ \\
+     \& & \& & \& \\
+     \& & \&\& & \& \\
+     \&\& & \& & \& \\
+     \&\& & \&\& & \&\& \\
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]{Пример схлопывания ссылок}
+
+\begin{lstlisting}
+using X = T &;
+using Y = T &&;
+
+T t;
+
+X & x = t; // decltype(x) == T &
+X && xx = t; // decltype(xx) == T &
+Y & y = t; // decltype(y) == T &
+Y && yy = std::move(t); // decltype(yy) == T &&
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Реализация ссылок}
+
+Реализация ссылок не определена стандартом. Ссылки не обязаны существовать в результате трансляции программы.
+
+\vspace{1em}
+
+Однако, можно ожидать, что:
+
+\vspace{1em}
+
+\begin{lstlisting}
+struct A {
+    int * x;
+};
+
+struct B {
+    int & x;
+};
+
+static_assert(sizeof(A) == sizeof(B));
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Квалификаторы и указатели/ссылки}
+
+cv-квалификатор можно ставить как слева, так и справа от того, на что он действует.
+
+\vspace{1em}
+
+\begin{lstlisting}
+const int x = 10;
+int const x = 10;
+
+const char * str; // points to a const object
+char const * str; // pointer itself is non-const
+
+char * const str_c; // points to a non-const object
+using X = char *;
+const X str_c;  // pointer itself is const
+X const str_c;
+
+const std::string & s; // reference a const object
+std::string const & s; // reference itself is inherently immutable
+
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Квалификаторы и многоуровневые указатели}
+
+\begin{lstlisting}
+
+int *** x;
+int const *** y;
+int * const ** z;
+int ** const * w;
+int *** const v;
+
+using X = const int;
+using Y = const X *;
+using Z = const Y *;
+const Z * p;
+int const * const * const * p;
+
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Передача объектов}
+
+\begin{itemize}
+  \item по значению -- объект копируется
+  \item по указателю -- копируется указатель, можно передать нулевой указатель
+  \item по ссылке -- передаётся связь с объектом
+\end{itemize}
+
+\begin{lstlisting}
+struct S {};
+void f1(S s) {
+    s = S();
+}
+void f2(const S * ps) {
+    if (ps != nullptr) {
+        std::cout << *ps << std::endl;
+    }
+}
+void f3(const S & rs) {
+    std::cout << rs << std::endl;
+}
+\end{lstlisting}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Работа с динамической памятью}
+
+\begin{frame}[fragile]{Работа с динамической памятью}
+
+Выделение -- делает доступным для использования участок памяти заданного размера.
+
+\vspace{1em}
+
+Освобождение -- возвращает выделенный ранее участок памяти операционной системе.
+
+\vspace{2em}
+
+\lstinline{malloc}/\lstinline{free} -- функции выделения/освобождения памяти из C.
+
+\vspace{1em}
+
+\lstinline{new}/\lstinline{delete} -- операторы выделения/освобождения памяти в C++.
+
+\end{frame}
+
+\begin{frame}[fragile]{new}
+
+\begin{lstlisting}
+X * x = new X;
+X * x = ::new X;
+X * x = new X();
+X * x = new X(a, b, c);
+X * x = new X{a, b, c};
+X * x = new X[10];
+X * x = new X[10]{x1, x2, x3};
+X * x = new X[0]; // OK, zero element array
+
+auto p = new (int (*[10])()); // array of function pointers
+
+auto m = new double[n][5][10][100];
+auto mm = new double[5][n][10]; // error
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Размещающее new}
+
+\begin{lstlisting}
+struct S { ... };
+
+std::byte * ptr = new std::byte[sizeof(S)];
+
+S * ps = new (ptr) S(...);
+
+ps->~S();
+
+delete [] ptr;
+
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{delete}
+
+\begin{lstlisting}
+X * x = new X;
+delete x;
+
+X * x = nullptr;
+delete x;
+
+X * x = new X[10];
+delete [] x;
+
+struct A {};
+struct B : A {};
+A * a = new B;
+delete a;
+\end{lstlisting}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Некоторые вспомогательные классы}
+
+\begin{frame}[fragile]{std::string\_view}
+
+Указание на участок памяти, интерпретируемый как последовательность символов. Не позволяет менять данные, на которые указывает.
+
+\vspace{1em}
+
+\begin{lstlisting}
+std::string x("Some string");
+std::string_view y = x;
+
+if (const auto pos = y.find("me"); pos != y.npos) {
+    std::string_view z = y.substr(pos, 4);
+    assert(z.size() == 4);
+    assert(z == "me s");
+}
+
+for (char c : y) {
+    std::cout << c;
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{std::reference\_wrapper}
+
+\begin{lstlisting}
+void f(S &);
+void cf(const S &);
+
+S s;
+auto r = std::ref(s);
+auto cr = std::cref(s);
+f(r);
+f(r.get());
+cf(cr);
+
+std::vector<std::reference_wrapper<const S>> v;
+v.push_back(cr);
+v.push_back(cr);
+auto vv = v;
+\end{lstlisting}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Наглядный пример}
+
+\begin{frame}{Абстракция линейной памяти}
+
+Для прикладных приложений в большинстве случаев применима следующая абстракция памяти:
+
+\vspace{1em}
+
+\begin{itemize}
+  \item память линейна \vspace{0.5em}
+  \item память полностью принадлежит приложению \vspace{0.5em}
+  \item память не ограничена ничем, кроме пределов адресации \vspace{0.5em}
+  \item адрес в памяти -- целое число \vspace{0.5em}
+  \item конкретные выделяемые адреса произвольны, а выделяемые области -- не связаны
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{lru.h}
+\lstinputlisting[lastline=32,basicstyle=\ttfamily\srcsize]{examples/lru/lru.h}
+\end{frame}
+
+\begin{frame}[fragile]{lru.h, продолжение}
+\lstinputlisting[firstline=34,basicstyle=\ttfamily\srcsize]{examples/lru/lru.h}
+\end{frame}
+
+\begin{frame}[fragile]{main.cpp, типы}
+\lstinputlisting[firstline=8,lastline=28,basicstyle=\ttfamily\srcbigsize]{examples/lru/main.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{main.cpp, функция main}
+\lstinputlisting[firstline=1,lastline=6,basicstyle=\ttfamily\srcbigsize]{examples/lru/main.cpp}
+...
+\lstinputlisting[firstline=98,lastline=104,basicstyle=\ttfamily\srcbigsize]{examples/lru/main.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{main.cpp, тест}
+\lstinputlisting[firstline=30,lastline=39,basicstyle=\ttfamily\small]{examples/lru/main.cpp}
+...
+\lstinputlisting[firstline=93,lastline=95,basicstyle=\ttfamily\small]{examples/lru/main.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{main.cpp, тело теста}
+\lstinputlisting[firstline=40,lastline=64,basicstyle=\ttfamily\srcmediumsize]{examples/lru/main.cpp}
+...
+\end{frame}
+
+\begin{frame}[fragile]{main.cpp, тело теста, продолжение}
+\lstinputlisting[firstline=66,lastline=91,basicstyle=\ttfamily\srcmediumsize]{examples/lru/main.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{Тест}
+
+\begin{cmdline}
+$ ./lru
+1[1] 2[2]
+9[9@] 8[8@] 7[7@] 6[6@] 5[5@] 4[4@] 3[3@] 2[2@] 1[1@] 0[0@]
+9[9@] 8[8@] 7[7@] 6[6@] 5[5@] 4[4@] 3[3@] 2[2@] 1[1@] 0[0@]
+29[29!] 28[28!] 27[27!] 26[26!] 25[25!] 24[24!] 23[23!] 22[22!] 21[21!] 20[20!]
+26[26!] 23[23!] 29[29!] 28[28!] 27[27!] 25[25!] 24[24!] 22[22!] 21[21!] 20[20!]
+20[20!] 21[21!] 22[22!] 23[23!] 24[24!] 25[25!] 26[26!] 27[27!] 28[28!] 29[29!]
+19[19] 18[18] 17[17] 16[16] 15[15] 14[14] 13[13] 12[12] 11[11] 10[10]
+Test passed: true
+\end{cmdline}
+
+\end{frame}
+
+\begin{frame}[fragile]{pool.h}
+\lstinputlisting[lastline=21,basicstyle=\ttfamily\srcbigsize]{examples/lru/pool.h}
+\end{frame}
+
+\begin{frame}[fragile]{pool.h, класс аллокатора}
+\lstinputlisting[firstline=23,lastline=64,basicstyle=\ttfamily\srcsmallsize]{examples/lru/pool.h}
+\end{frame}
+
+\begin{frame}[fragile]{pool.h, реализация аллокатора}
+\lstinputlisting[firstline=66,lastline=100,basicstyle=\ttfamily\srcsize]{examples/lru/pool.h}
+\end{frame}
+
+\begin{frame}[fragile]{pool.cpp}
+\lstinputlisting[lastline=38,basicstyle=\ttfamily\srcsmallsize]{examples/lru/pool.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{pool.cpp, поиск свободного места}
+\lstinputlisting[firstline=40,lastline=61,basicstyle=\ttfamily\srcbigsize]{examples/lru/pool.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{pool.cpp, выделение/освобождение}
+\lstinputlisting[firstline=63,lastline=89,basicstyle=\ttfamily\srcmediumsize]{examples/lru/pool.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{pool.cpp, публичный интерфейс}
+\lstinputlisting[firstline=91,basicstyle=\ttfamily\srcmediumsize]{examples/lru/pool.cpp}
+\end{frame}
+
+\end{document}

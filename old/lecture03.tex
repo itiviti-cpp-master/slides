@@ -1,0 +1,1128 @@
+\documentclass[unknownkeysallowed,xcolor=table]{beamer}
+ 
+\usepackage [T2A,T1] {fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{multirow}
+
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\lstnewenvironment{cmdline}
+  {\lstset{basicstyle=\ttfamily,keywordstyle=\color{blue},
+           language={bash}}}
+  {}
+  
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{pblue}{rgb}{0.1, 0.2, 0.8}
+
+\newcommand{\rarr}{$\rightarrow$}
+
+\lstset{
+      basicstyle=\ttfamily\small,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+      numberstyle=\tiny\color{blue},
+      stringstyle=\color{mymauve},
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      literate={~} {\textapprox}{1},
+      language={[11]C++}
+}
+
+\makeatletter
+\newcommand{\srcmediumsize}{\@setfontsize{\srcmediumsize}{7pt}{7pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcbigsize}{\@setfontsize{\srcbigsize}{8pt}{8pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2019]
+{ИТМО, весенний семестр 2019}
+ 
+\logo{%
+  \makebox[0.95\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.1cm,keepaspectratio]{itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%-------------------------------------------------
+
+\section{Функции}
+
+\begin{frame}{Функции}
+
+Функция -- это именованная сущность имеющая тело, список аргументов и тип возвращаемого значения. \vspace{1.5em}
+
+Тело -- обычно, блок инструкций. \vspace{1.5em}
+
+Список аргументов -- ноль или более объявлений аргументов, разделенных запятой. \vspace{1.5em}
+
+Тип возвращаемого значения: \lstinline{void} либо любой допустимый тип, кроме функции или C-массива. \vspace{1.5em}
+
+Тип самой функции можно записать, как \\ \vspace{0.5em}
+\emph{ret} \textbf{(} \emph{params} \textbf{)}
+
+\end{frame}
+
+\begin{frame}{Объявление и определение функций}
+
+Для функций различаются объявление функции и определение функции. \vspace{2em}
+
+Объявление (declaration) -- это задание типа функции и связывание типа с именем функции. \vspace{1.5em}
+
+Определение (definition) -- это описание тела функции.
+
+\end{frame}
+
+\begin{frame}[fragile]{Форма объявления функции}
+
+\emph{ret name} \textbf{(} \emph{params} \textbf{);} \vspace{1.5em}
+
+\lstinline{auto} \emph{name} \textbf{(} \emph{params} \textbf{)} \lstinline{->} \emph{ret} \textbf{;} \vspace{1.5em}
+
+\emph{ret} -- указание типа возвращаемого значения, либо \lstinline{auto}, тогда тип будет выведен компилятором на основе выражений в инструкции \lstinline{return}. \vspace{1.5em}
+
+Объявление функции можно вставить в более широкую инструкцию объявления: 
+
+\begin{lstlisting}
+int a = 5, foo();
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Объявление аргументов}
+
+Список параметров - последовательность объявлений аргументов, разделенных запятой.
+
+\begin{itemize}
+  \item обычное объявление переменной: \lstinline{type name} \vspace{0.5em}
+  \item объявление с инициализацией: \lstinline{type name = init} -- аргумент со значением по умолчанию \vspace{0.5em}
+  \item объявление без имени: \lstinline{type} \vspace{0.5em}
+  \item объявление без имени с инициализацией: \lstinline{type = init}
+\end{itemize}
+
+\vspace{0.7em}
+Variadic functions: в конце списка параметров можно поставить \lstinline{...}, это будет означать список параметров переменной длины:
+
+\begin{lstlisting}
+int printf(const char * fmt, ...);
+int print(...);
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Дополнительные особенности объявления аргументов}
+
+При определении типа функции в объявлении типов аргументов производятся следующие замены:
+\begin{itemize}
+  \item типы, обозначающие C-массивы или функции заменяются на указатели соответственно на тип элемента массива или на функцию \vspace{0.7em}
+  \item cv-квалификатор верхнего уровня отбрасывается
+\end{itemize}
+\vspace{0.7em}
+
+Значения по умолчанию являются частью объявления функции, будут проанализированы (например, будет произведен поиск имен) в точке объявления, но будут использованы в момент вызова функции.\\ \vspace{0.7em}
+
+В инициализаторе значения по умолчанию нельзя использовать локальные переменные.
+
+\end{frame}
+
+\begin{frame}[fragile]{Примеры объявлений функций}
+
+\begin{lstlisting}
+int foo(int a, const char * b, std::string &, char c = '\0', double = 0.5);
+
+// declare the same function of type void(int)
+void bar(const int x);
+void bar(const volatile int x);
+void bar(int x);
+
+int a = 1;
+int f(int = a);
+void b()
+{
+  a = 2;
+  {
+    int a = 3;
+    f(); // call f(2)
+  }
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Определение функции}
+
+Объявление, за которым следует определение тела.
+
+Определение тела -- это:
+
+\begin{itemize}
+  \item блок \vspace{0.7em}
+  \item try block функции \vspace{0.7em}
+  \item \lstinline{= delete} \vspace{0.7em}
+  \item \lstinline{= default}
+\end{itemize}
+\vspace{0.7em}
+
+Аргументы функции работают как обычные переменные внутри тела функции. Их область видимости начинается с момента объявления аргумента и заканчивается концом тела функции.
+
+Время жизни -- от момента инициализации при вызове функции и до конца исполнения тела функции.
+
+\end{frame}
+
+\begin{frame}[fragile]{Инструкция return}
+
+\begin{itemize}
+  \item \lstinline{return} \emph{выражение} \lstinline{;}
+  \item \lstinline|return {| \emph{список инициализации} \lstinline|};|
+\end{itemize}
+
+\vspace{1em}
+
+где \emph{выражение} используется для вычисления возвращаемого значения и не обязательно в \lstinline{void} функциях и запрещено в конструкторах/деструкторах.
+
+\vspace{1em}
+
+В функциях без возвращаемого значения \lstinline{return} в конце тела можно опустить.
+
+\vspace{1em}
+
+В функции \lstinline{main} можно опустить \lstinline{return x;}, тогда в конце тела выполнится \lstinline{return 0;}.
+
+\end{frame}
+
+\begin{frame}[fragile]{Пример определения функции}
+
+\begin{lstlisting}
+unsigned mod_div(unsigned, unsigned);
+unsigned mod_div(unsigned, unsigned = 10);
+unsigned mod_div(unsigned = 0xABCDEF, unsigned);
+
+unsigned mod_div(unsigned v, const unsigned n)
+{
+    const unsigned d = (1 << n) - 1;
+    unsigned m;
+    for (m = v; v > d; v = m) {
+        for (m = 0; v; v >>= n) {
+            m += v & d;
+        }
+    }
+    return m == d ? 0 : m;
+}
+
+unsigned x = mod_div();
+\end{lstlisting}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Единицы трансляции}
+
+\begin{frame}{Единица трансляции}
+
+Один cpp файл после обработки препроцессором составляет единицу трансляции, т.е. выделенную часть программы, которую компилятор обрабатывает независимо от других.
+
+\vspace{1.5em}
+
+Единица трансляции должна содержать объявления всех используемых сущностей.
+
+\vspace{1.5em}
+
+Порядок инициализации глобальных переменных:
+\begin{itemize}
+  \item в рамках одной единицы трансляции -- в порядке определения
+  \item между единицами трансляции -- не определен
+\end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Объявление и определение}
+
+\begin{frame}{Объявление и определение}
+
+В некоторых случаях объявление не идентично определению:
+\begin{itemize}
+  \item объявление функций \vspace{0.3em}
+  \item предварительное объявление классов \vspace{0.3em}
+  \item предварительное объявление enum \vspace{0.3em}
+  \item объявление внешней (extern) переменной \vspace{0.3em}
+  \item объявление статического члена класса \vspace{0.3em}
+  \item объявление шаблонного параметра \vspace{0.3em}
+  \item объявление псевдонима типа \vspace{0.3em}
+  \item \lstinline{using} объявление  \vspace{0.3em}
+  \item явное объявление инстанциации шаблона \vspace{0.3em}
+  \item специализация шаблона без определения
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Объявление и определение}
+
+Объявление вводит в употребление некоторое имя (переменной, функции и т.д.). В программе может быть много объявлений одного и того же имени, если они не противоречат друг другу.
+
+\vspace{3em}
+
+Определение полностью описывает сущность, связанную с именем, например, определяет тело функции.
+
+\end{frame}
+
+\begin{frame}{Уникальность определений}
+
+One definition rule (ODR)
+
+\vspace{2em}
+
+В одной единице трансляции допустимо лишь одно определение любой переменной, функции, класса, enum или шаблона.
+
+\vspace{2em}
+
+Во всей программе допустимо лишь одно определение функции или переменной, которая ODR-используется. Инструментарий трансляции не обязан проверять это условие, но поведение программы в случае его нарушения не определено (UB).
+
+\end{frame}
+
+\begin{frame}{Повторение определений}
+
+Во всей программе может быть более одного определения класса, enum, шаблона, если:
+
+\vspace{1em}
+
+\begin{itemize}
+  \item каждый вариант определения состоит из одинаковой последовательности токенов \vspace{1em}
+  \item поиск имени, связанного с каждым таким определением, во всех случаях дает ту же сущность \vspace{1em}
+  \item любые связанные операторы и методы должны давать вызов одной и той же функции в каждом случае
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{ODR-использование}
+
+\begin{itemize}
+  \item объект ODR-используется, если его значение читается (если только это не константа с известным на момент компиляции значением), записывается, его адрес берётся или с ним связывается ссылка \vspace{2em}
+  \item функция ODR-используется, если она вызывается или её адрес берётся
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Пример объявления и определения}
+
+\begin{lstlisting}
+struct S
+{
+    static const int x = 0; // declaration
+};
+
+const int S::x; // definition
+
+int main(int argc, char ** argv)
+{
+    const int & x = S::x; // S::x is ODR-used
+    return S::x; // S::x is not ODR-used
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{inline}
+
+Определение функции можно дополнить спецификатором \lstinline{inline}. Тогда допустимо иметь много определений одной и той же функции в программе, но требуется, чтобы они состояли из одной и той же последовательности токенов. Также спецификатор \lstinline{constexpr} неявно подразумевает \lstinline{inline} для функций.
+
+\vspace{1em}
+
+Можно объявить глобальную переменную имеющую статическое размещение как \lstinline{inline}.
+
+\vspace{2em}
+
+Имеет смысл использовать для размещения определения функции или переменной в заголовочном файле.
+
+\end{frame}
+
+\begin{frame}{Linkage}
+
+Имя, обозначающее объект, ссылку, функцию, тип, шаблон, пространство имен или значение, может иметь linkage (связывание).
+
+\vspace{0.5em}
+
+\begin{itemize}
+  \item отсутствие связывания: имя является локальным для своей области видимости  \vspace{0.5em}
+  \item внешнее связывание: имя в разных единицах трансляции ссылается на одну и ту же сущность \vspace{0.5em}
+  \item внутреннее связывание: имя в любых областях видимости данной единицы трансляции ссылается на одну и ту же сущность
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Назначение связывания по умолчанию}
+
+\begin{itemize}
+  \item отсутствие связывания: любая локальная переменная без спецификатора extern, локальные классы и т.п. \vspace{1em}
+  \item внешнее: глобальные не-const переменные, const или не-const глобальные inline переменные, функции вне зависимости от их объявления, классы \vspace{1em}
+  \item внутреннее: глобальные const переменные, члены анонимных union, глобальные переменные, функции, классы объявленные в анонимном пространстве имен
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Явное назначение связывания}
+
+\begin{itemize}
+  \item \lstinline{extern} -- спецификатор объявления переменных, позволяющий явно задать внешнее связывание \vspace{0.5em}
+  \item \lstinline{static} -- спецификатор определения глобальных переменных или функций, явно задающий внутреннее связывание
+\end{itemize}
+
+\begin{lstlisting}
+extern int x; // declaration, not a definition
+extern int y = 101; // external
+int z = 10; // external
+static int u = 33; // internal
+const int w = -99; // internal
+extern const int v = 1; // external
+static const int t = 222; // internal
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Language linkage}
+
+Любое имя с внешним связыванием неявно обладает т.н. ``language linkage''.
+
+\vspace{1em}
+
+Можно задать явно: \\
+
+\vspace{0.7em}
+
+\lstinline{extern} \emph{string-literal} \lstinline|{ ... }|
+
+\vspace{1em}
+
+где \emph{string-literal}:
+
+\begin{itemize}
+  \item \lstinline{"C++"}
+  \item \lstinline{"C"}
+\end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Препроцессор}
+
+\begin{frame}[fragile]{Директивы препроцессора}
+
+\lstinline{#} \emph{директива [аргументы]}
+
+\vspace{1em}
+
+Директива должна размещаться на одной строке, занимает всю строку.
+
+\begin{itemize}
+  \item \lstinline{define}
+  \item \lstinline{undef}
+  \item \lstinline{include}
+  \item \lstinline{if}, \lstinline{ifdef}, \lstinline{ifndef}, \lstinline{else}, \lstinline{elif}, \lstinline{endif}
+  \item \lstinline{error}
+  \item \lstinline{pragma}
+  \item \lstinline{line}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{error}
+
+\lstinline{#error message}
+
+\vspace{2em}
+
+Директива \lstinline{#error message} прерывает процесс трансляции с печатью соответствующего сообщения.
+
+\end{frame}
+
+\begin{frame}[fragile]{line}
+
+\begin{itemize}
+  \item \lstinline{#line lineno}
+  \item \lstinline{#line lineno "filename"}
+\end{itemize}
+
+\vspace{2em}
+
+Директива \lstinline{#line lineno} меняет текущее значение номера строки в препроцессоре на lineno.
+
+\vspace{0.5em}
+
+Директива \lstinline{#line lineno "filename"} меняет текущее значение номера строки и текущее имя файла.
+
+\vspace{1em}
+
+Препроцессор автоматически определяет макросы \lstinline{__LINE__} и \lstinline{__FILE__}, раскрытие которых дает эти значения.
+Может быть полезно для внешних кодогенераторов.
+
+\end{frame}
+
+\begin{frame}[fragile]{pragma}
+
+Директива \lstinline{#pragma params} дает доступ к функционалу, определенному в конкретной реализации транслятора.
+
+\vspace{1em}
+
+Например, \lstinline{#pragma pack(x)} позволяет явно задать padding для сложных структур данных.
+
+\end{frame}
+
+\begin{frame}[fragile]{Условные директивы}
+
+\begin{lstlisting}
+#ifdef identifier
+#ifndef identifier
+#if expression
+#elif expression
+#else
+#endif
+\end{lstlisting}
+
+\vspace{0.5em}
+
+\lstinline{#ifdef} и \lstinline{#ifndef} -- проверяют, является ли идентификатор определенным идентификатором (в случае \lstinline{#ifndef} -- наоборот) препроцессора.
+
+\lstinline{#if} и \lstinline{#elif} -- проверяют, преобразуется ли выражение к ненулевому значению.
+
+\lstinline{#else} открывает альтернативный блок.
+
+\lstinline{#endif} завершает всю конструкцию.
+
+\vspace{0.5em}
+
+Конструкции могут быть вложенными.
+
+\end{frame}
+
+\begin{frame}[fragile]{Условные директивы, конструкция}
+
+\begin{lstlisting}
+#ifdef / ifndef / if
+// main case
+...
+#elif ...
+// alternative case
+...
+#else
+// else case
+...
+#endif
+\end{lstlisting}
+
+\vspace{1em}
+
+По результатам проверки условий, препроцессор выбирает одну ``ветку'' и вся конструкция замещается текстом этой ветки (остальные удаляются).
+
+\end{frame}
+
+\begin{frame}[fragile]{Условные директивы, выражения}
+
+Выражение \lstinline{#if} / \lstinline{#elif} должно быть константным, может дополнительно включать в себя операторы
+
+\begin{itemize}
+  \item \lstinline{defined id} или \lstinline{defined(id)}: результат этих операторов является 1, если идентификатор является определенным идентификатором препроцессора, иначе -- 0
+  \item \lstinline{__has_include(...)}: результат 1, если препроцессор обнаруживает указанный включаемый файл, иначе -- 0
+\end{itemize}
+
+После раскрытия макросов, выполнения операторов \lstinline{defined}/\lstinline{__has_include}, любой идентификатор в выражении (\lstinline{true}/\lstinline{false}) заменяется на 0. Если результат полученного выражения равен нулю, то условие считается не выполненным, иначе -- выполненным.
+
+\end{frame}
+
+\begin{frame}[fragile]{Условные директивы, пример}
+
+\begin{lstlisting}
+#if !defined(FOO)
+xxx
+#elif X == 3
+yyy
+#else
+#  ifndef BAR
+zzz
+#  endif
+#endif
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{include}
+
+\begin{itemize}
+  \item \lstinline{#include <} \emph{файл} \lstinline{>} -- ``стандартные'' или ``глобальные'' файлы
+  \item \lstinline{#include "} \emph{файл} \lstinline{"} -- ``локальные'' файлы
+\end{itemize}
+
+\vspace{2em}
+
+Препроцессор заменяет такую директиву на содержимое указанного файла.
+
+Можно указывать относительный путь.
+
+\vspace{1em}
+
+Выражение для \lstinline{__has_include} имеет такую же форму и смысл.
+
+\vspace{1em}
+
+Файлы будут включаться рекурсивно.
+
+\end{frame}
+
+\begin{frame}[fragile]{Заголовочные файлы}
+
+Используются для выделения объявлений сущностей, используемых в разных единицах трансляции.
+
+\vspace{1em}
+
+Это примитивная подстановка текста целого файла -- нет защиты от повторного включения.
+
+\vspace{1em}
+
+``Include guards'':
+\begin{lstlisting}
+#ifndef SOME_UNIQUE_HEADER_NAME
+#define SOME_UNIQUE_HEADER_NAME
+
+...
+#endif
+\end{lstlisting}
+
+\vspace{0.5em}
+
+Альтернатива:
+\begin{lstlisting}
+#pragma once
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Макросы}
+
+Осуществляют текстовую подстановку.
+
+\vspace{1em}
+
+Директива \lstinline{#define} определяет идентификатор препроцессора, а \lstinline{#undef} -- удаляет определение.
+
+\vspace{0.5em}
+
+\begin{lstlisting}
+#define identifier
+#define identifier replacement
+#define identifier(parameters) replacement
+#define identifier(parameters, ...) replacement
+#define identifier(...) replacement
+#undef identifier
+\end{lstlisting}
+
+\vspace{1em}
+
+В случае простых макросов препроцессор заменяет встреченный идентификатор на его строку замены.
+
+\end{frame}
+
+\begin{frame}[fragile]{Сложные макросы}
+
+Сложные макросы -- примитивный аналог функций.
+
+Препроцессор заменяет встреченные вхождения идентификатора с параметрами на строку замены, затем заменяет в строке замены идентификаторы параметров на указанные.
+
+\begin{lstlisting}
+#define MAX(a, b) a < b ? b : a
+
+if (MAX(x, y) == 0) {
+  ...
+}
+
+->
+
+if (x < y ? y : x == 0) {
+  ...
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Ограничения макросов}
+
+Рекурсия запрещена
+
+\begin{lstlisting}
+#define foo foo
+
+foo
+->
+foo
+\end{lstlisting}
+
+\vspace{2em}
+
+Вложенные вызовы разрешены
+
+\begin{lstlisting}
+#define foo(x) x
+
+foo(foo(foo(1)))
+->
+1
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Особенности подстановки параметров}
+
+В подстановке сложных макросов параметры дополнительно раскрываются.
+
+\vspace{1em}
+
+Этапы подстановки:
+\vspace{0.5em}
+\begin{enumerate}
+  \item Определение мест вхождения параметров в строке замены и их первичная подстановка \vspace{0.7em}
+  \item Раскрытие параметров в местах их подстановки \vspace{0.7em}
+  \item В строке замены обрабатываются макросы (при этом явно запрещена рекурсия)
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}[fragile]{Специальные операции подстановки}
+
+В подстановке сложных макросов \lstinline{#} и \lstinline{##} играют особую роль:
+
+\vspace{2em}
+
+\begin{itemize}
+  \item stringification (литерация): \lstinline{#a}, где \lstinline{a} -- параметр макроса; вместо обычной подстановки параметра, параметр превращается в корректный строковый литерал (с обрамляющими \lstinline{""}) и подставляется в строку замены \vspace{1em}
+  \item concatenation (склейка): \lstinline{##} между любыми двумя параметрами или между параметром и другим токеном вызывает конкатенацию результатов их подстановки (препроцессор проверит корректность полученного токена)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Примеры stringification и concatenation}
+
+\begin{lstlisting}
+#define show(a, b, c) #a #b #c
+
+show(x, 10, "hello\n")
+->
+"x10\"hello\\n\""
+
+
+#define print(type) void print_ ## type (type x) { ... }
+
+print(char)
+->
+void print_char(char x) { ... }
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Особенности stringification и concatenation}
+
+При этом \lstinline{#} и \lstinline{##} оказывает влияние на обработку параметров макросов: литерация или склейка производятся \emph{до} возможного раскрытия параметров.
+
+\vspace{1em}
+
+\begin{lstlisting}
+#define foo ABC
+#define concat(a) foo ## a
+
+concat(__LINE__)
+->
+foo__LINE__
+\end{lstlisting}
+
+\vspace{1em}
+
+При этом ни макрос \lstinline{foo}, макрос \lstinline{__LINE__} уже не будут обработаны.
+
+\end{frame}
+
+\begin{frame}[fragile]{Обход особенностей stringification и concatenation}
+
+Обойти раннюю обработку операций \lstinline{#} и \lstinline{##} можно двойным перенаправлением:
+
+\begin{lstlisting}
+#define show(x) do_show(x)
+#define do_show(x) #a
+
+show(__LINE__)
+->
+"123"
+
+#define concat(a, b) do_concat(a, b)
+#define do_concat(a, b) a ## b
+
+concat(0x, __LINE__)
+->
+0x123
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Защита параметров макросов}
+
+Неизвестно, что будет передано в качестве параметров макроса -- можно отчасти защититься:
+
+\vspace{2em}
+
+Неправильное синтаксическое дерево:
+\begin{lstlisting}
+#define MAX(a, b) a < b ? b : a
+
+MAX(0, x & 0xFF)
+->
+0 < x & 0xFF ? x & 0xFF : 0
+\end{lstlisting}
+
+\vspace{1em}
+
+\begin{lstlisting}
+#define MAX(a, b) (a) < (b) ? (b) : (a)
+MAX(0, x & 0xFF)
+->
+(0) < (x & 0xFF) ? (x & 0xFF) : (0)
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Защита тела макросов}
+
+\begin{lstlisting}
+#define MAX(a, b) (a < b ? b : a)
+
+if (MAX(x, y) == 0) {
+  ...
+}
+->
+if ((a < b ? b : a) == 0) {
+  ...
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Защита места вставки}
+
+Неизвестно, куда макрос будет вставлен, часто желательно гарантировать, что это будет одна инструкция:
+
+\vspace{1em}
+
+\begin{lstlisting}
+#define PRINT(x) do { \
+    ...; \
+    ...; \
+} while (false)
+
+// Now this is OK:
+if (...)
+    PRINT(...);
+else
+    ...;
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Побочные эффекты в макросах}
+
+Если передать в качестве параметра макроса выражение, оно будет исполнено в каждом месте подстановки:
+
+\vspace{1em}
+
+\begin{lstlisting}
+#define MAX(a, b) (a) < (b) ? (b) : (a)
+
+MAX(x++, --y);
+->
+(x++) < (--y) < (--y) : (x++);
+\end{lstlisting}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Наглядный пример}
+
+\begin{frame}{CBOE BOE}
+
+\url{https://cdn.batstrading.com/resources/participant_resources/BATS_Europe_BOE2_Specification.pdf}
+
+\end{frame}
+
+\begin{frame}{Типы данных}
+
+Все бинарные типы кодируются little-endian.
+
+\vspace{1em}
+
+\begin{center}
+\begin{tabular}{ |l|c|m{18em}| }
+  \hline
+    Тип & Размер & Описание \\
+  \hline
+    Binary & 1,2,4,8 & unsigned \\
+    Binary price & 8 & signed, 4 неявных десятичных знака после запятой \\
+    Alphanum & 1 & Латинские буквы и цифры \\
+    Text & N & Последовательность ASCII символов, завершенная нулем \\
+  \hline
+\end{tabular}
+\end{center}
+
+Пример: \\
+Binary price\hspace{1em} 12.45678 \rarr\hspace{1em} 97 E6 01 00 00 00 00 00 \\
+
+\end{frame}
+
+\begin{frame}{Структура сообщения New order}
+
+\begin{columns}
+\column{\dimexpr\paperwidth-10pt}
+\begin{center}
+\begin{tabular}{ |m{5em}|c c c |m{10em}| }
+  \hline
+    Поле & Смещ. & Размер & Тип & Описание \\
+  \hline
+    Start & 0 & 2 & Binary & 0xBA 0xBA \\[4pt]
+    Message Length & 2 & 2 & Binary & Длина сообщения в байтах, не считая Start \\[4pt]
+    Message Type & 4 & 1 & Binary & 0x38 \\[4pt]
+    Matching Unit & 5 & 1 & Binary & 0x00 \\[4pt]
+    Sequence Number & 6 & 4 & Binary & Порядковый номер сообщения \\[4pt]
+    ClOrdID & 10 & 20 & Text & Уникальный идентификатор заказа \\[4pt]
+    Side & 30 & 1 & Alphanum & '1' - Buy, '2' - Sell \\[4pt]
+  \hline
+\end{tabular}
+\end{center}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Структура сообщения New order, продолжение}
+
+\begin{columns}
+\column{\dimexpr\paperwidth-10pt}
+\begin{center}
+\begin{tabular}{ |m{5em}|c c c |m{10em}| }
+  \hline
+    Поле & Смещ. & Размер & Тип & Описание \\
+  \hline
+    Order Qty & 31 & 4 & Binary & Объем заказа \\[4pt]
+    Num of bitfields & 35 & 1 & Binary & Число использованных битовых масок \\[4pt]
+    Bitfield1 & 36 & 1 & Binary & Битовая маска 1 \\[4pt]
+    ... & ... & ... & ... & ... \\
+    BitfieldN & 36 & 1 & Binary & Битовая маска N \\[4pt]
+    Optional fields... & 37 & & & \\
+  \hline
+\end{tabular}
+\end{center}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Опциональные поля New order}
+
+\begin{center}
+\begin{tabular}{ |c|c|c| }
+  \hline
+    Byte & Bit  & Field \\
+  \hline
+    \multirow{8}{*}{1} & 1 & ClearingFirm \\
+      & 2 & ClearingAccount \\
+      & 4 & Price \\
+      & 8 & ExecInst \\
+      & 16 & OrdType \\
+      & 32 & TimeInForce \\
+      & 64 & MinQty \\
+      & 128 & MaxFloor \\
+    \hline
+    \multirow{8}{*}{2} & 1 & Symbol \\
+      & 2 & -- \\
+      & 4 & Currency \\
+      & 8 & IdSource \\
+      & 16 & SecurityId \\
+      & 32 & SecurityExchange \\
+      & 64 & Capacity \\
+      & 128 & RoutingInst \\
+  \hline
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Опциональные поля New order, продолжение}
+
+\begin{center}
+\begin{tabular}{ |c|c|c| }
+  \hline
+    Byte & Bit  & Field \\
+  \hline
+    \multirow{8}{*}{3} & 1 & Account \\
+      & 2 & DisplayIndicator \\
+      & 4 & -- \\
+      & 8 & -- \\
+      & 16 & PegDifference \\
+      & 32 & PreventParticipantMatch \\
+      & 64 & -- \\
+      & 128 & ExpireTime \\
+  \hline
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Используемые в примере поля}
+
+\begin{center}
+\begin{tabular}{ |l|c|m{12em}| }
+  \hline
+    Поле & Тип & Описание \\
+  \hline
+    Account & Text[16] & \\
+    & & \\
+    Capacity & Alphanum & 'A' - Agency, 'P' - Principal, 'R' - Riskless Principal \\
+    & & \\
+    MaxFloor & Binary[4] & \\
+    & & \\
+    OrdType & Alphanum & '1' - Market, '2' - Limit, 'P' - Pegged \\
+    & & \\
+    Price & Binary price & \\
+    Symbol & Text[8] & \\
+    & & \\
+    TimeInForce & Alphanum & '0' - Day, '3' - IOC, '6' - GTD \\
+  \hline
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Структура проекта}
+\begin{itemize}
+  \item main.cpp -- кодирование тестового сообщения и вывод на экран \vspace{0.5em}
+  \item codec.h -- утилиты кодирования базовых типов \vspace{0.5em}
+  \item fields.h и fields.inl -- утилиты кодирования полей протокола \vspace{0.5em}
+  \item new\_order\_opt\_fields.inl -- перечень использованных полей сообщения New order \vspace{0.5em}
+  \item requests.h и requests.cpp -- реализация кодирования сообщений протокола
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{codec.h}
+\lstinputlisting[lastline=35,basicstyle=\ttfamily\srcsize]{examples/bats/codec.h}
+\end{frame}
+
+\begin{frame}[fragile]{codec.h, продолжение}
+\lstinputlisting[firstline=37,basicstyle=\ttfamily\srcbigsize]{examples/bats/codec.h}
+\end{frame}
+
+\begin{frame}[fragile]{fields.inl}
+\lstinputlisting[basicstyle=\ttfamily\scriptsize]{examples/bats/fields.inl}
+\end{frame}
+
+\begin{frame}[fragile]{fields.h}
+\lstinputlisting[lastline=19,basicstyle=\ttfamily\scriptsize]{examples/bats/fields.h}
+\end{frame}
+
+\begin{frame}[fragile]{fields.h, продолжение}
+\lstinputlisting[firstline=20,lastline=45,basicstyle=\ttfamily\srcmediumsize]{examples/bats/fields.h}
+\end{frame}
+
+\begin{frame}[fragile]{fields.h, продолжение следует}
+\lstinputlisting[firstline=47,basicstyle=\ttfamily\srcmediumsize]{examples/bats/fields.h}
+\end{frame}
+
+\begin{frame}[fragile]{new\_order\_opt\_fields.inl}
+\lstinputlisting[basicstyle=\ttfamily\small]{examples/bats/new_order_opt_fields.inl}
+\end{frame}
+
+\begin{frame}[fragile]{requests.h}
+\lstinputlisting[lastline=32,basicstyle=\ttfamily\srcsize]{examples/bats/requests.h}
+\end{frame}
+
+\begin{frame}[fragile]{requests.h, продолжение}
+\lstinputlisting[firstline=34,lastline=67,basicstyle=\ttfamily\srcsize]{examples/bats/requests.h}
+\end{frame}
+
+\begin{frame}[fragile]{requests.h, продолжение следует}
+\lstinputlisting[firstline=69,basicstyle=\ttfamily\small]{examples/bats/requests.h}
+\end{frame}
+
+\begin{frame}[fragile]{requests.cpp}
+\lstinputlisting[lastline=27,basicstyle=\ttfamily\srcmediumsize]{examples/bats/requests.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{requests.cpp, продолжение}
+\lstinputlisting[firstline=29,lastline=63,basicstyle=\ttfamily\srcsize]{examples/bats/requests.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{requests.cpp, продолжение следует}
+\lstinputlisting[firstline=65,lastline=74,basicstyle=\ttfamily\small]{examples/bats/requests.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{requests.cpp, окончание}
+\lstinputlisting[firstline=76,basicstyle=\ttfamily\srcsize]{examples/bats/requests.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{main.cpp}
+\lstinputlisting[lastline=30,basicstyle=\ttfamily\srcsize]{examples/bats/main.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{main.cpp, продолжение}
+\lstinputlisting[firstline=32,basicstyle=\ttfamily\small]{examples/bats/main.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{Результат работы}
+
+\begin{lstlisting}
+ba ba 4c 00 38 00 01 00  00 00 4f 52 44 31 30 30
+31 00 00 00 00 00 00 00  00 00 00 00 00 00 31 64
+00 00 00 03 b4 41 01 7a  e8 01 00 00 00 00 00 32
+30 0a 00 00 00 41 41 50  6c 00 00 00 00 50 41 43
+43 33 33 31 00 00 00 00  00 00 00 00 00 00
+\end{lstlisting}
+
+\end{frame}
+
+\end{document}

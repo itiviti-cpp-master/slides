@@ -1,0 +1,785 @@
+\documentclass[unknownkeysallowed,xcolor=table]{beamer}
+ 
+\usepackage [T2A,T1] {fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{multirow}
+
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\lstnewenvironment{cmdline}
+  {\lstset{basicstyle=\ttfamily\scriptsize,keywordstyle=\color{blue},
+           language={bash}}}
+  {}
+
+\lstnewenvironment{cmdlinelarge}
+  {\lstset{basicstyle=\ttfamily\small,keywordstyle=\color{blue},
+           language={bash}}}
+  {}
+
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{pblue}{rgb}{0.1, 0.2, 0.8}
+
+\newcommand{\rarr}{$\rightarrow$}
+
+\lstset{
+      basicstyle=\ttfamily\small,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+      numberstyle=\tiny\color{blue},
+      stringstyle=\color{mymauve},
+      numbers=left,
+      stepnumber=1,
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      literate={~} {\textapprox}{1},
+      language={[11]C++}
+}
+
+\makeatletter
+\newcommand{\srcmediumsize}{\@setfontsize{\srcmediumsize}{7pt}{7pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcbigsize}{\@setfontsize{\srcbigsize}{8pt}{8pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+\newcommand{\rot}[1]{\makebox[1em][l]{\rotatebox{45}{#1}}}
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2019]
+{ИТМО, весенний семестр 2019}
+ 
+\logo{%
+  \makebox[0.97\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.5cm,keepaspectratio]{new_itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+
+%-------------------------------------------------
+
+\section{Специальные методы классов}
+
+\begin{frame}{Конструктор}
+Конструктор -- это специальная функция-член класса, служащая для инициализации объектов этого класса.
+
+\vspace{1em}
+
+Имя функции совпадает с именем класса.
+
+\vspace{1em}
+
+При создании объекта класса всегда вызывается один конструктор.
+
+\vspace{1em}
+
+Конструктор нельзя вызвать явно.
+
+\vspace{1em}
+
+У класса может быть произвольное число конструкторов.
+\end{frame}
+
+\begin{frame}[fragile]{Деструктор}
+Деструктор -- это специальная функция-член класса, служащая для выполнения произвольных действий непосредственно перед удалением объекта класса.
+
+\vspace{1em}
+
+Обычно используется для освобождения ресурсов, используемых классом, или иной финализации.
+
+\vspace{1em}
+
+Имя функции -- \lstinline{~ClassName}.
+
+\vspace{1em}
+
+При любом удалении объекта класса, его деструктор вызывается.
+
+\vspace{1em}
+
+У класса может быть только один деструктор.
+\end{frame}
+
+\begin{frame}{Особенности конструкторов и деструкторов}
+\begin{itemize}
+  \item нет возвращаемого значения \vspace{1em}
+  \item нет cv-квалификаторов \vspace{1em}
+  \item нет ref-квалификаторов
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Пример конструкторов и деструктора}
+\begin{lstlisting}
+struct S {
+    S(); // 1
+    S(int); // 2
+    S(char, double); // 3
+    S(const S &); // 4
+    ~S();
+};
+
+int main() {
+    S s1; // 1st constructor is called
+    S s2(10); // 2nd constructor is called
+    S s3('a', 0); // 3rd constructor is called
+    S s4 = s1; // 4th constructor is called
+} // S::~S() for s1, s2, s3 and s4 is called
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Список инициализации членов}
+\begin{lstlisting}
+struct S {
+    S(int x) : a(x), b(a*2) {}
+    
+    int a;
+    int b = 10;
+};
+
+struct SS : S {
+    SS() : S(20), c(b) {}
+    
+    int c;
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Варианты инициализации в списке}
+\begin{lstlisting}
+struct A {
+    A() {}
+    int a = 10;
+};
+struct B {
+    B(int x) : b(x) {} // direct initialization
+    int b;
+};
+template <class... Ts>
+struct C : A, B, Ts... {
+    C(int x, int y, const Ts &... ts)
+        : B{x}  // list initialization
+        , Ts(ts)... // pack expansion
+        , c(y) // direct
+    {}
+    int c;
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Порядок инициализации объекта класса}
+\begin{enumerate}
+  \item базовые классы инициализируются в том порядке, в каком они перечислены в списке наследования \vspace{1em}
+  \item нестатические поля класса инициализируются в том порядке, в каком они объявлены в определении класса \vspace{1em}
+  \item выполняется тело конструктора
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Порядок уничтожения объекта класса}
+\begin{enumerate}
+  \item тело деструктора \vspace{1em}
+  \item нестатические поля класса разрушаются в порядке, обратном порядку их объявления в классе \vspace{1em}
+  \item для базовых классов деструкторы вызываются в порядке, обратном их порядку в списке наследования
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Некорректное завершение выполнения конструктора}
+\begin{lstlisting}
+struct S {
+    std::string s;
+    std::vector<int> v;
+    S * next = nullptr;
+    
+    S();
+    S(int);
+};
+S::S()
+    : s("Hello, world")
+{
+    v.resize(100);
+    next = new S(1);
+    throw 1;
+}
+void f() { S s; }
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Делегирование конструкторов}
+\begin{lstlisting}
+struct S {
+    S(int, double, char) {...}
+    S() : S(10, 0.5, 'a') {...}
+};
+\end{lstlisting}
+
+\vspace{2em}
+
+У делегирующего конструктора список инициализации членов должен состоять из одного элемента -- вызова целевого конструктора.
+\end{frame}
+
+\begin{frame}[fragile]{Наследование конструкторов}
+\begin{lstlisting}
+struct A {
+    A(int, double, char);
+};
+
+struct B : A {};
+
+struct C : A {
+    using A::A;
+};
+
+int main() {
+    B b(10, 0.5, 'a'); // error
+    C c(10, 0.5, '\n'); // OK
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{explicit конструкторы}
+\begin{lstlisting}
+struct A {
+    A(int);
+};
+struct B {
+    explicit B(int);
+};
+A f(const A &) {
+    return 10; // OK, A::A(int) is called
+}
+B g(const B &) {
+    return 10; // error
+    return B(10); // OK, B::B(int) is called
+}
+int main() {
+    f(10); // OK, A::A(int) is called
+    g(10); // error
+    g(B(10)); // OK B::B(int) is called
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Удалённые и автоматически создаваемые методы}
+Некоторые методы могут быть созданы автоматически -- как неявно, так и явно.
+
+\vspace{0.5em}
+
+Запретить неявную автоматическую генерацию можно ``удалив'' метод.
+\begin{lstlisting}
+struct A {}; // A::A() is implicitly-defined
+
+struct B {
+    B() = default; // B::B() implicit definition is forced
+};
+
+struct C {
+    C() = delete; // C::C() is not defined
+};
+\end{lstlisting}
+Некоторые методы могут быть удалены неявно.
+\end{frame}
+
+\begin{frame}{Методы, создаваемые автоматически}
+\begin{itemize}
+  \item конструктор по умолчанию \vspace{1em}
+  \item конструктор копирования \vspace{1em}
+  \item конструктор перемещения \vspace{1em}
+  \item деструктор \vspace{1em}
+  \item операторы присваивания
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Конструктор по умолчанию}
+\begin{lstlisting}
+struct S {
+    S() {...} // default constructor
+};
+
+S s; // default constructor is called
+
+struct A {
+    A() {...}
+};
+struct B : A {
+    B() {...}
+};
+
+B b; // A::A() and B::B() are called
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Автоматическое создание конструктора по умолчанию}
+Если у класса нет явно определенных конструкторов, то конструктор по умолчанию создаётся автоматически и эквивалентен явно определенному конструктору без списка инициализации и с пустым телом:
+\begin{lstlisting}
+struct A {
+};
+
+struct B {
+    B() {}
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Удалённый конструктор по умолчанию}
+\begin{lstlisting}
+struct A {
+    A() = delete;
+};
+struct B {
+    ~B() = delete;
+};
+class C {
+    C() = default;
+};
+class D {
+    ~D() {}
+};
+struct E : B, C, D {
+    int & n;
+    const int x;
+    A a;
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Преобразующие конструкторы}
+\begin{lstlisting}
+struct A {
+    A(int);
+    A(char);
+    A(double, int = 10);
+};
+
+void f(A);
+
+int main() {
+    f(10);
+    f('a');
+    f(0.5);
+}
+\end{lstlisting}
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Копирование и перемещение}
+
+\begin{frame}{Конструктор копирования}
+Это не шаблонный конструктор, принимающий первым аргументом lvalue ссылку на объект того же типа, что и класс конструктора, который может быть вызван с одним аргументом.
+
+\vspace{1em}
+
+Конструктор копирования вызывается всегда, когда объект класса инициализируется из lvalue выражения того же типа (класса).
+\end{frame}
+
+\begin{frame}[fragile]{Пример конструкторов копирования}
+\begin{lstlisting}
+struct S {
+    S(int);
+    S(const S &); // copy constructor 1
+    S(S &); // copy constructor 2
+};
+
+S f(S s) {
+    return s; // copy constructor 2 is called
+}
+
+const S s1(10);
+S s2 = s1, s3(s1); // copy constructor 1 is called
+f(S(10)); // copy constructor 1 is called
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Автоматическое создание конструктора копирования}
+Если у класса не объявлено явно никаких конструкторов копирования, то автоматически создаётся конструктор копирования.
+\begin{lstlisting}
+struct A {
+    char c;
+    A(char c_) : c(c_) {}
+};
+struct S {
+    int i;
+    A a;
+    S(int i_, char c_) : i(i_), a(c_) {}
+};
+S s1(10, '\n');
+S s2 = s1;
+assert(s1.i == s2.i && s2.i == 10);
+assert(s1.a.c == s2.a.c && s2.a.c == '\n');
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Удалённый конструктор копирования}
+\begin{lstlisting}
+struct A {
+    A() = default;
+    A(const A &) = delete;
+};
+
+struct B {
+    B(B &&); // user-defined move constructor
+    // B(const B &) = default
+};
+
+class C {
+    ~C() {}
+};
+
+class D : B, C {
+    int && n;
+    A a;
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Копирующий оператор присваивания}
+Это не шаблонный и не статический оператор присваивания, принимающий ровно один аргумент, имеющий тип \lstinline{T}, \lstinline{T&} или \lstinline{const T&} (если \lstinline{T} -- это данный класс).
+
+\vspace{1em}
+
+\begin{lstlisting}
+struct S {
+    S(const S &);
+    S & operator = (const S &);
+};
+
+S s1, s2 = s1; // copy constructor is called
+s1 = s2; // copy assignment is called
+\end{lstlisting}
+\vspace{1em}
+
+Предполагаемое поведение такого оператора -- копирование значения одного объекта данного класса в другой объект этого же класса.
+\end{frame}
+
+\begin{frame}[fragile]{Автоматическое создание копирующего оператора присваивания}
+\begin{lstlisting}
+struct A {
+    char c;
+    A(char c_) : c(c_) {}
+};
+struct S {
+    int i;
+    A a;
+    S(int i_, char c_) : i(i_), a(c_) {}
+};
+S s1(10, '\n');
+S s2(20, 'x');
+s2 = s1;
+assert(s1.i == s2.i && s2.i == 10);
+assert(s1.a.c == s2.a.c && s2.a.c == '\n');
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Удалённый копирующий оператор присваивания}
+\begin{lstlisting}
+struct A {
+    A(A &&); // move constructor
+    // A & operator = (const A &) = default
+};
+struct B {
+    void operator = (const B &) = delete;
+};
+
+struct C : B {
+    A a;
+    const int i;
+    int & x;
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Конструктор перемещения}
+Это не шаблонный конструктор, принимающий первым аргументом rvalue ссылку на объект того же типа, что и класс конструктора, может быть вызван с одним аргументом.
+
+\vspace{1em}
+
+Конструктор перемещения вызывается всегда, когда объект класса инициализируется из xvalue выражения того же типа (класса).
+
+\vspace{1em}
+
+Предназначение перемещающего конструктора -- забрать содержимое у аргумента - временного объекта и, по возможности, избежать затрат на копирование этого содержимого. 
+
+При этом аргумент должен остаться в валидном, но не обязательно определённом, состоянии.
+\end{frame}
+
+\begin{frame}[fragile]{Пример конструкторов копирования и перемещения}
+\begin{lstlisting}
+struct S {
+    S(const S &); // copy constructor
+    S(S &&); // move constructor
+};
+
+void f(S s) {...}
+
+int main() {
+    S s1;
+    f(s1); // copy constructor is called
+    f(S{}); // move constructor is called
+    f(std::move(s1)); // move constructor is called
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Автоматическое создание конструктора перемещения}
+\begin{lstlisting}
+struct A {
+    A(const A &) { std::cout << "copy" << std::endl; }
+    A(A &&) { std::cout << "move" << std::endl; }
+};
+struct B {
+    A a;
+    // B(const B &);
+    // B & operator = (const B &);
+    // B & operator = (B &&);
+    // ~B();
+};
+
+void f(B b) {}
+int main() {
+    f(B{});
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Удалённый конструктор перемещения}
+\begin{lstlisting}
+class A {
+    A(A &&);
+};
+
+struct B {
+    B(const B &);
+};
+
+struct C {
+    ~C() = delete;
+};
+
+class D : B, C {
+    A a;
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Перемещающий оператор присваивания}
+Это не шаблонный и не статический оператор присваивания, принимающий ровно один аргумент, имеющий тип \lstinline{T&&} или \lstinline{const T&&}.
+
+\vspace{1em}
+
+\begin{lstlisting}
+struct S {
+    S & operator = (S &&);
+};
+
+S s1, s2;
+s2 = S(); // move assignment is called
+s1 = std::move(s2); // move assignment is called
+
+\end{lstlisting}
+\vspace{1em}
+
+Предполагаемое поведение перемещающего оператор присваивания -- перемещение значения одного объекта данного класса в другой объект данного класса.
+\end{frame}
+
+\begin{frame}[fragile]{Автоматическое создание перемещающего оператора присваивания}
+\begin{lstlisting}
+struct A {
+    void operator=(const A&) { std::cout<<"copy"<<std::endl; }
+    void operator=(A&&) { std::cout<<"move"<<std::endl; }
+};
+struct B {
+    A a;
+    // B(const B &);
+    // B(B &&);
+    // B & operator = (const B &);
+    // ~B();
+};
+int main() {
+    B b1, b2;
+    b1 = std::move(b2);
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Удалённый перемещающий оператор присваивания}
+\begin{lstlisting}
+struct A {
+    void operator = (A &&) = delete;
+};
+
+struct B {
+    ~B() = default;
+};
+
+struct C : B {
+    A a;
+    const int n;
+    char && r;
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{std::move}
+\begin{lstlisting}
+struct S;
+
+void f(S &); // 1
+void f(S &&); // 2
+void f(const S &); // 3
+void f(const S &&); // 4
+
+S s1;
+const S s2;
+f(s1); // 1st is called
+f(s2); // 3rd is called
+f(std::move(s1)); // 2nd is called
+f(std::move(s2)); // 4th is called
+\end{lstlisting}
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Квалификаторы методов}
+
+\begin{frame}[fragile]{Неявный аргумент при разрешении перегрузки}
+\begin{lstlisting}
+struct S {
+    void f(int);
+};
+S s;
+s.f(10); // correct syntax
+f(s, 10); // implied syntax in overload resolution
+\end{lstlisting}
+\vspace{1em}
+Другой взгляд:
+\begin{lstlisting}
+struct S {
+    void f(int);
+    void g(char) const;
+};
+void f(S * this, int) { ... }
+void g(const S * this, char) { ... }
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Перегрузка методов по cv-квалификаторам}
+\begin{lstlisting}
+struct S {
+    void f() const; // 1
+    void f() volatile; // 2
+    void f(); // 3
+};
+void t1(S & s) {
+    s.f(); // 3rd 'f' is called
+}
+void t2(const S & s) {
+    s.f(); // 1st 'f' is called
+}
+void t3(volatile S & s) {
+    s.f(); // 2nd 'f' is called
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{ref квалификаторы}
+\begin{lstlisting}
+struct S {
+    void f() &; // 1
+    void f() const &; // 2
+    void f() &&; // 3
+};
+
+S s1;
+const S s2;
+s1.f(); // 1st 'f' is called
+s2.f(); // 2nd 'f' is called
+std::move(s1); // 3rd 'f' is called
+\end{lstlisting}
+Воображаемый альтернативный синтаксис:
+\begin{lstlisting}
+void f(S & self); // 1
+void f(const S & self); // 2
+void f(S && self); // 3
+\end{lstlisting}
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Copy elision}
+
+\begin{frame}[fragile]{Copy elision}
+Отсутствие материализации: \vspace{1em}
+\begin{itemize}
+  \item инструкция return, когда её операнд -- prvalue того же типа, что и тип возвращаемого значения функции \vspace{1em}
+  \item инициализация переменной, когда выражение инициализации -- prvalue того же типа
+\end{itemize}
+
+\vspace{1em}
+\begin{lstlisting}
+T f() {
+    return T();
+}
+T x = T(T(T(f()))); // only default constructor of T is called
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{NRVO}
+Named return value optimization: если в инструкции return операнд обозначает локальную переменную, которая:
+\begin{itemize}
+  \item не является параметром функции
+  \item объект которой не является volatile
+  \item объект которой имеет автоматический тип размещения
+  \item тип объекта которой совпадает с типом возвращаемого значения функции
+\end{itemize}
+То компилятор \emph{может} не генерировать код вызова конструктора копирования/перемещения, как если бы это была copy elision.
+
+\begin{lstlisting}
+T f() {
+    T t;
+    return t;
+}
+T x = f(); // only default constructor of T is called
+\end{lstlisting}
+\end{frame}
+
+\end{document}

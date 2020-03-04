@@ -1,0 +1,313 @@
+\documentclass[unknownkeysallowed,xcolor=table]{beamer}
+ 
+\usepackage [T2A,T1] {fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{multirow}
+
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\lstnewenvironment{cmdline}
+  {\lstset{basicstyle=\ttfamily\scriptsize,keywordstyle=\color{blue},
+           language={bash}}}
+  {}
+  
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{pblue}{rgb}{0.1, 0.2, 0.8}
+
+\newcommand{\rarr}{$\rightarrow$}
+
+\lstset{
+      basicstyle=\ttfamily\small,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+      numberstyle=\tiny\color{blue},
+      stringstyle=\color{mymauve},
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      literate={~} {\textapprox}{1},
+      language={[11]C++}
+}
+
+\makeatletter
+\newcommand{\srcmediumsize}{\@setfontsize{\srcmediumsize}{7pt}{7pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcbigsize}{\@setfontsize{\srcbigsize}{8pt}{8pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2019]
+{ИТМО, весенний семестр 2019}
+ 
+\logo{%
+  \makebox[0.97\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.5cm,keepaspectratio]{new_itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%-------------------------------------------------
+
+\section{Представление сложных типов в памяти}
+
+\begin{frame}{Классы}
+
+Объект классового типа состоит из:
+\begin{itemize}
+  \item всех нестатических полей этого класса -- подобъекты-члены
+  \item всех базовых классов -- подобъекты - базовые классы
+\end{itemize}
+
+\vspace{1em}
+
+Общие правила:
+\begin{itemize}
+  \item размеры подобъектов-членов $\geq 1$ (ссылочные поля -- не обязательно)
+  \item объектные представления подобъектов класса не могут пересекаться
+  \item последовательность размещения подобъектов в целом не оговорена
+  \item подобъекты-члены с одинаковыми правами доступа располагаются друг относительно друга в том же порядке, что и в объявлении
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Empty base optimization}
+
+Подобъект - базовый класс может иметь нулевой размер, если этот класс не содержит нестатических полей и не совпадает по типу с первым нестатическим полем данного класса.
+
+\vspace{1em}
+
+\begin{lstlisting}
+struct X {};
+struct Y {};
+
+struct Z1 : X, Y {};
+
+struct Z2 : X, Y { X x; };
+
+struct Z3 : X, Y { X x; Y y; };
+
+struct Z4 : X, Y { int n; };
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Union}
+
+Union -- специальный случай пользовательского типа, подобный классу, но экземпляр которого в один конкретный момент времени содержит только одно из его нестатических полей.
+
+\vspace{1em}
+
+\lstinline{union} \emph{[имя]} \lstinline|{| \emph{члены} \lstinline|}|
+
+\vspace{1em}
+
+\begin{itemize}
+  \item нет виртуальных методов
+  \item нет наследования (ни union, ни от union)
+  \item нет ссылочных нестатических полей
+  \item только для одного из нестатических полей можно объявить инициализацию
+  \item наличие нетривиального специального метода у поля делает соответствующий метод \lstinline{union} удалённым по умолчанию
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Свойства union}
+
+\begin{itemize}
+  \item права доступа по умолчанию -- \lstinline{public} \vspace{0.5em}
+  \item размер объекта \lstinline{union} равен размеру наибольшего его нестатического поля \vspace{0.5em}
+  \item все остальные поля размещаются в той же области памяти, что и наибольшее \vspace{0.5em}
+  \item определен доступ только к активному полю \lstinline{union}, доступ к неактивному -- UB \vspace{0.5em}
+  \item время жизни поля начинается в момент активации и заканчивается в момент деактивации
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Активация полей union}
+
+Поле может быть активировано:
+
+\begin{itemize}
+  \item инициализацией
+  \item присвоением ему значения
+  \item вызовом размещающего new
+  \item участием в левой части выражения присваивания, если только эта операция не переопределена или поле имеет нетривиальный или удаленный конструктор по умолчанию
+\end{itemize}
+
+\vspace{0.5em}
+
+Предыдущее активное поле при этом деактивируется. Если поле имеет нетривиальный деструктор, то его необходимо деактивировать явно, вызвав этот деструктор.
+
+\vspace{0.5em}
+
+Написать нетривиальную операцию копирования для \lstinline{union} можно только зная, какое именно поле активно в данный момент -- с обычными union проблематично.
+
+\end{frame}
+
+\begin{frame}[fragile]{Примеры активации}
+
+\begin{lstlisting}
+union A { double d; int x[4]; };
+struct B { A a; };
+union C { B b; int k; };
+C c; // no active member
+c.k = 10; // k is active
+c.b.a.x[3] = -1; // b is active in c and x is active in c.b.a
+// int i = c.k; <- UB
+int i = c.b.a.x[3]; // OK
+
+struct X { const int a; int b; };
+union Y { X x; int k; };
+Y y = { {1, 2} };
+int n = y.x.a;
+y.k = 4;
+y.x.b = n; // UB - X default constructor is deleted
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Анонимные union}
+
+\lstinline{union}, определенные без имени и без одновременного определения переменной этого типа (или указателя, ссылки на этот тип), являются анонимными.
+
+\vspace{1em}
+
+\lstinline|union {| \emph{члены} \lstinline|};|
+
+\vspace{1em}
+
+Имеют дополнительные ограничения:
+\begin{itemize}
+  \item отсутствие методов \vspace{0.5em}
+  \item отсутствие статических членов \vspace{0.5em}
+  \item права доступа -- только public
+\end{itemize}
+
+\vspace{1em}
+
+Имена полей анонимного \lstinline{union} попадают в окружающую область видимости и не должны конфликтовать с другими именами в этой области видимости.
+
+\end{frame}
+
+\begin{frame}[fragile]{Пример анонимного union}
+
+\begin{lstlisting}
+int f() {
+    union {
+        int x;
+        double y;
+    };
+    x = 1;
+    y = 0.5;
+    return x; // UB
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Union-подобные классы}
+
+\lstinline{union}-подобный класс -- класс, в составе которого есть хотя бы один анонимный union.
+
+\vspace{0.7em}
+
+Пример использования -- tagged union:
+
+\begin{lstlisting}
+struct S {
+    enum { CHAR, INT, DOUBLE } tag;
+    union {
+        char c;
+        int i;
+        double d;
+    };
+};
+S s{S::CHAR, 'a'};
+std::cout << s.c << std::endl;
+
+S ss{S::INT, 111111};
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Улучшенный tagged union}
+
+\begin{lstlisting}[basicstyle=\ttfamily\srcsize]
+class Var {
+public:
+    enum TAG {CHAR, INT, DOUBLE};
+    
+    Var() = delete;
+    Var(const char c)
+        : m_tag(CHAR), m_c(c)
+    { }
+    Var(const int i)
+        : m_tag(INT), m_i(i)
+    { }
+    Var(const double d)
+        : m_tag(DOUBLE), m_d(d)
+    { }
+    
+    TAG get_tag() const { return m_tag; }
+    char as_char() const { return m_c; }
+    char & as_char() { return m_c; }
+    int as_int() const { return m_i; }
+    int & as_int() { return m_i; }
+    double as_double() const 	{ return m_d; }
+    double & as_double() { return m_d; }
+private:
+    TAG m_tag;
+    union {
+        char m_c;
+        int m_i;
+        double m_d;
+    };
+};
+Var var(111111);
+std::cout << var.get_tag() << " : " << var.as_int() << std::endl;
+\end{lstlisting}
+
+\end{frame}
+
+\end{document}

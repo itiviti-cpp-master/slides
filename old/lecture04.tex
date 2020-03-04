@@ -1,0 +1,1251 @@
+\documentclass[unknownkeysallowed,xcolor=table]{beamer}
+ 
+\usepackage [T2A,T1] {fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{multirow}
+
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\lstnewenvironment{cmdline}
+  {\lstset{basicstyle=\ttfamily,keywordstyle=\color{blue},
+           language={bash}}}
+  {}
+  
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{pblue}{rgb}{0.1, 0.2, 0.8}
+
+\newcommand{\rarr}{$\rightarrow$}
+
+\lstset{
+      basicstyle=\ttfamily\small,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+      numberstyle=\tiny\color{blue},
+      stringstyle=\color{mymauve},
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      literate={~} {\textapprox}{1},
+      language={[11]C++}
+}
+
+\makeatletter
+\newcommand{\srcmediumsize}{\@setfontsize{\srcmediumsize}{7pt}{7pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcbigsize}{\@setfontsize{\srcbigsize}{8pt}{8pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2019]
+{ИТМО, весенний семестр 2019}
+ 
+\logo{%
+  \makebox[0.97\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.5cm,keepaspectratio]{new_itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%-------------------------------------------------
+
+\section{Структуры и классы}
+
+\begin{frame}{Структуры и классы}
+
+Классы -- это типы, определенные пользователем. Структура и класс -- практически идентичные понятия.
+
+\vspace{1em}
+
+Каждый класс задаёт уникальный тип, который можно использовать в программе как и любой другой тип.
+
+\vspace{1em}
+
+У класса могут быть члены: поля данных, методы (функции класса), типы, псевдонимы типов, шаблоны.
+
+\vspace{1em}
+
+Как и для любого типа, в программе можно создавать объекты класса. Обычно объекты класса называются экземплярами класса.
+
+\vspace{1em}
+
+ Классы можно наследовать от других классов -- наследник будет неявно включать в себя все базовые классы.
+
+\end{frame}
+
+\begin{frame}[fragile]{Определение}
+
+Определение класса (структуры) является одной из форм выражений объявления и имеет вид:
+
+\begin{itemize}
+  \item \emph{класс имя} \lstinline|{| \emph{члены} \lstinline|}|
+  \item \emph{класс имя} \lstinline{:} \emph{список наследования} \lstinline|{| \emph{члены} \lstinline|}|
+\end{itemize}
+
+\vspace{0.5em}
+
+где \emph{класс} -- это ключевое слово \lstinline{class} или \lstinline{struct}, \emph{имя} -- идентификатор, \emph{члены} -- объявление членов класса, а \emph{список наследования} -- это перечисление через запятую базовых классов.
+
+\vspace{0.5em}
+
+Определение класса может повторяться в разных единицах трансляции, но все повторения должны быть идентичны.
+
+\vspace{0.5em}
+
+Предварительное объявление: \emph{класс имя} \lstinline{;}
+
+Позволяет ссылаться на ещё не определенный класс.
+
+\end{frame}
+
+\begin{frame}[fragile]{Примеры определений и создания}
+
+\begin{lstlisting}
+class C {};
+
+C c;
+C cc = C();
+C(); // temporary
+
+struct S
+{
+  int a;
+} s_a, s_b;
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Область видимости класса}
+
+Область видимости для имен членов класса начинается в точке их объявления, распространяется на всё оставшееся тело класса, а также на:
+
+\vspace{0.5em}
+
+\begin{itemize}
+  \item тела всех методов класса \vspace{0.5em}
+  \item на инициализацию аргументов \vspace{0.5em}
+  \item спецификаторы исключений \vspace{0.5em}
+  \item внутриклассовую инициализацию \vspace{0.5em}
+  \item все эти вещи во вложенных классах
+\end{itemize}
+
+\vspace{0.5em}
+
+вне зависимости от места определения этих элементов.
+
+\end{frame}
+
+\begin{frame}[fragile]{Примеры области видимости}
+
+\begin{lstlisting}
+struct S {
+  struct T {
+    int z = 10 * n;
+    int baz();
+  };
+  int foo(int x) {
+    return x * n;
+  }
+  void bar(int y = n);
+  int z = 3 * n;
+  static const int n = 101;
+  char str[n];
+};
+int S::T::baz()
+{ return z * 3; }
+void S::bar(int y)
+{ z *= y; }
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Доступ к членам вне области видимости класса}
+
+Вне области видимости класса, доступ к его членам может осуществляться с помощью операторов:
+
+\vspace{1em}
+
+\begin{itemize}
+  \item \lstinline{.} -- применимо к выражению, имеющему тип класса или тип его потомка \vspace{0.5em}
+  \item \lstinline{->} -- применимо к выражению, имеющему тип указателя на класс или его потомка \vspace{0.5em}
+  \item \lstinline{::} -- применимо к имени класса или имени его потомка \vspace{0.5em}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Примеры доступа к членам вне класса}
+
+\begin{lstlisting}
+struct S {
+    int x;
+    void foo(char c);
+    static int size();
+};
+
+int f(const S * ss) {
+    S s;
+    s.x = ss->x;
+    s.foo('\n');
+    return S::size();
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Наследование}
+
+Классы можно наследовать от других классов.
+
+\vspace{0.5em}
+
+В определении класса указывается список базовых классов (с необязательными спецификаторами прав доступа) от которых класс наследуется.
+
+\vspace{0.5em}
+
+Каждый базовый класс включается в объект наследника как подобъект, в порядке следования базовых классов в списке наследования.
+
+\vspace{0.5em}
+
+Наследник имеет доступ ко всем членам базового класса (с учетом прав доступа).
+
+Наследник может объявить собственный член с именем, идентичным имени какого-нибудь члена базового класса. Тогда член базового класса будет ``перекрыт''.
+
+\end{frame}
+
+\begin{frame}[fragile]{Поля данных}
+
+Нестатические -- подобъекты объекта класса, статические -- глобальные объекты, связанные с типом класса.
+
+\vspace{1em}
+
+Объявление аналогично объявлению переменных:
+
+\begin{lstlisting}
+struct S {
+  int a, b, c = 10;
+  const char str[6] = "Hello";
+  static const size_t size;
+};
+
+const size_t S::size = sizeof(S);
+
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Нестатические поля}
+
+Нестатические поля нельзя объявлять \lstinline{auto}, \lstinline{extern} или \lstinline{thread_local}.
+
+\vspace{0.5em}
+
+Тип нестатических полей должен быть полностью определен в точке определения класса.
+
+\vspace{0.5em}
+
+Типом поля класса не может быть сам этот класс.
+
+\vspace{0.5em}
+
+Инициализация нестатического поля:
+\begin{itemize}
+  \item может быть описана в его объявлении
+  \item может осуществляться в конструкторе класса
+\end{itemize}
+
+\vspace{0.5em}
+
+Нестатические поля класса являются подобъектами, но как и объекты должны иметь ненулевой размер (и их размещение в памяти не может пересекаться).
+
+\vspace{0.5em}
+
+Нестатические поля класса являются частью каждого экземпляра класса и неотделимы от него.
+
+\end{frame}
+
+\begin{frame}[fragile]{Пример нестатических полей}
+
+\begin{lstlisting}
+class C {};
+struct S
+{
+  C c;
+  int a;
+};
+
+static_assert(sizeof(C) == 1);
+static_assert(sizeof(SS) >= sizeof(int) + 1);
+
+S x, y, z;
+x.a = 1;
+y.a = 222;
+z.a = -999;
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Статические поля}
+
+Статические поля полностью аналогичны глобальным переменным с внешним связыванием (внутренним, если класс определен в анонимном пространстве имён), за исключением имени.
+
+\vspace{1em}
+
+Статические поля могут быть \lstinline{thread_local}, а также могут быть \lstinline{auto}, если это \lstinline{const} поле и его инициализация описана в объявлении поля.
+
+\vspace{1em}
+
+Описание статических полей в теле класса является объявлением (за исключением \lstinline{constexpr} или \lstinline{inline}), но не определением (и может иметь неполный тип).
+
+В программе должно быть также определение всех статических полей (для \lstinline{const} полей допускается отсутствие определения, если соответствующее поле не ODR-используется в программе).
+
+\end{frame}
+
+\begin{frame}[fragile]{Примеры статических полей}
+
+\begin{lstlisting}
+struct S; // forward declaration
+class C {
+  static int x; // declaration
+  static S y; // declaration
+};
+
+static_assert(sizeof(C) == 1);
+
+// definitions
+int C::x = 101;
+struct S {};
+S C::y;
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Инициализация статических полей}
+
+\begin{itemize}
+  \item для не-\lstinline{const}, не-\lstinline{inline}, не-\lstinline{constexpr} статического поля -- в его определении \vspace{1em}
+  \item для \lstinline{const} статического поля -- можно в определении класса, можно в определении поля \vspace{1em}
+  \item для \lstinline{constexpr}/\lstinline{inline} статического поля -- только в определении класса (отдельное определение поля в этом случае не требуется)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Методы}
+
+Это функции, объявленные как члены класса. Как и данные могут быть нестатическими и статическими.
+
+\begin{lstlisting}
+struct S {
+  int f(); // declaration
+  void g() { // definition
+    // body
+  }
+};
+int S::f() { // definition
+  // body
+}
+\end{lstlisting}
+
+Метод, определенный в теле класса неявно подразумевает спецификатор \lstinline{inline}.
+Определение метода вне тела класса подчиняется правилам определения функций (например, в плане ODR).
+
+\end{frame}
+
+\begin{frame}[fragile]{Статические методы}
+
+Статические методы полностью аналогичны функциям, за исключением прав доступа к другим членам соответствующего класса и обращения к ним самим:
+
+\vspace{1em}
+
+\begin{lstlisting}
+struct S {
+  static int size() { return 1111; }
+};
+
+void foo() {
+  int x = S::size();
+}
+\end{lstlisting}
+
+\vspace{1em}
+
+У статических методов нет доступа к нестатическим полям класса.
+
+\end{frame}
+
+\begin{frame}[fragile]{Нестатические методы}
+
+Нестатические методы аналогичны функциям, но при вызове связаны с конкретным экземпляром своего класса и могут оперировать его нестатическими полями. При этом экземпляр класса, для которого вызван нестатический метод, явно доступен через указатель \lstinline{this}.
+
+\begin{lstlisting}
+struct S {
+  int a, b, c;
+  void sum();
+};
+void S::sum() {
+  a = b + c; // same as this->a = this->b + this->c
+}
+void foo() {
+  S s;
+  s.b = 2;
+  s.c = 3;
+  s.sum(); // s.a = s.b + s.c
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{cv-квалификаторы нестатических методов}
+
+Нестатические методы могут иметь cv-квалификатор:
+
+\vspace{1em}
+
+\begin{lstlisting}
+struct S {
+  int foo(); // no qualifier
+  size_t size() const; // const
+  void boom() volatile; // volatile
+};
+S a;
+a.foo();
+a.size();
+a.boom();
+const S b;
+b.foo(); // compilation error
+b.size();
+b.boom(); // compilation error
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Операторы}
+
+Это функции, объявленные как члены класса и повторяющие синтаксис вызова обычных операторов языка.
+
+\vspace{1em}
+
+\begin{lstlisting}
+class C {
+  C & operator++ () {
+    // some custom increment logic
+  }
+};
+C c;
+++c;
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Отображение синтаксиса операторов}
+
+Определение операторов, как членов класса -- это частный случай перегрузки операторов.
+
+\begin{center}
+\begin{tabular}{ l l }
+  \hline
+    Синтаксис оператора & Синтаксис перегруженной функции \\
+  \hline
+    &\\
+    @a & (a).operator@ () \\
+    a@ & (a).operator@ (0) \\
+    a@b & (a).operator@ (b) \\
+    a(b…) & (a).operator() (b…) \\
+    a[b] & (a).operator[] (b) \\
+    a-> & (a).operator-> () \\
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]{Члены-типы}
+
+В определении класса можно объявить какой-либо тип или псевдоним типа, это будет считаться членом класса (с т.з. доступа к имени этого типа/псевдонима)
+
+\vspace{2em}
+
+\begin{lstlisting}
+struct S {
+  using X = int;
+  class C { ... }; // nested class
+};
+
+S::X x = 10;
+S::C c;
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Вложенные классы}
+
+В определении тела класса можно определить другой класс -- ``вложенный'' (nested). Кроме иных правил доступа к имени такого вложенного класса, от отдельно стоящего он отличается особенностями прав доступа к членам класса, в котором он определён.
+
+\vspace{1em}
+
+Внешние объявления членов вложенного класса:
+\begin{lstlisting}
+struct S {
+  class C {
+    int foo();
+  };
+};
+
+int S::C::foo() {
+  ...
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Права доступа к членам класса}
+
+Имя каждого члена класса ассоциировано со спецификатором доступа, который проверяется во всех случаях использования этого имени. Можно сказать, что это ``права доступа''.
+
+\vspace{2em}
+
+Права доступа не распространяются на члены класса (включая на его вложенные классы) -- все члены класса (включая вложенные классы) имеют полный доступ ко всем другим членам класса.
+
+\end{frame}
+
+\begin{frame}{Виды доступа}
+
+\begin{itemize}
+  \item \lstinline{public} -- публичный доступ, нет ограничений \vspace{0.5em}
+  \item \lstinline{private} -- закрытый доступ, только другие члены этого класса (или его друзья) имеют доступ к этому имени \vspace{0.5em}
+  \item \lstinline{protected} -- защищенный доступ, подобно закрытому, но права доступа есть также у наследников класса
+\end{itemize}
+
+\vspace{1em}
+
+Права доступа не влияют на видимость членов класса, только на разрешения доступа к ним, проверка прав доступа -- последний этап анализа выражения доступа к члену класса.
+
+Например, анализ перегрузок, неявных приведений и т.п. происходит до проверки права доступа.
+
+\end{frame}
+
+\begin{frame}[fragile]{Назначение прав доступа}
+
+\begin{itemize}
+  \item явно в теле класса -- действует на все последующие члены до следующего явного указания спецификатора доступа \vspace{1em}
+  \item при наследовании -- действует на все члены родительского класса
+\end{itemize}
+
+\begin{lstlisting}
+class C {
+  public: // inside of class definition
+};
+
+class CC : protected C // in inheritance list
+{
+};
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Пример назначения прав доступа}
+
+\begin{lstlisting}
+class C
+{
+  public:
+    size_t size() const;
+  protected:
+    void foo();
+  private:
+    int x;
+};
+
+C c;
+c.size(); // OK
+c.foo(); // compilation error
+c.x = 10; // compilation error
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Пример назначения прав доступа при наследовании}
+
+\begin{lstlisting}
+class CC : public C
+{
+    void bar()
+    {
+      const auto s = size(); // OK
+      foo(); // OK
+      x = 10; // compilation error
+    }
+};
+
+CC cc;
+cc.size(); // OK
+cc.foo(); // compilation error
+cc.x = 10; // compilation error
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Права доступа и наследование}
+
+В соответствии с указанным спецификатором доступа при наследовании, наследование называют -- публичным, защищенным или закрытым.
+
+\vspace{2em}
+
+При этом
+\begin{itemize}
+  \item \lstinline{public} -- спецификаторы доступа родительского класса наследуются без изменений \vspace{0.5em}
+  \item \lstinline{protected} -- \lstinline{public} и \lstinline{protected} члены родительского класса считаются \lstinline{protected} у наследника, \lstinline{private} не меняется \vspace{0.5em}
+  \item \lstinline{private} -- \lstinline{public} и \lstinline{protected} члены родительского класса наследуются, как \lstinline{private}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Права доступа и вложенные классы}
+
+С точки зрения доступа к нему, имя типа вложенного класса является членом основного класса.
+
+\vspace{2em}
+
+Все члены вложенного класса -- это члены вложенного класса, к ним основной класс не имеет никакого специального доступа.
+
+\vspace{2em}
+
+Однако, т.к. вложенный класс является членом основного, члены вложенного класса имеют полный доступ к членам основного.
+
+\end{frame}
+
+\begin{frame}[fragile]{Пример прав доступа с вложенными классами}
+
+\begin{lstlisting}
+class C {
+  private:
+    class C_A {
+        int x = 10;
+      public:
+        int get_x() const { return x + counter++; }
+    };
+    static int counter;
+  public:
+    static C_A get_a() { return C_A(); }
+};
+
+int C::counter = 0;
+int foo() {
+    const auto a = C::get_a();
+    return a.get_x();
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Различие между структурами и классами}
+
+\begin{itemize}
+  \item \lstinline{struct} -- по умолчанию, \lstinline{public} права доступа к членам, \lstinline{public} наследование \vspace{0.5em}
+  \item \lstinline{class} -- по умолчанию, \lstinline{private} права доступа к членам, \lstinline{private} наследование
+\end{itemize}
+
+\vspace{1em}
+
+\begin{lstlisting}
+struct S : A // public inheritance implied
+{
+    int x; // public access implied
+};
+
+class C : B // private inheritance implied
+{
+  int y; // private access implied
+};
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Агрегатная инициализация}
+
+\begin{lstlisting}
+T obj = { a, b, c, ... };
+T obj{a, b, c, ... };
+{a, b, c, ...}; // temporary, type must be implied by context
+\end{lstlisting}
+
+\vspace{1em}
+
+Агрегатная инициализация возможно для агрегатов:
+\begin{itemize}
+  \item Массив
+  \item Класс с только публичными нестатическими полями, без конструкторов, без виртуальных методов, все базовые классы должны удовлетворять тем же требованиям
+\end{itemize}
+
+\vspace{1em}
+
+Эффект агрегатной инициализации -- каждый подобъект объекта-агрегата инициализируется копией значения из списка инициализации.
+
+\end{frame}
+
+\begin{frame}[fragile]{Пример использования агрегатной инициализации}
+
+\begin{lstlisting}
+struct A {
+  int a_a;
+  int a_b;
+};
+
+struct B : A {
+  char b_a;
+  char b_b;
+};
+
+struct C : A, B {
+  std::string c_a;
+};
+
+C c { 20, 30, -20, -30, '\0', 'X', "Hello" };
+\end{lstlisting}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Enum}
+
+\begin{frame}[fragile]{Enum}
+
+Перечисление (enumeration) -- это тип с конечным множеством значений, которые преобразуются к значениям интегрального типа.
+
+\vspace{1em}
+
+\begin{lstlisting}
+enum Side {
+  Buy,
+  Sell,
+  ShortSell
+};
+
+void foo(const Side side) {
+  switch (side) {
+    case Buy: ...
+    case Sell: ...
+  }
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Классические открытые (unscoped) enum}
+
+\begin{itemize}
+  \item \lstinline{enum} [\emph{имя}] \lstinline|{| \emph{enumerator} [\lstinline{=} \emph{constexpr}]\lstinline{,} ... \lstinline|}|
+  \item \lstinline{enum} \emph{имя} \lstinline{:} \emph{тип} \lstinline|{| \emph{enumerator} [\lstinline{=} \emph{constexpr}]\lstinline{,} ... \lstinline|}|
+  \item \lstinline{enum} \emph{имя} \lstinline{:} \emph{тип}\lstinline{;}
+\end{itemize}
+
+\vspace{0.5em}
+
+Конструкция объявляет новый тип \emph{имя}, если базовый тип не указан, то компилятор сам выбирает тип, не шире \lstinline{int} (если только объявленные значения не выходят за рамки \lstinline{int}/\lstinline{unsigned}).
+
+\vspace{0.5em}
+
+Каждый \emph{enumerator} становится константой объявленного типа в той же области видимости, что и объявление \lstinline{enum} (например, тело класса -- константы становятся его членами). Каждая такая константа может быть неявно приведена к интегральному типу по обычным правилам.
+
+\end{frame}
+
+\begin{frame}[fragile]{Строгие (scoped) enum}
+
+\begin{itemize}
+  \item \lstinline{enum} \lstinline{class} | \lstinline{struct} \emph{имя} \lstinline|{| \emph{enumerator} [\lstinline{=} \emph{constexpr}]\lstinline{,} ... \lstinline|}|
+  \item \lstinline{enum} \lstinline{class} | \lstinline{struct} \emph{имя} \lstinline{:} \emph{тип} \lstinline|{| \emph{enumerator} [\lstinline{=} \emph{constexpr}]\lstinline{,} ... \lstinline|}|
+  \item \lstinline{enum} \lstinline{class} | \lstinline{struct} \emph{имя} \lstinline{;}
+  \item \lstinline{enum} \lstinline{class} | \lstinline{struct} \emph{имя} \lstinline{:} \emph{тип}\lstinline{;}
+\end{itemize}
+
+\vspace{0.5em}
+
+Конструкция объявляет новый тип \emph{имя}, если базовый тип не указан, то он устанавливается в \lstinline{int}.
+
+\vspace{0.5em}
+
+Каждый \emph{enumerator} становится константой объявленного типа в области видимости \lstinline{enum} и их можно указывать в виде \emph{name}\lstinline{::}\emph{enumerator}.
+Неявных преобразований строгого \lstinline{enum} к другим типам нет. Можно использовать явное преобразование.
+
+\end{frame}
+
+\begin{frame}[fragile]{Приведение к enum}
+
+Значения интегральных, floating-point типов и других \lstinline{enum} могут быть \textbf{явно} приведены к любому \lstinline{enum} типу, даже если результирующее значение не равно ни одной enumeration константе.
+
+\vspace{1em}
+
+Если исходное значение не представимо в результирующем типе -- UB
+
+\vspace{1em}
+
+\begin{lstlisting}
+enum class X { A, B, C};
+X x = static_cast<X>(1001);
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Пример строгих enum}
+
+\begin{lstlisting}
+enum class TimeInForce {
+  Day = 0,
+  GTD = 1,
+  IOC = 2
+};
+
+void foo(const TimeInForce time_in_force) {
+  switch (time_in_force) {
+    case TimeInForce::Day: ...
+    case TimeInForce::GTD: ...
+  }
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Преимущества строгих enum над классическими}
+
+Имена элементов строгого \lstinline{enum} не засоряют область видимости -- важно для \lstinline{enum}, объявляемых в пространстве имен.
+
+\vspace{2em}
+
+Невозможно случайно получить неявное преобразование к совершенно другому типу.
+
+\vspace{1em}
+
+\begin{lstlisting}
+enum Side { Buy, Sell };
+enum TimeInForce { Day, GTD, IOC };
+
+void foo(const Side side, const TimeInForce tif) {
+    if (side == Day) { // obviously, an error, but compiles happily
+        ...
+    }
+}
+\end{lstlisting}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Полные и неполные типы}
+
+\begin{frame}[fragile]{Полные и неполные типы}
+
+Полный тип -- полностью определенный тип.
+
+\vspace{0.7em}
+
+Неполный тип -- предварительное объявление класса или enum.
+
+\vspace{1.2em}
+
+Неполный тип можно использовать в некоторых случаях, когда компилятору для генерации соответствующего кода не нужно знать определение типа:
+
+\vspace{0.5em}
+
+\begin{lstlisting}
+class Foo;
+void foo(Foo * f);
+
+enum class Side : int;
+enum class TimeInForce : int;
+TimeInForce bar(const Side side)
+{
+    return static_cast<TimeInForce>(side);
+}
+\end{lstlisting}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Некоторые классы стандартной библиотеки}
+
+\begin{frame}[fragile]{std::string}
+
+\begin{lstlisting}
+#include <string>
+
+std::string s1; // empty string
+std::string s2("Hello!"); // from a string literal
+std::string s3 = s2, s4(s2); // from another string
+std::string s5(10, 'x'); // results in "xxxxxxxxxx"
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Некоторые методы, чтение}
+
+\begin{lstlisting}
+void foo(const std::string & s)
+{
+    if (!s.empty()) {
+        const char * cs = s.c_str();
+        ...
+    }
+    if (s.size() >= 5) {
+        char x = s[4];
+        ...
+    }
+    size_t i = s.find("el");
+    if (i != s.npos) {
+        const auto ss = s.substr(i, 5); // up to 5 characters starting with "el"
+    }
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Некоторые методы, запись}
+
+\begin{lstlisting}
+void bar(std::string & s)
+{
+    s.assign("Hello", 3); // s contains "Hel"
+    s += '\t';
+    s.replace(2, 4, "fOO"); // s contains "HefOO"
+    s.clear();
+    assert(s.empty());
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{std::array}
+
+\begin{lstlisting}
+#include <array>
+
+std::array<int, 5> x = {1, 2, 3, 4, 5};
+std::array<int, 10> y = x; // compilation error
+static_assert(!x.empty());
+static_assert(x.size() == 5);
+x[2] = 22;
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{std::vector}
+
+\begin{lstlisting}
+#include <vector>
+
+std::vector<unsigned> x(10, 0xAE);
+std::vector<int> y(5);
+y = x; // compilation error
+assert(!x.empty());
+assert(x.size() == 10);
+auto z = y;
+x[5] = 128;
+y[3] = x[4];
+std::memcpy(&x[0], &y[0], 5); // memory regions copying
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Некоторые варианты использования std::vector}
+
+\begin{lstlisting}
+std::vector<std::string> strings;
+strings.reserve(100);
+for (std::string line; std::getline(std::cin, line); ) {
+    strings.push_back(line);
+}
+
+std::cout << "Read " << strings.size() << " input lines" << std::endl;
+
+strings.clear();
+assert(strings.size() == 0);
+assert(strings.size() != strings.capacity());
+
+strings.shrink_to_fit();
+assert(strings.size() == strings.capacity()); // maybe
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{std::pair}
+
+\begin{lstlisting}
+#include <utility>
+
+std::pair<int, std::string> x(-10, "Cat");
+std::cout << x.first << " : " << x.second << std::endl;
+
+const auto y = std::make_pair(99, "Dog");
+
+const auto z = std::make_pair<unsigned, std::string>(99, "Explicit dog");
+
+std::pair<A, B> foo() {
+    A a;
+    B b;
+    return {a, b};
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{std::tuple}
+
+\begin{lstlisting}
+#include <tuple>
+
+auto many() {
+    return std::make_tuple(1, 2, 'a', std::string{"str"});
+}
+
+const auto x = many();
+std::cout << std::get<0>(x) << ", " << std::get<1>(x) << ", " << std::get<2>(x)
+    << ", " << std::get<3>(x) << std::endl;
+
+const auto y = std::tuple_cat(x, x, x);
+static_assert(std::tuple_size_v<decltype(y)> == 12);
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Structured bindings}
+
+\begin{lstlisting}
+std::tuple<A, B, C> foo();
+
+auto [a, b, c] = foo();
+a = A();
+const auto x = b;
+
+void foo(std::vector<std::pair<int, std::string>> & v) {
+    for (auto & [n, s] : v) {
+        n = s.size();
+        s += '\n';
+    }
+}
+\end{lstlisting}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Наглядный пример}
+
+\begin{frame}[fragile]{Команда wc}
+
+\begin{cmdline}
+$ cat a.txt
+Hello, world
+$ wc a.txt
+       1       2      13 a.txt
+\end{cmdline}
+
+\vspace{2em}
+
+Может использоваться для подсчёта строк, слов, символов и байт в текстовых файлах.
+
+\end{frame}
+
+\begin{frame}{Постановка задачи}
+
+Для текстового ввода из стандартного потока ввода посчитать:
+
+\vspace{1em}
+
+\begin{itemize}
+  \item Количество символов перевода строки \vspace{0.5em}
+  \item Количество байтов \vspace{0.5em}
+  \item Количество символов UTF-8 \vspace{0.5em}
+  \item Количество слов (разделенных пробельными символами) \vspace{0.5em}
+  \item Максимальную длину строки в символах
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Полный вывод wc}
+
+\begin{cmdline}
+$ cat e.txt
+\end{cmdline}
+Привет, мир
+\begin{cmdline}
+$ wc -cmwlL e.txt
+ 1  2 12 21 11 e.txt
+\end{cmdline}
+
+\vspace{1em}
+
+Порядок вывода:
+\begin{enumerate}
+  \item число строк
+  \item число слов
+  \item число символов
+  \item число байт
+  \item максимальная длина строки.
+\end{enumerate}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Функция main}
+\lstinputlisting[firstline=3,lastline=3,basicstyle=\ttfamily\small]{examples/wc.cpp}
+...
+\lstinputlisting[firstline=92,lastline=96,basicstyle=\ttfamily\small]{examples/wc.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{Структура данных для собираемых данных}
+\lstinputlisting[firstline=6,lastline=20,basicstyle=\ttfamily\srcbigsize]{examples/wc.cpp}
+...
+\lstinputlisting[firstline=90,lastline=90,basicstyle=\ttfamily\srcbigsize]{examples/wc.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{Основная функция обработки}
+\lstinputlisting[firstline=1,lastline=1,basicstyle=\ttfamily\srcbigsize]{examples/wc.cpp}
+\lstinputlisting[firstline=4,lastline=4,basicstyle=\ttfamily\srcbigsize]{examples/wc.cpp}
+...
+\lstinputlisting[firstline=70,lastline=88,basicstyle=\ttfamily\srcbigsize]{examples/wc.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{Подсчёт слов}
+\lstinputlisting[firstline=2,lastline=2,basicstyle=\ttfamily\srcbigsize]{examples/wc.cpp}
+...
+\lstinputlisting[firstline=48,lastline=68,basicstyle=\ttfamily\srcbigsize]{examples/wc.cpp}
+\end{frame}
+
+\begin{frame}{Вкратце о UTF-8}
+
+Один Unicode символ кодируется от 1 до 4 байт:
+
+\vspace{1em}
+
+\begin{center}
+\begin{tabular}{ c | c | c | c | c }
+  \hline
+    Число байт & Байт 1 & Байт 2 & Байт 3 & Байт 4 \\
+  \hline
+    1 & 0xxxxxxx & - & - & - \\
+    2 & 110xxxxx & 10xxxxxx & - & - \\
+    3 & 1110xxxx & 10xxxxxx & 10xxxxxx & - \\
+    4 & 11110xxx & 10xxxxxx & 10xxxxxx & 10xxxxxx \\
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]{Подсчёт числа символов}
+\lstinputlisting[firstline=22,lastline=46,basicstyle=\ttfamily\srcbigsize]{examples/wc.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{Тестирование}
+
+\begin{cmdline}
+$ xxd a.txt
+$ wc -cmwlL a.txt
+0 0 0 0 0 a.txt
+$ ./wc < a.txt
+0	0	0	0	0
+
+$ xxd b.txt
+0000000: 31                                       1
+$ wc -cmwlL b.txt
+0 1 1 1 1 b.txt
+$ ./wc < b.txt
+0	1	1	1	1
+\end{cmdline}
+
+\end{frame}
+
+\begin{frame}[fragile]{Тестирование, продолжение}
+
+\begin{cmdline}
+$ xxd c.txt
+0000000: 0a                                       .
+$ wc -cmwlL c.txt
+1 0 1 1 0 c.txt
+$ ./wc < c.txt
+1	0	1	1	0
+
+$ xxd d.txt
+0000000: 310a                                     1.
+$ wc -cmwlL d.txt
+1 1 2 2 1 d.txt
+$ ./wc < d.txt
+1	1	2	2	1
+\end{cmdline}
+
+\end{frame}
+
+\begin{frame}[fragile]{Тестирование, окончание}
+
+\begin{cmdline}
+$ xxd e.txt
+0000000: d09f d180 d0b8 d0b2 d0b5 d182 2c20 d0bc  ............, ..
+0000010: d0b8 d180 0a                             .....
+$ wc -cmwlL e.txt
+ 1  2 12 21 11 e.txt
+$ ./wc < e.txt
+1	2	12	21	11
+\end{cmdline}
+
+\end{frame}
+
+\begin{frame}[fragile]{Сравнение с wc из GNU coreutils}
+
+\begin{cmdline}
+$ wc -l wc.cpp
+97 wc.cpp
+
+$ wc -l coreutils-8.31/src/wc.c
+895 coreutils-8.31/src/wc.c
+\end{cmdline}
+
+\vspace{1em}
+
+На текстовом файле \textapprox8 Гб:
+
+\begin{itemize}
+  \item подсчёт только байт и строк -- медленнее на 20\%
+  \item подсчёт всех метрик -- быстрее в \textapprox4 раза
+\end{itemize}
+
+\end{frame}
+
+\end{document}
