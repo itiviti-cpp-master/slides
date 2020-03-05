@@ -158,6 +158,10 @@
     \item \emph{члены} -- объявление членов класса \vspace{0.5em}
     \item \emph{список наследования} -- \emph{base1, ..., baseN}
   \end{itemize}
+
+  \vspace{1em}
+
+  Тип класса полностью определён \emph{после} закрывающей скобки.
 \end{frame}
 
 \begin{frame}[fragile]{Примеры определений классов}
@@ -213,6 +217,176 @@
     { @2return z * 3;@ }
     void S::bar(int y)
     { @2z *= y;@ }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{И ещё немного об области видимости класса}
+  \begin{lstlisting}
+    struct S {
+      struct T {
+        int z = 10 * n;
+        int baz();
+      };
+
+      T create() const;
+      T another();
+    };
+
+    //T S::create() const
+    auto S::create() const
+        -> T
+    { return {}; }
+
+    S::T S::another()
+    { return {}; }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Вторжение в область видимости класса}
+  \begin{lstlisting}
+    int x = 0;
+
+    struct S
+    {
+      char data[x]; // error
+
+      constexpr std::size_t size() const
+      {
+        return x; // OK
+      }
+
+      static constexpr std::size_t x = 55;
+    };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Использование имён членов вне области видимости класса}
+  \begin{itemize}
+    \item область видимости наследников \vspace{1em}
+    \item оператор \lstinline{.} : \lstinline{expr.name} \\
+      где \emph{expr} имеет тип:
+      \begin{itemize}
+        \item класса
+        \item потомка
+      \end{itemize}
+      \vspace{1em}
+    \item оператор \lstinline{->} : \lstinline{expr->name} \\
+      где \emph{expr} имеет тип:
+      \begin{itemize}
+        \item указатель на класс
+        \item указатель на потомок
+      \end{itemize}
+      \vspace{1em}
+    \item оператор \lstinline{::} : \lstinline{Class::member} \\
+      где \emph{Class}:
+      \begin{itemize}
+        \item имя класса
+        \item имя потомка
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Поля и методы}
+  \begin{itemize}
+    \item статические \vspace{0.5em}
+    \item нестатические \vspace{1em}
+  \end{itemize}
+  \begin{lstlisting}
+    struct S
+    {
+      static int a;
+      int b;
+
+      static int get_a();
+      int get_b();
+    };
+
+    int main()
+    {
+      std::cout << S::a;
+      std::cout << S::get_a();
+      S s;
+      std::cout << s.b;
+      std::cout << s.get_b();
+      std::cout << s.a;
+      std::cout << s.get_a();
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Статические поля и методы}
+  \begin{lstlisting}
+    struct S
+    {
+      static int a;
+      static const int b, c = 5;
+      static constexpr int d = 1; // inline
+      static S s; // incomplete type
+      static thread_local S ss;
+      static const auto e = sizeof(int); // declaration only
+      static const auto f = 111;
+
+      static S & instance(); // declaration
+    };
+    int S::a;
+    const int S::b = -1, S::c;
+    S S::s;
+    thread_local S S::ss;
+    const int S::f;
+
+    // definition
+    S & S::instance()
+    { return ss; }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Нестатические поля и методы}
+  Поля:
+  \begin{itemize}
+    \item являются подобъектами объекта класса \vspace{0.5em}
+    \item тип должен быть полностью определён в точке объявления \vspace{0.5em}
+    \item не могут быть \lstinline{auto}, \lstinline{extern}, \lstinline{thread_local} \vspace{0.5em}
+    \item размер $\geq 1$ \vspace{0.5em}
+    \item неотделимы от объекта класса \vspace{1em}
+  \end{itemize}
+  Методы:
+  \begin{itemize}
+    \item при вызове имеют доступ к полям конкретного объекта класса \vspace{0.5em}
+    \item объект класса доступен через \lstinline{this} \vspace{0.5em}
+    \item могут иметь квалификаторы вызова
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Примеры нестатических полей и методов}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+    struct S
+    {
+      const int a = 10;
+      int b = 5;
+      char str[6] = "Hello";
+
+      void plus_one()
+      { ++b; }
+      constexpr std::size_t length() const
+      { return sizeof(str) / sizeof(char); }
+    };
+
+    int main()
+    {
+      S s1, s2;
+      std::cout << "1: " << s1.a << ", " << s1.b << ", " << s1.str << std::endl;
+      std::cout << "2: " << s2.a << ", " << s2.b << ", " << s2.str << std::endl;
+      s1.plus_one();
+      s1.plus_one();
+      --s2.b;
+      s2.str[1] = 'X';
+      std::cout << "1: " << s1.a << ", " << s1.b << ", " << s1.str << std::endl;
+      std::cout << "2: " << s2.a << ", " << s2.b << ", " << s2.str << std::endl;
+      constexpr S s3;
+      std::cout << s3.length() << std::endl;
+      // s1.a++;
+      // s3.plus_one();
+    }
   \end{lstlisting}
 \end{frame}
 
