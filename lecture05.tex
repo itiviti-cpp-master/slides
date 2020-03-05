@@ -262,21 +262,21 @@
 
 \begin{frame}[fragile]{Использование имён членов вне области видимости класса}
   \begin{itemize}
-    \item область видимости наследников \vspace{1em}
+    \item область видимости наследников \vspace{0.5em}
     \item оператор \lstinline{.} : \lstinline{expr.name} \\
       где \emph{expr} имеет тип:
       \begin{itemize}
         \item класса
         \item потомка
       \end{itemize}
-      \vspace{1em}
+      \vspace{0.5em}
     \item оператор \lstinline{->} : \lstinline{expr->name} \\
       где \emph{expr} имеет тип:
       \begin{itemize}
         \item указатель на класс
         \item указатель на потомок
       \end{itemize}
-      \vspace{1em}
+      \vspace{0.5em}
     \item оператор \lstinline{::} : \lstinline{Class::member} \\
       где \emph{Class}:
       \begin{itemize}
@@ -289,9 +289,9 @@
 \begin{frame}[fragile]{Поля и методы}
   \begin{itemize}
     \item статические \vspace{0.5em}
-    \item нестатические \vspace{1em}
+    \item нестатические \vspace{0.5em}
   \end{itemize}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     struct S
     {
       static int a;
@@ -315,7 +315,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Статические поля и методы}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     struct S
     {
       static int a;
@@ -343,10 +343,10 @@
 \begin{frame}{Нестатические поля и методы}
   Поля:
   \begin{itemize}
-    \item являются подобъектами объекта класса \vspace{0.5em}
-    \item тип должен быть полностью определён в точке объявления \vspace{0.5em}
-    \item не могут быть \lstinline{auto}, \lstinline{extern}, \lstinline{thread_local} \vspace{0.5em}
-    \item размер $\geq 1$ \vspace{0.5em}
+    \item являются подобъектами объекта класса
+    \item тип должен быть полностью определён в точке объявления
+    \item не могут быть \lstinline{auto}, \lstinline{extern}, \lstinline{thread_local}
+    \item размер $\geq 1$
     \item неотделимы от объекта класса \vspace{1em}
   \end{itemize}
   Методы:
@@ -357,8 +357,8 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Примеры нестатических полей и методов}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+\begin{frame}[fragile]{Примеры нестатических полей и методов}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcmediumsize]
     struct S
     {
       const int a = 10;
@@ -404,6 +404,7 @@
   Неполный тип:
   \begin{itemize}
     \item предварительное объявление класса \vspace{0.5em}
+    \item определение класса до закрывающей скобки \vspace{0.5em}
     \item \lstinline{enum} до момента определения его типа реализации \vspace{0.5em}
     \item \lstinline{void} \vspace{0.5em}
     \item ...
