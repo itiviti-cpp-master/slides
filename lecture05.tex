@@ -181,6 +181,7 @@
     public:
       std::size_t value() const
       { return n; }
+      using X = B;
     };
 
     int main()
@@ -189,6 +190,8 @@
       C c = C();
       std::cout << sizeof(a) << ":" << sizeof(b1) << ":" << sizeof(c) << std::endl;
       std::cout << C().value() << std::endl;
+      C::X x;
+      std::cout << x.b << std::endl;
     }
   \end{lstlisting}
 \end{frame}
@@ -337,6 +340,10 @@
     // definition
     S & S::instance()
     { return ss; }
+
+    char xx[S::e];
+    // const void * pp = &S::e;
+    const void * pp = &S::f;
   \end{lstlisting}
 \end{frame}
 
@@ -347,13 +354,15 @@
     \item тип должен быть полностью определён в точке объявления
     \item не могут быть \lstinline{auto}, \lstinline{extern}, \lstinline{thread_local}
     \item размер $\geq 1$
-    \item неотделимы от объекта класса \vspace{1em}
+    \item неотделимы от объекта класса
+    \item инициализация -- в объявлении или в конструкторе \vspace{0.5em}
   \end{itemize}
   Методы:
   \begin{itemize}
-    \item при вызове имеют доступ к полям конкретного объекта класса \vspace{0.5em}
-    \item объект класса доступен через \lstinline{this} \vspace{0.5em}
+    \item при вызове имеют доступ к полям конкретного объекта класса
+    \item объект класса доступен через \lstinline{this}
     \item могут иметь квалификаторы вызова
+    \item специальные методы -- конструкторы, деструкторы, операторы присваивания
   \end{itemize}
 \end{frame}
 
@@ -367,6 +376,8 @@
 
       void plus_one()
       { ++b; }
+      void alt_plus_one()
+      { ++this->b; }
       constexpr std::size_t length() const
       { return sizeof(str) / sizeof(char); }
     };
@@ -390,8 +401,361 @@
   \end{lstlisting}
 \end{frame}
 
+\begin{frame}[fragile]{Операторы классов}
+  \begin{lstlisting}
+    class C
+    {
+    public:
+      C & operator++ ()
+      {
+        // some custom increment logic
+      }
+      C & operator &= (const C & rhs)
+      {
+        return *this;
+      }
+    };
+
+    C c, cc;
+    ++c;
+    c &= ++cc;
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Отображение синтаксиса операторов}
+  Определение операторов, как членов класса -- это частный случай перегрузки операторов.
+
+  \begin{center}
+    \begin{tabular}{ l l }
+      \hline
+      Синтаксис оператора & Синтаксис перегруженной функции \\
+      \hline
+      &\\
+      @a & (a).operator@ () \\
+      a@ & (a).operator@ (0) \\
+      a@b & (a).operator@ (b) \\
+      a(b...) & (a).operator() (b...) \\
+      a[b] & (a).operator[] (b) \\
+      a-> & (a).operator-> () \\
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Вложенные классы}
+  \begin{lstlisting}
+    struct S {
+      class C {
+        int f();
+      };
+      class CC;
+    };
+    int S::C::f() {}
+
+    S::C c;
+    int n = c.f();
+
+    class S::CC {};
+  \end{lstlisting}
+  \begin{itemize}
+    \item область видимости включает имена окружающего класса
+    \item как член класса имеет полные права доступа к другим его членам
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Наследование}
+  \begin{lstlisting}
+    struct A {};
+    struct B
+    {
+      int a, b;
+    };
+    struct C : A, B
+    {
+      double a, c;
+    };
+
+    C c;
+    int x = c.b;
+    double y = c.c;
+    auto z = c.a;
+
+    static_assert(sizeof(C) >= sizeof(A) + sizeof(B));
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Права доступа к членам класса}
+  \begin{itemize}
+    \item \lstinline{public} -- публичный доступ, нет ограничений \vspace{0.5em}
+    \item \lstinline{private} -- закрытый доступ, только другие члены этого класса (или его друзья) имеют доступ к этому имени \vspace{0.5em}
+    \item \lstinline{protected} -- защищенный доступ, подобно закрытому, но права доступа есть также у наследников класса
+  \end{itemize}
+  \begin{lstlisting}
+    class C
+    {
+    private:
+      int f(int)
+      { return 10; }
+    public:
+      int f(double)
+      { return -10; }
+    };
+
+    int main()
+    {
+      C c;
+      return c.f(1); // error
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Назначение прав доступа}
+  \begin{itemize}
+    \item явно в теле класса -- действует на все последующие члены до следующего явного указания спецификатора доступа \vspace{1em}
+    \item при наследовании -- действует на все члены родительского класса
+  \end{itemize}
+
+  \begin{lstlisting}
+    class C
+    {
+      public: // inside of class definition
+    };
+
+    class CC : protected C // in inheritance list
+    {
+    };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Пример назначения прав доступа}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+    #include <iostream>
+
+    class A
+    {
+    public:
+      std::size_t size() const
+      { return sizeof(n); }
+    protected:
+      int next()
+      { return ++n; }
+    private:
+      int n = 0;
+    };
+
+    class B : public A
+    {
+    public:
+      void next()
+      { A::next(); }
+    };
+
+    int main()
+    {
+      A a;
+      B b;
+      std::cout << a.size() << std::endl;
+      // std::cout << a.next() << std::endl;
+      // std::cout << a.n << std::endl;
+      b.next();
+      std::cout << b.size() << std::endl;
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Права доступа и наследование}
+  \begin{itemize}
+    \item \lstinline{public} -- спецификаторы доступа родительского класса наследуются без изменений \vspace{1em}
+    \item \lstinline{protected} -- \lstinline{public} и \lstinline{protected} члены родительского класса считаются \lstinline{protected} у наследника, \lstinline{private} не меняется \vspace{1em}
+    \item \lstinline{private} -- \lstinline{public} и \lstinline{protected} члены родительского класса наследуются, как \lstinline{private}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Права доступа и вложенные классы}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+    class Outer
+    {
+    public:
+      class Inner
+      {
+      public:
+        static int get_a()
+        { return a; }
+        int get_b(const Outer & outer) const
+        { return outer.b; }
+      private:
+        int c = 22;
+      };
+
+      Inner get_inner() const
+      {
+        Inner i;
+        // b = i.c;
+        return i;
+      }
+    private:
+      static const int a = 10;
+      int b = -5;
+    };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Различие между структурами и классами}
+  \begin{itemize}
+    \item \lstinline{struct} -- по умолчанию, \lstinline{public} права доступа к членам, \lstinline{public} наследование \vspace{0.5em}
+    \item \lstinline{class} -- по умолчанию, \lstinline{private} права доступа к членам, \lstinline{private} наследование
+  \end{itemize}
+
+  \vspace{1em}
+
+  \begin{lstlisting}
+  struct S : A // public inheritance implied
+  {
+    int x; // public access implied
+  };
+
+  class C : B // private inheritance implied
+  {
+    int y; // private access implied
+  };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Агрегатная инициализация}
+  \begin{lstlisting}
+  T obj = { a, b, c, ... };
+  T obj{a, b, c, ... };
+  {a, b, c, ...}; // temporary, type must be implied by context
+  \end{lstlisting}
+
+  \vspace{0.5em}
+
+  Агрегатная инициализация возможно для агрегатов:
+  \begin{itemize}
+    \item Массив \vspace{0.5em}
+    \item Класс с только публичными нестатическими полями, без конструкторов, без виртуальных методов, все базовые классы должны удовлетворять тем же требованиям
+  \end{itemize}
+
+  \vspace{1em}
+
+  Эффект агрегатной инициализации -- каждый подобъект объекта-агрегата инициализируется копией значения из списка инициализации.
+\end{frame}
+
+\begin{frame}[fragile]{Пример использования агрегатной инициализации}
+  \begin{lstlisting}
+  struct A {
+    int a_a;
+    int a_b;
+  };
+
+  struct B : A {
+    char b_a;
+    char b_b;
+  };
+
+  struct C : A, B {
+    std::string c_a;
+  };
+
+  C c { 20, 30, -20, -30, '\0', 'X', "Hello" };
+  \end{lstlisting}
+\end{frame}
+
 %-------------------------------------------------
 \section{Enum}
+
+\begin{frame}[fragile]{\lstinline{enum}}
+  \begin{lstlisting}
+  enum Side {
+    Buy,
+    Sell
+  };
+
+  char encode_side(const Side side) {
+    switch (side) {
+      case Buy: return '1';
+      case Sell: return '2';
+    }
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Классические открытые (unscoped) enum}
+  \begin{itemize}
+    \item \lstinline{enum} [\emph{имя}] \lstinline|{| \emph{enumerator} [\lstinline{=} \emph{const expr}]\lstinline{,} ... \lstinline|}|
+    \item \lstinline{enum} \emph{имя} \lstinline{:} \emph{тип} \lstinline|{| \emph{enumerator} [\lstinline{=} \emph{const expr}]\lstinline{,} ... \lstinline|}|
+    \item \lstinline{enum} \emph{имя} \lstinline{:} \emph{тип}\lstinline{;}
+  \end{itemize}
+
+  \vspace{0.5em}
+
+  \begin{itemize}
+    \item \emph{имя} -- новый тип \vspace{0.5em}
+    \item \emph{тип} -- базовый тип, по умолчанию -- не шире \lstinline{int} \vspace{0.5em}
+    \item \emph{enumerator} -- константа в той же области видимости \vspace{0.5em}
+    \item \emph{const expr} -- значение, которым инициализируется константа \vspace{0.5em}
+    \item неявное приведение $\mathbf{type}(enumerator) \to \mathbb{I}$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Строгие (scoped) \lstinline{enum}}
+  \begin{itemize}
+    \item \lstinline{enum} \lstinline{class} | \lstinline{struct} \emph{имя} \lstinline|{| \emph{enumerator} [\lstinline{=} \emph{constexpr}]\lstinline{,} ... \lstinline|}|
+    \item \lstinline{enum} \lstinline{class} | \lstinline{struct} \emph{имя} \lstinline{:} \emph{тип} \lstinline|{| \emph{enumerator} [\lstinline{=} \emph{constexpr}]\lstinline{,} ... \lstinline|}|
+    \item \lstinline{enum} \lstinline{class} | \lstinline{struct} \emph{имя} \lstinline{;}
+    \item \lstinline{enum} \lstinline{class} | \lstinline{struct} \emph{имя} \lstinline{:} \emph{тип}\lstinline{;}
+  \end{itemize}
+
+  \vspace{0.5em}
+
+  \begin{itemize}
+    \item \emph{имя} -- новый тип \vspace{0.5em}
+    \item \emph{тип} -- базовый тип, по умолчанию -- \lstinline{int} \vspace{0.5em}
+    \item \emph{enumerator} -- константа в области видимости \lstinline{enum} \vspace{0.5em}
+    \item \emph{const expr} -- значение, которым инициализируется константа
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\lstinline{enum} и приведения типов}
+  \begin{itemize}
+    \item неявное приведение открытых \lstinline{enum} к интегральным типам \vspace{0.5em}
+    \item явное приведение интегральных, floating типов и других \lstinline{enum} к любому \lstinline{enum} \vspace{0.5em}
+    \item если базовый тип не задан, а преобразуемое значение не представимо в выбранном по умолчанию -- \textbf{UB} \vspace{0.5em}
+  \end{itemize}
+  \begin{lstlisting}
+    enum E1 { A = 5, B, C };
+    enum class E2 { A, B };
+
+    E1 e1 = static_cast<E1>(1000);
+    E2 e2 = static_cast<E2>(B);
+
+    int main()
+    {
+      // return E2::B;
+      return B;
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Преимущества строгих enum над классическими}
+  Имена элементов строгого \lstinline{enum} не засоряют область видимости -- важно для \lstinline{enum}, объявляемых в пространстве имен.
+
+  \vspace{2em}
+
+  Невозможно случайно получить неявное преобразование к совершенно другому типу.
+
+  \vspace{1em}
+
+  \begin{lstlisting}
+  enum Side { Buy, Sell };
+  enum TimeInForce { Day, GTD, IOC };
+
+  void foo(const Side side, const TimeInForce tif) {
+    if (side == Day) { // obviously, an error, but compiles happily
+      ...
+    }
+  }
+  \end{lstlisting}
+\end{frame}
 
 %-------------------------------------------------
 \section{Полные и неполные типы}
@@ -480,5 +844,135 @@
 %-------------------------------------------------
 \section{Некоторые классы стандартной библиотеки}
 
+\begin{frame}[fragile]{\lstinline{std::string}}
+  \url{https://en.cppreference.com/w/cpp/string/basic_string}
+  \begin{lstlisting}
+    #include <string>
+
+    std::string s1, s2 = "Hello", s3 = s2;
+
+    void foo(const std::string & str) {
+      if (!str.empty()) {
+        const char * s = str.c_str();
+      }
+      if (str.size() >= 5) {
+        char c = str[4];
+      }
+      if (std::size_t i = str.find("ll"); i != str.npos) {
+        const auto ss = str.substr(i, 3);
+      }
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\lstinline{std::array}}
+  \url{https://en.cppreference.com/w/cpp/container/array}
+  \begin{lstlisting}
+    #include <array>
+
+    std::array<int, 5> x = {1, 2, 3, 4, 5};
+    std::array<int, 10> y = x; // compilation error
+
+    static_assert(!x.empty());
+    static_assert(x.size() == 5);
+
+    x[2] = 22;
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\lstinline{std::vector}}
+  \url{https://en.cppreference.com/w/cpp/container/vector}
+  \begin{lstlisting}
+    #include <vector>
+
+    std::vector<unsigned> x(10, 0xAE), y(100, 0x11);
+    y = x;
+    
+    std::vector<int> z(5, -1);
+    z = x; // compilation error
+
+    x.push_back(1111);
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Некоторые варианты использования \lstinline{std::vector}}
+  \begin{lstlisting}
+  std::vector<std::string> strings;
+  strings.reserve(100);
+  for (std::string line; std::getline(std::cin, line); ) {
+    strings.push_back(line);
+  }
+
+  std::cout << "Read " << strings.size() << " input lines" << std::endl;
+
+  strings.clear();
+  assert(strings.size() == 0);
+  assert(strings.size() != strings.capacity());
+
+  strings.shrink_to_fit();
+  assert(strings.size() == strings.capacity()); // maybe
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\lstinline{std::pair}}
+  \url{https://en.cppreference.com/w/cpp/utility/pair}
+  \begin{lstlisting}
+  #include <utility>
+
+  std::pair<int, std::string> x(-10, "Cat");
+  std::cout << x.first << " : " << x.second << std::endl;
+
+  const auto y = std::make_pair(99, "Dog");
+
+  const auto z = std::make_pair<unsigned, std::string>(99, "Explicit dog");
+
+  std::pair<A, B> foo() {
+    A a;
+    B b;
+    return {a, b};
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\lstinline{std::tuple}}
+  \url{https://en.cppreference.com/w/cpp/utility/tuple}
+  \begin{lstlisting}
+  #include <tuple>
+
+  auto many() {
+    return std::make_tuple(1, 2, 'a', std::string{"str"});
+  }
+
+  std::tuple<int, char, double> alt() {
+    return {1, 'a', 0.1};
+  }
+
+  const auto x = many();
+  std::cout << std::get<0>(x)
+        << ", " << std::get<1>(x)
+        << ", " << std::get<2>(x)
+        << ", " << std::get<3>(x) << std::endl;
+
+  const auto y = std::tuple_cat(x, x, x);
+  static_assert(std::tuple_size_v<decltype(y)> == 12);
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Structured bindings}
+  \begin{lstlisting}
+  std::tuple<A, B, C> foo();
+
+  auto [a, b, c] = foo();
+  a = A();
+  const auto x = b;
+
+  void bar(std::vector<std::pair<int, std::string>> & v) {
+    for (auto & [n, s] : v) {
+      n = s.size();
+      s += '\n';
+    }
+  }
+  \end{lstlisting}
+\end{frame}
 
 \end{document}
