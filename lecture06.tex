@@ -570,6 +570,9 @@ $P - Q = i - j$
     assert(y == z);
     assert(cy == cz);
     assert(x == reinterpret_cast<T1 *>(y));
+    T1 * n1 = nullptr;
+    T2 * n2 = nullptr;
+    assert(n1 == reinterpret_cast<T1 *>(n2));
   }
   \end{lstlisting}
 \end{frame}
