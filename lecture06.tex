@@ -17,11 +17,6 @@
 
 \newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
 
-\lstnewenvironment{cmdline}
-  {\lstset{basicstyle=\ttfamily\scriptsize,keywordstyle=\color{blue},
-           language={bash}}}
-  {}
-  
 \colorlet{mygreen}{green!60!blue}
 \colorlet{mymauve}{red!60!blue}
 \definecolor{pblue}{rgb}{0.1, 0.2, 0.8}
@@ -33,8 +28,10 @@
       commentstyle=\color{mygreen},
       keywordstyle=\color{blue},
 %      numberstyle=\tiny\color{blue},
-      numberstyle=\noncopynumber
+      numberstyle=\noncopynumber,
       stringstyle=\color{mymauve},
+      numbers=left,
+      stepnumber=1,
       columns=fullflexible,
       breaklines=true,
       postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
@@ -61,7 +58,7 @@
 % to not copy line numbers
 \newcommand{\noncopynumber}[1]{%
   \BeginAccSupp{method=escape,ActualText={}}%
-    #1%
+    \color{blue} #1%
   \EndAccSupp{}%
 }
 % to not copy line numbers
@@ -102,7 +99,7 @@
 
 %-------------------------------------------------
 
-\section{Указатели и ссылки}
+\section{Указатели}
 
 \begin{frame}[fragile]{Указатели}
 
@@ -187,7 +184,7 @@ void * u = nullptr; // null pointer to void
 \end{frame}
 
 \begin{frame}[fragile]{Указатели, приведения типов и \lstinline{NULL}}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
   #include <iostream>
 
   int f() { return 10; }
@@ -503,7 +500,7 @@ $P - Q = i - j$
 \end{frame}
 
 \begin{frame}[fragile]{Полиморфизм в стиле C}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
   #include <cstdlib>
 
   int cmp(const void * lhs, const void * rhs)
@@ -527,19 +524,16 @@ $P - Q = i - j$
 \end{frame}
 
 \begin{frame}[fragile]{Немного о \lstinline{reinterpret_cast}}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcmediumsize]
+  \begin{lstlisting}[basicstyle=\ttfamily\srcsmallsize]
   template <class T>
-  void a(T x)
-  {
-    if constexpr (std::is_integral_v<T> || std::is_enum_v<T> ||
-          std::is_pointer_v<T> || std::is_member_pointer_v<T>) {
+  void a(T x) {
+    if constexpr(std::is_integral_v<T> || std::is_enum_v<T> || std::is_pointer_v<T> || std::is_member_pointer_v<T>){
       assert(x == reinterpret_cast<T>(x);
     }
   }
 
   template <class I, class P>
-  void b(P x)
-  {
+  void b(P x) {
     if constexpr (std::is_pointer_v<P> && sizeof(P) <= sizeof(I)) {
       I i = reinterpret_cast<I>(x);
       assert(x == reinterpret_cast<P>(i));
@@ -550,10 +544,8 @@ $P - Q = i - j$
   }
 
   template <class P, class I>
-  void c(I x)
-  {
-    if constexpr ((std::is_integral_v<I> || std::is_enum_v<I>) &&
-          std::is_pointer_v<P>) {
+  void c(I x) {
+    if constexpr ((std::is_integral_v<I> || std::is_enum_v<I>) && std::is_pointer_v<P>) {
       P p = reinterpret_cast<P>(x);
       assert(static_cast<P>(nullptr) ??? reinterpret_cast<P>(I{0}));
       assert(static_cast<P>(nullptr) ??? reinterpret_cast<P>(NULL));
@@ -561,8 +553,7 @@ $P - Q = i - j$
   }
 
   template <class T1, class T2>
-  void d(T1 * x)
-  {
+  void d(T1 * x) {
     T2 * y = reinterpret_cast<T2 *>(x);
     const T2 * cy = reinterpret_cast<const T2 *>(x);
     T2 * z = static_cast<T2 *>(static_cast<void *>(x));
@@ -576,6 +567,10 @@ $P - Q = i - j$
   }
   \end{lstlisting}
 \end{frame}
+
+%-------------------------------------------------
+
+\section{Ссылки}
 
 \begin{frame}[fragile]{Ссылки}
 
@@ -824,17 +819,19 @@ void f3(const S & rs) {
 \end{frame}
 
 \begin{frame}[fragile]{Возврат результатов через аргументы функции}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
   bool f(int a, int * b)
   {
     *b = a;
     return true;
   }
+
   bool g(int a, int & b)
   {
     b = a;
     return true;
   }
+
   bool h(int a, int b)
   {
     b = a;
@@ -931,13 +928,13 @@ delete a;
 
 \section{Некоторые вспомогательные классы}
 
-\begin{frame}[fragile]{std::string\_view}
+\begin{frame}[fragile]{\lstinline{std::string_view}}
 
 Указание на участок памяти, интерпретируемый как последовательность символов. Не позволяет менять данные, на которые указывает.
 
 \vspace{1em}
 
-\begin{lstlisting}
+\begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
 #include <string>
 #include <string_view>
 
@@ -957,7 +954,7 @@ for (char c : y) {
 
 \end{frame}
 
-\begin{frame}[fragile]{std::reference\_wrapper}
+\begin{frame}[fragile]{\lstinline{std::reference_wrapper}}
 
 \begin{lstlisting}
 #include <functional>
