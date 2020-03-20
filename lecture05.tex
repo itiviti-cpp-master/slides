@@ -168,15 +168,13 @@
   \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     struct A {};
 
-    struct B
-    {
+    struct B {
       A a;
       int b;
       char c;
     } b1, b2;
 
-    class C
-    {
+    class C {
       const std::size_t n = 0;
     public:
       std::size_t value() const
@@ -184,8 +182,7 @@
       using X = B;
     };
 
-    int main()
-    {
+    int main() {
       A a;
       C c = C();
       std::cout << sizeof(a) << ":" << sizeof(b1) << ":" << sizeof(c) << std::endl;
@@ -485,16 +482,20 @@
 
 \begin{frame}[fragile]{Права доступа к членам класса}
   \begin{itemize}
-    \item \lstinline{public} -- публичный доступ, нет ограничений \vspace{0.5em}
-    \item \lstinline{private} -- закрытый доступ, только другие члены этого класса (или его друзья) имеют доступ к этому имени \vspace{0.5em}
+    \item \lstinline{public} -- публичный доступ, нет ограничений \vspace{1em}
+    \item \lstinline{private} -- закрытый доступ, только другие члены этого класса (или его друзья) имеют доступ к этому имени \vspace{1em}
     \item \lstinline{protected} -- защищенный доступ, подобно закрытому, но права доступа есть также у наследников класса
   \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Права доступа к членам класса}
   \begin{lstlisting}
     class C
     {
     private:
       int f(int)
       { return 10; }
+
     public:
       int f(double)
       { return -10; }
@@ -513,7 +514,6 @@
     \item явно в теле класса -- действует на все последующие члены до следующего явного указания спецификатора доступа \vspace{1em}
     \item при наследовании -- действует на все члены родительского класса
   \end{itemize}
-
   \begin{lstlisting}
     class C
     {
@@ -527,7 +527,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Пример назначения прав доступа}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  \begin{lstlisting}[basicstyle=\ttfamily\srcmediumsize]
     #include <iostream>
 
     class A
@@ -829,14 +829,14 @@
 
     enum class C : unsigned;
 
-    A get_a()
+    A get_a(unsigned long x)
     {
-      return static_cast<A>(10); // potential UB
+      return static_cast<A>(x); // potential UB
     }
 
     B a_to_b(const A a)
     {
-      return static_cast<B>(a); // potential UB
+      return static_cast<B>(a); // OK
     }
   \end{lstlisting}
 \end{frame}
@@ -936,14 +936,16 @@
 
 \begin{frame}[fragile]{\lstinline{std::tuple}}
   \url{https://en.cppreference.com/w/cpp/utility/tuple}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
   #include <tuple>
 
-  auto many() {
+  auto many()
+  {
     return std::make_tuple(1, 2, 'a', std::string{"str"});
   }
 
-  std::tuple<int, char, double> alt() {
+  std::tuple<int, char, double> alt()
+  {
     return {1, 'a', 0.1};
   }
 
