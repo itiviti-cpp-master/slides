@@ -1,0 +1,534 @@
+\documentclass[unknownkeysallowed,xcolor=table]{beamer}
+ 
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{multirow}
+
+% to not copy line numbers
+\usepackage{accsupp}
+% to not copy line numbers
+
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{pblue}{rgb}{0.1, 0.2, 0.8}
+
+\newcommand{\rarr}{$\rightarrow$}
+
+\lstset{
+      basicstyle=\ttfamily\small,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+      numberstyle=\noncopynumber,
+      stringstyle=\color{mymauve},
+      numbers=left,
+      stepnumber=1,
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      literate={~} {\textapprox}{1},
+      language={[11]C++}
+}
+
+\makeatletter
+\newcommand{\srcmediumsize}{\@setfontsize{\srcmediumsize}{7pt}{7pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcbigsize}{\@setfontsize{\srcbigsize}{8pt}{8pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+% to not copy line numbers
+\newcommand{\noncopynumber}[1]{%
+  \BeginAccSupp{method=escape,ActualText={}}%
+    \color{blue} #1%
+  \EndAccSupp{}%
+}
+% to not copy line numbers
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2020]
+{ИТМО, весенний семестр 2020}
+ 
+\logo{%
+  \makebox[0.97\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.5cm,keepaspectratio]{itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%-------------------------------------------------
+\section{Пространства имён}
+
+\begin{frame}[fragile]{Пространства имён}
+  Позволяют использовать одинаковые имена для разных сущностей в разных частях программы.
+
+  \begin{lstlisting}
+  namespace A {
+    void f(int);
+    double g();
+  }
+  namespace B {
+    bool f(const std::string &);
+    void g();
+  }
+  int main()
+  {
+    int i = 101;
+    A::f(i);
+    double x = A::g();
+    B::g();
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Пространства имён и определения}
+  \begin{lstlisting}
+  namespace A {
+    int f();
+    void g();
+    double sqrt(double x)
+    {
+      ...
+    }
+  }
+
+  int A::f()
+  { ... }
+
+  void A::g()
+  { ... }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Вложенные пространства имён}
+  \begin{lstlisting}
+  namespace A {
+    namespace B {
+      namespace C {
+        class C {...};
+      }
+    }
+  }
+  namespace A::B::C {
+    struct S {...};
+  }
+
+  int main()
+  {
+    A::B::C::C c;
+    A::B::C::S s;
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Область видимости пространства имён}
+  \begin{lstlisting}
+  namespace A {
+    const int n = 1;
+
+    namespace B {
+      void f()
+      { std::cout << n << std::endl; }
+    }
+  }
+
+  const int n = 0;
+
+  namespace A {
+    namespace B {
+      const int n = 3;
+
+      void g()
+      { f(); }
+
+      void h()
+      { std::cout << n << std::endl; }
+    }
+  }
+
+  int main()
+  {
+    A::B::g();
+    A::B::h();
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Область видимости пространства имён, продолжение}
+  \begin{lstlisting}
+  namespace A {
+    int f(int);
+    const int n = -13;
+  }
+
+  int A::f(int i = n)
+  { return i; }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Анонимные пространства имён}
+  \begin{lstlisting}
+  namespace {
+    class C {...};
+    C c;
+    void f() {...}
+  }
+  namespace A {
+    namespace {
+      int g() {...};
+    }
+  }
+
+  int main()
+  {
+    C cc = c;
+    f();
+    return A::g();
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Полностью квалифицированные имена}
+  \begin{lstlisting}
+  namespace U {
+    namespace X {
+      void f();
+    }
+    namespace Y {
+      namespace X {
+        double f(int);
+      }
+      void g(int n) {
+        double x = X::f(n);
+        ::U::X::f();
+      }
+    }
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Псевдонимы пространств имён}
+  \begin{lstlisting}
+  namespace A::B::C::D::E {
+    class X {...};
+  }
+  namespace abcde = A::B::C::D::E;
+
+  int main()
+  {
+    abcde::X x;
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{using директива и объявление}
+  \begin{lstlisting}
+  namespace A {
+    using namespace std; // using directive
+
+    void say_hi()
+    {
+      cout << "Hi!" << endl;
+    }
+  }
+  namespace B {
+    using std::string; // using declaration
+
+    std::size_t strlen(const string & s)
+    {
+      return s.size();
+    }
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Особенности using}
+  \begin{lstlisting}
+  class X {};
+
+  void swap(X &, X &) {}
+
+  namespace N {
+    void swap(X &, X &) {}
+  }
+
+  struct Y { X x; };
+
+  void swap(Y & l, Y & r) {
+    using std::swap;
+    using namespace N; // N::swap is hidden
+    swap(l.x, r.x); // ::swap is found by ADL
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Добавление в пространство std}
+  В общем случае добавление в пространство \lstinline{std} запрещено и является UB.
+
+  \vspace{1em}
+
+  Исключение: специализация шаблонных классов из пространства \lstinline{std}, которая зависит хотя бы от одного пользовательского типа.
+
+  \vspace{1em}
+
+  Ограничения добавления специализаций:
+  \begin{itemize}
+    \item полная специализация метода класса из \lstinline{std} -- UB
+    \item полная или частичная специализация класса, являющегося вложенным в класс из \lstinline{std} -- UB
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Пример правильного расширения std}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  struct S
+  {
+    std::string str;
+  };
+
+  namespace std {
+    template <>
+    struct hash<S> : hash<std::string> {
+      using argument_type = S;
+      using result_type = size_t;
+      size_t operator() (const S & s) const noexcept {
+        return hash<std::string>::operator() (s.str);
+      }
+    };
+  }
+
+  void f() {
+    std::unordered_set<S> set;
+    set.insert("foo");
+    set.insert("foo");
+    set.insert("bar");
+    assert(set.size() == 2);
+  }
+  \end{lstlisting}
+\end{frame}
+
+%-------------------------------------------------
+\section{Поиск имён}
+
+\begin{frame}{Виды поиска имён}
+  \begin{itemize}
+    \item Квалифицированный \vspace{2em}
+    \item Неквалифицированный \vspace{2em}
+    \item ADL
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Квалифицированный поиск имён}
+  Квалифицированное имя -- имя справа от оператора \lstinline{::}.
+
+  \vspace{1em}
+
+  Может относиться к:
+
+  \vspace{0.5em}
+
+  \begin{itemize}
+    \item члену класса \vspace{0.5em}
+    \item сущности из пространства имён \vspace{0.5em}
+    \item элементу \lstinline{enum}
+  \end{itemize}
+
+  \vspace{1em}
+
+  Слева от оператора \lstinline{::} -- либо ничего, либо уже найденное имя (класса, пространства имён или \lstinline{enum}).
+\end{frame}
+
+\begin{frame}[fragile]{Примеры квалифицированного поиска имён}
+  \begin{lstlisting}
+  namespace N {   
+  struct A {
+    int f() const { return 10; }
+  };
+  struct B : A {
+    int f() const { return 15; }
+
+    enum class E { A, B, C };
+  };
+  }
+
+  void g() {
+    N::B b;
+    std::cout << b.f() << std::endl;
+    std::cout << b.A::f() << std::endl;
+    std::cout << static_cast<int>(N::B::E::A) << std::endl;
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Приоритет поиска в пространствах имён}
+  \begin{lstlisting}
+  namespace A {
+    void f();
+    void g();
+  }
+  namespace B {
+    using namespace A;
+    void f();
+  }
+
+  int main() {
+    B::f(); // 'f' from 'B'
+    B::g(); // 'g' from 'A'
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Elaborated type specifier}
+  \begin{lstlisting}
+  class X {
+  public:
+    struct Y {};
+  private:
+    int Y;
+  };
+
+  void f() {
+    char X;
+    X x; // error, 'X' refers to variable X
+    class X xx; // OK
+    X::Y y; // error, 'X::Y' refers to private member 'Y'
+    class X::Y yy; // OK
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Неквалифицированный поиск}
+  Если имя не стоит справа от \lstinline{::} применяется неквалифицированный поиск.
+
+  \vspace{1em}
+
+  При таком поиске будут анализироваться только подходящие сущности (например, для имени слева от \lstinline{::} -- только пространства имён, классы и \lstinline{enum}).
+
+  \vspace{1em}
+
+  Такой поиск обрабатывает \lstinline{using} директивы, как если бы содержимое соответствующего пространства имён находилось в ближайшем окружающем пространстве имён.
+
+  \vspace{1em}
+
+  Поиск будет идти вплоть до обнаружения хотя бы одной сущности с таким именем или до исчерпания вариантов. Результатом будут все подходящие сущности с искомым
+  именем, объявленные на первом уровне, на котором обнаружилось имя.
+\end{frame}
+
+\begin{frame}[fragile]{ADL: пример}
+  \begin{lstlisting}
+  std::cout << x << std::endl;
+  operator << (std::cout, x);
+  operator << (std::cout, std::endl);
+
+  std::cout << endl; // error: 'endl' identifier not found
+  endl(std::cout); // OK
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{ADL: пример посложнее}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  namespace adl {
+    struct X {
+      int n = 10;
+      X & operator + (const X & other) {
+        n += other.n;
+        return *this;
+      }
+    };
+    X operator + (const X & lhs, const int rhs)
+    {
+      X x = lhs;
+      x.n += rhs;
+      return x;
+    }
+    enum class E { A, B, C };
+    std::ostream & operator << (std::ostream & strm, const E & e)
+    { return strm << static_cast<int>(e); }
+  }
+
+  int main() {
+    adl::X x1, x2 = adl::X{} + 10;
+    std::cout << (x1 + x2).n << std::endl;
+    adl::E e = adl::E::B;
+    std::cout << e << std::endl;
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{ADL: правила}
+  Применяется для имени из выражения вызова функции.
+
+  \vspace{1em}
+
+  Не производится, если неквалифицированный поиск дал:
+  \begin{itemize}
+    \item член класса
+    \item объявление функции на уровне блока (не считая \lstinline{using} объявления)
+    \item объявление сущности, не являющееся функцией
+  \end{itemize}
+
+  \vspace{1em}
+
+  Иначе каждый аргумент функционального вызова добавляет пространства имён и/или классы во множество, в котором затем будет производиться поиск (помимо обычного неквалифицированного поиска).
+
+  \vspace{1em}
+
+  В процессе поиска отбираются только объявления функций.
+\end{frame}
+
+\begin{frame}{ADL: правила для различных типов аргументов}
+
+  В зависимости от типа аргумента к поиска добавляется:
+
+  \begin{itemize}
+    \item базовый тип -- ничего
+    \item класс -- сам класс, его предки, его область определения (окружающий класс или пространство имён)
+    \item указатель на функцию -- анализ применяется для типа возвращаемого значения и типов всех параметров
+    \item шаблон -- в дополнение к обычным правилам, анализ применяется для каждого шаблонного параметра-типа
+    \item \lstinline{enum} -- область определения \lstinline{enum}
+    \item \lstinline{T *} -- анализ применяется для \lstinline{T}
+    \item указатель на метод -- анализ применяется для класса, типа возвращаемого значения и всех параметров
+    \item указатель на поле -- анализ применяется для типа поля и класса
+  \end{itemize}
+\end{frame}
+
+\end{document}
