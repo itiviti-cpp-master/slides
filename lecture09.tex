@@ -162,13 +162,12 @@
 \end{frame}
 
 \begin{frame}[fragile]{Область видимости пространства имён}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
   namespace A {
     const int n = 1;
 
     namespace B {
-      void f()
-      { std::cout << n << std::endl; }
+      void f() { std::cout << n << std::endl; }
     }
   }
 
@@ -178,11 +177,9 @@
     namespace B {
       const int n = 3;
 
-      void g()
-      { f(); }
+      void g() { f(); }
 
-      void h()
-      { std::cout << n << std::endl; }
+      void h() { std::cout << n << std::endl; }
     }
   }
 
@@ -198,11 +195,14 @@
   \begin{lstlisting}
   namespace A {
     int f(int);
+
     const int n = -13;
   }
 
   int A::f(int i = n)
-  { return i; }
+  {
+      return i;
+  }
   \end{lstlisting}
 \end{frame}
 
@@ -234,10 +234,12 @@
     namespace X {
       void f();
     }
+
     namespace Y {
       namespace X {
         double f(int);
       }
+
       void g(int n) {
         double x = X::f(n);
         ::U::X::f();
@@ -394,7 +396,7 @@
     N::B b;
     std::cout << b.f() << std::endl;
     std::cout << b.A::f() << std::endl;
-    std::cout << static_cast<int>(N::B::E::A) << std::endl;
+    std::cout << static_cast<int>(N::B::E::A);
   }
   \end{lstlisting}
 \end{frame}
