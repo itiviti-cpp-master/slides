@@ -1,0 +1,450 @@
+\documentclass[unknownkeysallowed,xcolor=table]{beamer}
+ 
+\usepackage [T2A,T1] {fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{multirow}
+
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\lstnewenvironment{cmdline}
+  {\lstset{basicstyle=\ttfamily\scriptsize,keywordstyle=\color{blue},
+           language={bash}}}
+  {}
+  
+\lstnewenvironment{cmdlinelarge}
+  {\lstset{basicstyle=\ttfamily\small,keywordstyle=\color{blue},
+           language={bash}}}
+  {}
+  
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{pblue}{rgb}{0.1, 0.2, 0.8}
+
+\newcommand{\rarr}{$\rightarrow$}
+
+\lstset{
+      basicstyle=\ttfamily\small,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+      numberstyle=\tiny\color{blue},
+      stringstyle=\color{mymauve},
+      numbers=left,
+      stepnumber=1,
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      literate={~} {\textapprox}{1},
+      language={[11]C++}
+}
+
+\makeatletter
+\newcommand{\srcmediumsize}{\@setfontsize{\srcmediumsize}{7pt}{7pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcbigsize}{\@setfontsize{\srcbigsize}{8pt}{8pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+\newcommand{\rot}[1]{\makebox[1em][l]{\rotatebox{45}{#1}}}
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2019]
+{ИТМО, весенний семестр 2019}
+ 
+\logo{%
+  \makebox[0.97\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.5cm,keepaspectratio]{new_itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+
+%-------------------------------------------------
+
+\section{Неявные преобразования типов}
+
+\begin{frame}{Последовательность неявного преобразования типов}
+  \begin{enumerate}
+    \item 0 или 1 цепочка стандартных преобразований \vspace{0.5em}
+    \item 0 или 1 пользовательское преобразование \vspace{0.5em}
+    \item 0 или 1 цепочка стандартных преобразований
+  \end{enumerate}
+
+  \vspace{1em}
+
+  Цепочка стандартных преобразований: \vspace{0.5em}
+  \begin{enumerate}
+    \item 0 или 1 преобразование категории значения, преобразование массива или функции к указателю \vspace{0.5em}
+    \item 0 или 1 числовое расширение или числовое преобразование \vspace{0.5em}
+    \item 0 или 1 повышение квалификации
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Пользовательские преобразования}
+  \begin{itemize}
+    \item не \lstinline{explicit} конструктор \vspace{0.5em}
+    \item не \lstinline{explicit} оператор приведения типа
+  \end{itemize}
+  \begin{lstlisting}
+  struct S
+  {
+    S(int);
+    operator double() const;
+  };
+
+  double f(const S & s)
+  { return s; }
+
+  double g(const int x)
+  { return f(x); }
+  \end{lstlisting}
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Перегрузка функций}
+
+\begin{frame}[fragile]{Перегрузка функций}
+
+Допустимо иметь несколько функций с одним именем, если в каждом случае вызова функции с таким именем компилятор может найти один наиболее подходящий вариант.
+
+\vspace{1em}
+
+\begin{lstlisting}
+void f(int) { ... }
+void f(double) { ... }
+void f(const S &) { ... }
+
+f(10);
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}{Этапы выбора функции}
+
+\begin{itemize}
+  \item поиск кандидатов -- поиск сущностей по имени
+  \item выбор подходящих к контексту вызова
+  \item выбор единственного наилучшего кандидата
+\end{itemize}
+
+\vspace{1em}
+
+При этом в зависимости от контекста вызова ищутся:
+\begin{itemize}
+  \item контекст вызова функции -- функции с таким именем
+  \item контекст функционального вызова объекта -- члены-операторы функционального вызова соответствующего класса и его предков, а также операторы преобразования типа к типу подходящей функции
+  \item контекст вызова оператора -- члены-операторы (если первый или единственный операнд имеет сложный тип), свободные операторы, встроенные операторы
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Правила выбора подходящих к контексту вызова}
+Учитываются факторы:
+
+\vspace{1em}
+
+\begin{itemize}
+  \item число аргументов \vspace{1em}
+  \item типы аргументов \vspace{1em}
+  \item допустимая ссылочная связываемость
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Ранжирование неявных преобразований типов}
+  Каждому из 3 возможных этапов последовательности неявного преобразования назначается ранг:
+  \begin{enumerate}
+    \item точное совпадение
+    \item числовое расширение
+    \item преобразование
+  \end{enumerate}
+
+  \vspace{1em}
+
+  Ранг всей последовательности = наибольшему рангу этапов.
+
+  \vspace{1em}
+
+  Связывание со ссылкой -- либо точное совпадение, либо преобразование (к одному из базовых типов).
+
+  \vspace{1em}
+
+  Отсутствие необходимости преобразования считается последовательностью нулевой длины с минимальным рангом.
+\end{frame}
+
+\begin{frame}{Ранжирование неявных преобразований типов, продолжение}
+  Стандартное преобразование лучше пользовательского.
+
+  \vspace{1em}
+
+  Чем короче необходимая цепочка стандартных преобразований -- тем она лучше.
+
+  \vspace{1em}
+
+  Связывание rvalue с rvalue ссылкой лучше связывания rvalue с const lvalue ссылкой.
+
+  \vspace{1em}
+
+  Среди связываний lvalue с lvalue ссылкой лучше то, у которого меньше cv-квалификаторов.
+
+  \vspace{1em}
+
+  Из двух последовательностей, содержащих пользовательское преобразование к одному типу, лучше та, у которой лучше третий этап.
+\end{frame}
+
+\begin{frame}{Выбор единственного наилучшего кандидата}
+Все подходящие кандидаты попарно сравниваются и выбирается наилучший из них. Несколько одинаково наилучших кандидатов -- ошибка компиляции.
+
+\vspace{1em}
+
+Один кандидат лучше другого, если требуемые неявные преобразования для всех его аргументов не хуже (имеют ранг не ниже) таковых для конкурента, а кроме того:
+
+\begin{enumerate}
+  \item для хотя бы одного аргумента требуемое неявное преобразование лучше, чем у конкурента
+  \item либо этот кандидат -- не шаблонный, а конкурент -- шаблонный
+  \item либо этот кандидат более шаблонно-специализированный, чем конкурент
+\end{enumerate}
+
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Друзья классов}
+
+\begin{frame}{Друзья классов}
+\lstinline{friend} объявление: в теле класса можно объявить другой класс или функцию ``другом'', что даст такому другу доступ ко всем членам класса (игнорируя спецификаторы доступа).
+
+\vspace{1em}
+
+Отношение дружбы -- не транзитивно, не наследуемо.
+
+\vspace{1em}
+
+Возможные формы:
+\begin{itemize}
+  \item объявление функции (оператора)
+  \item определение функции (оператора)
+  \item предварительное объявление класса
+  \item объявление видимого класса / \lstinline{union}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Примеры friend}
+\begin{lstlisting}
+struct A {
+    void f();
+    int h();
+    int g(double) const;
+};
+class B {};
+class C {
+    int x;
+    
+    friend std::ostream & operator << (std::ostream & strm, const C & c); // definition later
+    friend void A::f();
+    friend int A::f(), A::g(double) const;
+    friend class D; // definition later
+    friend B;
+};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Пример friend определения функции}
+\begin{lstlisting}
+class C {
+public:
+    C(int i) : x(i) {}
+private:
+    int x;
+    
+    friend int get_x(const C & c)
+    { return c.x; }
+};
+
+C c(10);
+int a = get_x(c); // OK (ADL)
+int b = get_x(10); // error: 'get_x' is not declared
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Пример ограничения friend}
+\begin{lstlisting}
+class BigOne {
+    // lots of stuff
+    friend class Backdoor;
+};
+
+class Backdoor {
+    friend class UserA;
+    friend class UserB;
+    friend class UserC;
+    friend class UserD;
+    
+    void access();
+};
+\end{lstlisting}
+\end{frame}
+
+
+%-------------------------------------------------
+
+\section{Перегрузка операторов}
+
+\begin{frame}{Перегрузка операторов}
+Перегруженные операторы -- функции со специальным именем.
+
+\vspace{1em}
+
+\begin{itemize}
+  \item \lstinline{operator} \emph{op} -- обычный оператор
+  \item \lstinline{operator} \emph{type} -- пользовательское приведение типа
+  \item \lstinline{operator new} -- пользовательская аллокация
+  \item \lstinline{operator new []} -- пользовательская аллокация
+  \item \lstinline{operator delete} -- пользовательская деаллокация
+  \item \lstinline{operator delete []} -- пользовательская деаллокация
+  \item \lstinline{operator ""} \emph{suffix} -- пользовательский литерал
+\end{itemize}
+
+\vspace{1em}
+
+Если в выражении один из операндов -- сложный тип (класс, \lstinline{enum}), то производится поиск перегруженной функции, реализующей данный оператор.
+
+\end{frame}
+
+\begin{frame}{Ограничения перегрузки операторов}
+
+\begin{itemize}
+  \item Нельзя перегружать некоторые операторы (например, \lstinline{::}) \vspace{0.5em}
+  \item Нельзя менять приоритет, ассоциативность операторов \vspace{0.5em}
+  \item Нельзя менять число аргументов операторов \vspace{0.5em}
+  \item Нельзя создавать новые операторы \vspace{0.5em}
+  \item Перегруженный оператор \lstinline{->} должен возвращать либо указатель, либо объект, для которого перегружен \lstinline{->} \vspace{0.5em}
+  \item Перегруженные операторы \lstinline{&&} и \lstinline{||} не имеют ленивого вычисления аргументов (но сохраняют порядок вычисления аргументов)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Операторы -- члены классов}
+
+Оператор может быть определён, как член класса:
+
+\vspace{0.5em}
+
+\begin{lstlisting}
+struct SS {};
+struct S {
+    S & operator += (const S & other) { ... }
+    const SS & operator * () const { ... }
+};
+
+S s1, s2;
+s1 += s2;
+const SS & ss = *s1;
+\end{lstlisting}
+
+\vspace{1em}
+
+При поиске имён, если первый операнд в выражении вызова оператора имеет сложный тип, то осуществляется как поиск свободных функций, так и членов классов.
+\end{frame}
+
+\begin{frame}[fragile]{Отображение синтаксиса операторов}
+
+\begin{center}
+\begin{tabular}{l l l}
+  \hline
+    Оператор & Член класса & Свободная функция \\
+  \hline
+    & &\\
+    @a & (a).operator@ () & operator@ (a) \\
+    a@ & (a).operator@ (0) & operator@ (a, 0) \\
+    a@b & (a).operator@ (b) & operator@ (a, b) \\
+    a=b & (a).operator= (b) & -- \\
+    a(b…) & (a).operator() (b…) & -- \\
+    a[b] & (a).operator[] (b) & -- \\
+    a-> & (a).operator-> () & -- \\
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]{Доступные для перегрузки операторы}
+
+\begin{itemize}
+  \item арифметические \lstinline{+, -, *, /, %, +=, -=, *=, /=, %=}
+  \item инкремента/декремента \lstinline{++, --}
+  \item битовые \lstinline{^, &, |, ~, ^=, &=, |=}
+  \item сдвига \lstinline{<<, >>, <<=, >>=}
+  \item логические \lstinline{&&, ||, !}
+  \item сравнения \lstinline{<, >, ==, !=, <=, >=}
+  \item присваивания \lstinline{=}
+  \item разыменования, доступа к члену через указатель и указатель на член \lstinline{*, ->, ->*}
+  \item индексации \lstinline{[]}
+  \item функционального вызова \lstinline{()}
+  \item запятой \lstinline{,}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Оператор пользовательского приведения типа}
+
+\begin{lstlisting}
+struct S {
+    operator X ();
+    explicit operator Y ();
+    operator auto () { return 1; }
+    template <class T>
+    operator T ();
+};
+
+S s;
+X x = s;
+Y y = static_cast<Y>(s);
+Y yy(s);
+\end{lstlisting}
+
+\vspace{1em}
+
+Такой метод объявляется нестатическим, без параметров и без возвращаемого типа. Может иметь cv-квалификатор, \lstinline{inline}, \lstinline{virtual}, \lstinline{constexpr} спецификаторы.
+
+\end{frame}
+
+\end{document}
