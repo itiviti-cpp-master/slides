@@ -1,0 +1,713 @@
+\documentclass[unknownkeysallowed,xcolor=table]{beamer}
+ 
+\usepackage [T2A,T1] {fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{multirow}
+
+% to not copy line numbers
+\usepackage{accsupp}
+% to not copy line numbers
+
+% to not copy line numbers
+\newcommand{\noncopynumber}[1]{%
+  \BeginAccSupp{method=escape,ActualText={}}%
+    \color{blue} #1%
+  \EndAccSupp{}%
+}
+% to not copy line numbers
+
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{pblue}{rgb}{0.1, 0.2, 0.8}
+
+\newcommand{\rarr}{$\rightarrow$}
+
+\lstset{
+      basicstyle=\ttfamily\small,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+%      numberstyle=\tiny\color{blue},
+      numberstyle=\noncopynumber,
+      stringstyle=\color{mymauve},
+      numbers=left,
+      stepnumber=1,
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      literate={~} {\textapprox}{1},
+      language={[11]C++}
+}
+
+\makeatletter
+\newcommand{\srcmediumsize}{\@setfontsize{\srcmediumsize}{7pt}{7pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcbigsize}{\@setfontsize{\srcbigsize}{8pt}{8pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2020]
+{ИТМО, весенний семестр 2020}
+ 
+\logo{%
+  \makebox[0.97\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.5cm,keepaspectratio]{itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%-------------------------------------------------
+
+\section{Специальные методы классов}
+
+\begin{frame}{Конструктор}
+  Конструктор -- это специальная функция-член класса, служащая для инициализации объектов этого класса.
+
+  \vspace{1em}
+
+  Имя функции совпадает с именем класса.
+
+  \vspace{1em}
+
+  При создании объекта класса всегда вызывается один конструктор.
+
+  \vspace{1em}
+
+  Конструктор нельзя вызвать явно.
+
+  \vspace{1em}
+
+  У класса может быть произвольное число конструкторов.
+\end{frame}
+
+\begin{frame}[fragile]{Деструктор}
+  Деструктор -- это специальная функция-член класса, служащая для выполнения произвольных действий непосредственно перед удалением объекта класса.
+
+  \vspace{1em}
+
+  Обычно используется для освобождения ресурсов, используемых классом, или иной финализации.
+
+  \vspace{1em}
+
+  Имя функции -- \lstinline{~ClassName}.
+
+  \vspace{1em}
+
+  У деструктора не может быть аргументов.
+
+  \vspace{1em}
+
+  При любом удалении объекта класса, его деструктор вызывается.
+
+  \vspace{1em}
+
+  У класса может быть только один деструктор.
+
+  \vspace{1em}
+
+  Деструктор можно вызвать явно.
+\end{frame}
+
+\begin{frame}{Особенности конструкторов и деструкторов}
+  \begin{itemize}
+    \item нет возвращаемого значения \vspace{1em}
+    \item нет cv-квалификаторов \vspace{1em}
+    \item нет ref-квалификаторов
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Пример конструкторов и деструктора}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  struct S {
+      S(); // 1
+      S(int); // 2
+      S(char, double); // 3
+      S(const S &); // 4
+      ~S();
+  };
+
+  S get_s();
+
+  int main()
+  {
+      S s1; // 1st constructor is called
+      S s2(10); // 2nd constructor is called
+      {
+          const S & s_ref = get_s();
+          S s3('a', 0); // 3rd constructor is called
+          S s4 = get_s(); // probably, 4th constructor is called
+                          // then S::~S()
+      } // S::~S() for s3, s4 and tmp object is called
+  } // S::~S() for s1 and s2 is called
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Список инициализации членов}
+  \begin{lstlisting}
+  struct S {
+      S(int x) : a(x), b(a*2) {}
+
+      int a;
+      int b = 10;
+  };
+
+  struct SS : S {
+      SS() : S(20), c(b) {}
+
+      int c;
+  };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Варианты инициализации в списке}
+  \begin{lstlisting}
+  struct A {
+      A() {}
+      int a = 10;
+  };
+  struct B {
+      B(int x) : b(x) {} // direct initialization
+      int b;
+  };
+  template <class... Ts>
+  struct C : A, B, Ts... {
+      C(int x, int y, const Ts &... ts)
+        : B{x}  // list initialization
+        , Ts(ts)... // pack expansion
+        , c(y) // direct
+    {}
+    int c;
+  };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Порядок инициализации объекта класса}
+  \begin{enumerate}
+    \item базовые классы инициализируются в том порядке, в каком они перечислены в списке наследования \vspace{1em}
+    \item нестатические поля класса инициализируются в том порядке, в каком они объявлены в определении класса \vspace{1em}
+    \item выполняется тело конструктора
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Порядок уничтожения объекта класса}
+  \begin{enumerate}
+    \item тело деструктора \vspace{1em}
+    \item нестатические поля класса разрушаются в порядке, обратном порядку их объявления в классе \vspace{1em}
+    \item для базовых классов деструкторы вызываются в порядке, обратном их порядку в списке наследования
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Некорректное завершение выполнения конструктора}
+  \begin{lstlisting}
+  struct S {
+      std::string s;
+      std::vector<int> v;
+      S * next = nullptr;
+
+      S();
+  };
+
+  S::S() : s("Hello, world")
+  {
+      v.resize(100);
+      next = new S(1);
+      throw 1;
+  }
+
+  S s;
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Делегирование конструкторов}
+  \begin{lstlisting}
+  struct S {
+      S(int, double, char) {...}
+      S() : S(10, 0.5, 'a') {...}
+  };
+  \end{lstlisting}
+
+  \vspace{2em}
+
+  У делегирующего конструктора список инициализации членов должен состоять из одного элемента -- вызова целевого конструктора.
+\end{frame}
+
+\begin{frame}[fragile]{Наследование конструкторов}
+  \begin{lstlisting}
+  struct A {
+      A(int, double, char);
+  };
+
+  struct B : A {};
+
+  struct C : A {
+      using A::A;
+  };
+
+  int main() {
+      B b(10, 0.5, 'a'); // error
+      C c(10, 0.5, '\n'); // OK
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\lstinline{explicit} конструкторы}
+  \begin{lstlisting}
+  struct A {
+      A(int);
+  };
+
+  struct B {
+      explicit B(int);
+  };
+
+  A f(const A &)
+  {
+      return 10; // OK, A::A(int) is called
+  }
+
+  B g(const B &)
+  {
+      return 10; // error
+      return B(10); // OK, B::B(int) is called
+  }
+
+  int main()
+  {
+      f(10); // OK, A::A(int) is called
+      g(10); // error
+      g(B(10)); // OK B::B(int) is called
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Конструкторы приведения типа}
+  Любые не-\lstinline{explicit} конструкторы.
+
+  \vspace{1em}
+
+  Могут участвовать в последовательности неявного приведения типа.
+
+  \begin{lstlisting}
+  struct A {
+      A(int);
+  };
+
+  void f(A);
+
+  f(10);
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Удалённые и автоматически создаваемые методы}
+  Некоторые методы могут быть созданы автоматически -- как неявно, так и явно.
+
+  \vspace{0.5em}
+
+  Запретить неявную автоматическую генерацию можно ``удалив'' метод.
+  \begin{lstlisting}
+  struct A {}; // A::A() is implicitly-defined
+
+  struct B {
+      B() = default; // B::B() implicit definition is forced
+  };
+
+  struct C {
+      C() = delete; // C::C() is not defined
+  };
+  \end{lstlisting}
+
+  Некоторые методы могут быть удалены неявно.
+\end{frame}
+
+\begin{frame}{Методы, создаваемые автоматически}
+  \begin{itemize}
+    \item конструктор по умолчанию \vspace{1em}
+    \item конструктор копирования \vspace{1em}
+    \item конструктор перемещения \vspace{1em}
+    \item деструктор \vspace{1em}
+    \item операторы присваивания
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Конструктор по умолчанию}
+  \begin{lstlisting}
+  struct S {
+      S(); // default constructor
+  };
+
+  S s; // default constructor is called
+
+  struct A {
+      A();
+  };
+  struct B : A {
+      B();
+  };
+
+  B b; // A::A() and B::B() are called
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Автоматическое создание конструктора по умолчанию}
+  Если у класса нет явно определенных конструкторов, то конструктор по умолчанию создаётся автоматически и эквивалентен явно определенному конструктору без списка инициализации и с пустым телом:
+  \begin{lstlisting}
+  struct A {
+  };
+
+  struct B {
+    B() {}
+  };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Удалённый конструктор по умолчанию}
+  \begin{itemize}
+    \item наличие ссылочного поля без инициализатора \vspace{0.5em}
+    \item наличие не статического константного поля без явно определённого конструктора по умолчанию или инициализатора \vspace{0.5em}
+    \item наличие не статического поля без инициализатора, имеющего удалённый либо недоступный конструктор по умолчанию \vspace{0.5em}
+    \item наличие прямого или виртуального предка с удалённым либо недоступным конструктором по умолчанию \vspace{0.5em}
+    \item наличие прямого или виртуального предка с удалённым либо недоступным деструктором
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Удалённый деструктор}
+  \begin{lstlisting}
+  struct S {
+      ~S() = delete;
+  };
+
+  static S ss; // error
+  S s; // error
+  S * ps = new S; // error
+  S * ps = new (ptr) S(); // OK
+  \end{lstlisting}
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Копирование и перемещение}
+
+\begin{frame}{Конструктор копирования}
+  Это не шаблонный конструктор, принимающий первым аргументом lvalue ссылку на объект того же типа, что и класс конструктора, который может быть вызван с одним аргументом.
+
+  \vspace{1em}
+
+  Конструктор копирования вызывается всегда, когда объект класса инициализируется из lvalue выражения того же типа (класса).
+\end{frame}
+
+\begin{frame}[fragile]{Пример конструкторов копирования}
+  \begin{lstlisting}
+  struct S {
+      S(int);
+      S(const S &); // copy constructor 1
+      S(S &); // copy constructor 2
+  };
+
+  S f(S s) {
+      return s; // copy constructor ? is called
+  }
+
+  const S s1(10);
+  S s2 = s1, s3(s1); // copy constructor ? is called
+  f(S(10)); // copy constructor ? is called
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Автоматическое создание конструктора копирования}
+  \begin{itemize}
+    \item \lstinline{C(const C &)}, если
+      \begin{itemize}
+        \item все прямые или виртуальные предки имеют конструктор копирования \lstinline{B(const B &)}
+        \item все не статические поля имеют конструктор копирования \lstinline{M(const M &)}
+      \end{itemize}
+    \item \lstinline{C(C &)} в противном случае
+  \end{itemize}
+
+  \vspace{1em}
+
+  Такой конструктор выполняет копирование всех подобъектов создаваемого объекта, в обычном порядке инициализации.
+\end{frame}
+
+\begin{frame}{Удалённый конструктор копирования}
+  \begin{itemize}
+    \item наличие не копируемого не статического поля \vspace{0.5em}
+    \item наличие не копируемого прямого или виртуального предка \vspace{0.5em}
+    \item наличие прямого или виртуального предка с удалённым или недоступным деструктором \vspace{0.5em}
+    \item наличие rvalue ссылочного не статического поля
+  \end{itemize}
+
+  \vspace{1em}
+
+  Наличие пользовательского конструктора перемещения или перемещающего оператора присваивания $\eq$ отсутствие автоматически созданного конструктора копирования.
+\end{frame}
+
+\begin{frame}[fragile]{Копирующий оператор присваивания}
+  Это не шаблонный оператор присваивания, принимающий ровно один аргумент, имеющий тип \lstinline{T}, \lstinline{T&} или \lstinline{const T&} (если \lstinline{T} -- это данный класс).
+
+  \vspace{1em}
+
+  \begin{lstlisting}
+  struct S {
+      S(const S &);
+      S & operator = (const S &);
+  };
+
+  S s1, s2 = s1; // copy constructor is called
+  s1 = s2; // copy assignment is called
+  \end{lstlisting}
+
+  \vspace{1em}
+
+  Предполагаемое поведение такого оператора -- копирование значения одного объекта данного класса в другой объект этого же класса.
+\end{frame}
+
+\begin{frame}{Автоматическое создание копирующего оператора присваивания}
+  \begin{itemize}
+    \item \lstinline{C & operator = (const C &)}, если
+      \begin{itemize}
+        \item все прямые или виртуальные предки имеют копирующий оператор присваивания \lstinline{B & operator = (const B &)}
+        \item все не статические поля имеют копирующий оператор присваивания \lstinline{M & operator = (const M &)}
+      \end{itemize}
+    \item \lstinline{C & operator = (C &)} в противном случае
+  \end{itemize}
+
+  \vspace{1em}
+
+  Такой оператор выполняет копирующее присваивание всех подобъектов левого объекта из соответствующих подобъектов правого, в обычном порядке инициализации.
+\end{frame}
+
+\begin{frame}{Удалённый копирующий оператор присваивания}
+  \begin{itemize}
+    \item наличие не присваиваемого не статического поля \vspace{0.5em}
+    \item наличие не присваиваемого прямого или виртуального предка \vspace{0.5em}
+    \item наличие ссылочного не статического поля \vspace{0.5em}
+    \item наличие константного не статического поля, чей тип не является классом
+  \end{itemize}
+
+  \vspace{1em}
+
+  Наличие пользовательского конструктора перемещения или перемещающего оператора присваивания $\eq$ отсутствие автоматически созданного копирующего оператора
+  присваивания.
+\end{frame}
+
+\begin{frame}{Конструктор перемещения}
+  Это не шаблонный конструктор, принимающий первым аргументом rvalue ссылку на объект того же типа, что и класс конструктора, может быть вызван с одним аргументом.
+
+  \vspace{1em}
+
+  Конструктор перемещения вызывается всегда, когда объект класса инициализируется из xvalue выражения того же типа (класса).
+
+  \vspace{1em}
+
+  Предназначение перемещающего конструктора -- забрать содержимое у аргумента - временного объекта и, по возможности, избежать затрат на копирование этого содержимого. 
+
+  При этом аргумент должен остаться в валидном, но не обязательно определённом, состоянии.
+\end{frame}
+
+\begin{frame}[fragile]{Пример конструкторов копирования и перемещения}
+  \begin{lstlisting}
+  struct S {
+      S(const S &); // copy constructor
+      S(S &&); // move constructor
+  };
+
+  void f(S s);
+
+  int main() {
+    S s1;
+    f(s1); // copy constructor is called
+    f(S{}); // move constructor is called
+    f(std::move(s1)); // move constructor is called
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Автоматическое создание конструктора перемещения}
+  Создаётся, если
+  \begin{itemize}
+    \item нет ни одного пользовательского конструктора перемещения \vspace{0.5em}
+    \item нет ни одного пользовательского конструктора копирования \vspace{0.5em}
+    \item нет ни одного пользовательского оператора присваивания (копирующего или перемещающего) \vspace{0.5em}
+    \item нет пользовательского деструктора
+  \end{itemize}
+
+  \vspace{1em}
+
+  Такой конструктор выполняет инициализацию всех подобъектов создаваемого объекта, в обычном порядке инициализации, из xvalue выражения соответствующего подообъекта
+  объекта-донора.
+\end{frame}
+
+\begin{frame}[fragile]{Удалённый конструктор перемещения}
+  \begin{itemize}
+    \item наличие не статического поля, для которого нельзя вызвать конструктор перемещения \vspace{0.5em}
+    \item наличие прямого или виртуального предка, для которого нельзя вызвать конструктор перемещения \vspace{0.5em}
+    \item наличие прямого или виртуального предка, для которого нельзя вызвать деструктор
+  \end{itemize}
+
+  \vspace{1em}
+
+  Удалённый конструктор перемещения не участвует в разрешении перегрузки.
+  \begin{lstlisting}
+  struct S {
+      S(const S &);
+      S(S &&) = delete;
+  };
+
+  S get_s();
+
+  S s = get_s(); // OK
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Перемещающий оператор присваивания}
+  Это не шаблонный оператор присваивания, принимающий ровно один аргумент, имеющий тип \lstinline{T&&} или \lstinline{const T&&}.
+
+  \vspace{1em}
+
+  \begin{lstlisting}
+  struct S {
+      S & operator = (S &&);
+  };
+
+  S s1, s2;
+  s2 = S(); // move assignment is called
+  s1 = std::move(s2); // move assignment is called
+  \end{lstlisting}
+  \vspace{1em}
+
+  Предполагаемое поведение перемещающего оператор присваивания -- перемещение значения одного объекта данного класса в другой объект данного класса.
+\end{frame}
+
+\begin{frame}{Автоматическое создание перемещающего оператора присваивания}
+  Создаётся, если
+  \begin{itemize}
+    \item нет ни одного пользовательского конструктора перемещения \vspace{0.5em}
+    \item нет ни одного пользовательского конструктора копирования \vspace{0.5em}
+    \item нет ни одного пользовательского копирующего оператора присваивания \vspace{0.5em}
+    \item нет пользовательского деструктора
+  \end{itemize}
+
+  \vspace{1em}
+
+  Такой оператор выполняет перемещающее присваивание всех подобъектов левого объекта из соответствующих подобъектов правого, в обычном порядке инициализации.
+\end{frame}
+
+\begin{frame}[fragile]{Удалённый перемещающий оператор присваивания}
+  \begin{itemize}
+    \item наличие не статического константного поля \vspace{0.5em}
+    \item наличие не статического ссылочного поля \vspace{0.5em}
+    \item наличие не статического поля, для которого нельзя вызвать перемещающее присваивание \vspace{0.5em}
+    \item наличие прямого или виртуального предка, для которого нельзя вызвать перемещающее присваивание
+  \end{itemize}
+
+  \vspace{1em}
+
+  Удалённый конструктор перемещения не участвует в разрешении перегрузки.
+  \begin{lstlisting}
+  struct S {
+      S(const S &);
+      S(S &&) = delete;
+  };
+
+  S get_s();
+
+  S s = get_s(); // OK
+  \end{lstlisting}
+\end{frame}
+
+%-------------------------------------------------
+
+\section{Copy elision}
+
+\begin{frame}[fragile]{Материализация}
+  \textbf{prvalue} \rarr \textbf{xvalue}
+
+  \vspace{2em}
+
+  \begin{lstlisting}
+  T f();
+
+  int a = 1 + 2;
+  int && b = 1 + 2;
+  T x = f();
+  const M & m = f().member;
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Copy elision}
+  Отсутствие материализации: \vspace{1em}
+  \begin{itemize}
+    \item инструкция \lstinline{return}, когда её операнд -- prvalue того же типа, что и тип возвращаемого значения функции \vspace{1em}
+    \item инициализация переменной, когда выражение инициализации -- prvalue того же типа
+  \end{itemize}
+
+  \vspace{1em}
+  \begin{lstlisting}
+  T f() {
+    return T();
+  }
+  T x = T(T(T(f()))); // only default constructor of T is called
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{NRVO}
+  Named return value optimization: если в инструкции \lstinline{return} операнд обозначает локальную переменную, которая:
+  \begin{itemize}
+    \item не является параметром функции
+    \item объект которой не является \lstinline{volatile}
+    \item объект которой имеет автоматический тип размещения
+    \item тип объекта которой совпадает с типом возвращаемого значения функции
+  \end{itemize}
+  То компилятор \emph{может} не генерировать код вызова конструктора копирования/перемещения, как если бы это была copy elision.
+
+  \begin{lstlisting}
+  T f() {
+    T t;
+    return t;
+  }
+  T x = f(); // only default constructor of T is called
+  \end{lstlisting}
+\end{frame}
+
+\end{document}
