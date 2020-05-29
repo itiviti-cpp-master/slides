@@ -1,0 +1,864 @@
+\documentclass[unknownkeysallowed,xcolor=table]{beamer}
+ 
+\usepackage [T2A,T1] {fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{pifont}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{multirow}
+
+% to not copy line numbers
+\usepackage{accsupp}
+% to not copy line numbers
+
+% to not copy line numbers
+\newcommand{\noncopynumber}[1]{%
+  \BeginAccSupp{method=escape,ActualText={}}%
+    \color{blue} #1%
+  \EndAccSupp{}%
+}
+% to not copy line numbers
+
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{pblue}{rgb}{0.1, 0.2, 0.8}
+
+\newcommand{\rarr}{$\rightarrow$}
+
+\lstset{
+      basicstyle=\ttfamily\small,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+%      numberstyle=\tiny\color{blue},
+      numberstyle=\noncopynumber,
+      stringstyle=\color{mymauve},
+      numbers=left,
+      stepnumber=1,
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      literate={~} {\textapprox}{1},
+      language={[11]C++}
+}
+
+\makeatletter
+\newcommand{\srcmediumsize}{\@setfontsize{\srcmediumsize}{7pt}{7pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcbigsize}{\@setfontsize{\srcbigsize}{8pt}{8pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2020]
+{ИТМО, весенний семестр 2020}
+ 
+\logo{%
+  \makebox[0.97\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.5cm,keepaspectratio]{itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%-------------------------------------------------
+
+\section{Инкапсуляция, наследование, полиморфизм}
+
+\begin{frame}{Инкапсуляция}
+  \begin{itemize}
+    \item сокрытие логически связанных подробностей в одном месте
+    \item объединение данных и логики их обработки
+  \end{itemize}
+
+  \vspace{1em}
+
+  Помогает разделять программу на слабо связанные компоненты.
+
+  \vspace{1em}
+
+  Варианты:
+  \begin{itemize}
+    \item ООП
+    \item пространства имён и модули (Erlang, Haskell)
+    \item функции с локальным контекстом (Javascript, Scheme, Pascal)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Зачем нужно разделение?}
+  \begin{itemize}
+    \item легче читать \vspace{1em}
+    \item легче менять \vspace{1em}
+    \item легче тестировать
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Наследование}
+  \begin{itemize}
+    \item возможность переиспользовать код \vspace{1em}
+    \item возможность расширять функциональность \vspace{1em}
+    \item возможность компоновать код
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Статический и динамический полиморфизм}
+  Статический:
+  \begin{itemize}
+    \item использование одного кода для разных типов
+    \item на этапе компиляции полиморфизм раскрывается в обычный код
+    \item на этапе исполнения не остаётся следов
+  \end{itemize}
+
+  \vspace{1em}
+
+  Динамический:
+  \begin{itemize}
+    \item возможность работать с объектами разных типов через один интерфейс
+    \item поведение выбирается на этапе исполнения
+    \item рефлексия
+    \item гетерогенные коллекции
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Динамический полиморфизм в C++}
+  \begin{itemize}
+    \item наследование классов \vspace{1em}
+    \item ссылки или указатели \vspace{1em}
+    \item приведение типов \vspace{1em}
+    \item виртуальные методы
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Наследование без полиморфизма}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  class A
+  {
+      int m_a = 11;
+  public:
+      int compute() const
+      { return m_a; }
+  };
+
+  class B : public A
+  {
+      int m_b = 22;
+  public:
+      int compute() const
+      { return m_a + m_b; }
+  };
+
+  void process(const A & a)
+  { std::cout << a.compute() << std::endl; }
+
+  int main()
+  {
+      B b;
+      process(b);
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Наследование с полиморфизмом}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  class A
+  {
+      int m_a = 11;
+  public:
+      virtual int compute() const
+      { return m_a; }
+  };
+
+  class B : public A
+  {
+      int m_b = 22;
+  public:
+      int compute() const
+      { return m_a + m_b; }
+  };
+
+  void process(const A & a)
+  { std::cout << a.compute() << std::endl; }
+
+  int main()
+  {
+      B b;
+      process(b);
+  }
+  \end{lstlisting}
+\end{frame}
+
+\section{Виртуальные методы классов}
+
+\begin{frame}[fragile]{Виртуальные методы}
+  \lstinline{virtual} \emph{объявление метода}
+
+  \vspace{1em}
+
+  \begin{lstlisting}
+  class A
+  {
+      virtual void f();
+  };
+
+  void A::f() { ... }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Ограничения применения виртуальности}
+  Не могут быть виртуальными: \vspace{1em}
+  \begin{itemize}
+    \item свободные функции \vspace{0.5em}
+    \item статические методы \vspace{0.5em}
+    \item шаблонные методы
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Переопределение виртуальных методов}
+  Если класс ниже по иерархии наследования определяет метод
+  \begin{itemize}
+    \item с тем же именем
+    \item с тем же списком параметров
+    \item с теми же cv-квалификаторами
+    \item с теми же ссылочными квалификаторами
+  \end{itemize}
+  то этот метод тоже становится виртуальным и переопределяет исходный.
+\end{frame}
+
+\begin{frame}[fragile]{Особенности переопределения и вызова виртуальных методов}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  class A
+  {
+  public:
+      virtual void f();
+      virtual int g();
+  };
+
+  class B
+  {
+  private:
+      void f();
+      int g() const; // warning
+  };
+
+  class C
+  {
+  public:
+      double g(); // error
+  };
+
+  void call(A & a)
+  {
+      a.f();
+      a.A::f();
+  }
+
+  int main()
+  {
+      B b;
+      call(b);
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Скрытие и переопределение методов при наследовании}
+  \lstinline{Base} \rarr ... \rarr \lstinline{Derived}
+
+  \vspace{0.5em}
+
+  \lstinline{T Base::f(int);}
+
+  \vspace{1em}
+
+  \begin{center}
+    \begin{tabular}{ l | c | c }
+      & не виртуальный & виртуальный \\
+      \hline
+      T Derived::f(int) & скрывает & переопределяет \\
+      P Derived::f(int) & скрывает & переопределяет, если P ковариантен T \\
+      T Derived::f() & скрывает & скрывает \\
+      T Derived::f() const & скрывает & скрывает \\
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Ковариантный тип}
+  Y ковариантен X, если
+  \begin{itemize}
+    \item оба являются ссылкой или указателем на класс \vspace{0.5em}
+    \item Y не более cv-квалифицирован, нежели X \vspace{0.5em}
+    \item класс, на который сслыается/указывает X, должен быть однозначным и доступным предком класса, на который ссылается/указывает Y
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Пример с ковариантным типом}
+  \begin{lstlisting}
+  struct Base
+  {
+      const Base * clone()
+      { return new Base(*this); }
+  };
+
+  struct Derived : Base
+  {
+      Derived * clone()
+      { return new Derived(*this); }
+  };
+
+  int main()
+  {
+      Derived d;
+      auto c = d.clone(); // Derived *
+      Base & b = d;
+      auto cc = b.clone(); // const Base *
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Пример без ковариантного типа}
+  \begin{lstlisting}
+  struct Base
+  {
+      const Base * clone()
+      { return new Base(*this); }
+  };
+
+  struct Derived : Base
+  {
+      const Base * clone()
+      { return new Derived(*this); }
+  };
+
+  int main()
+  {
+      Derived d;
+      auto c = d.clone(); // const Base *
+      Base & b = d;
+      auto cc = b.clone(); // const Base *
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{\lstinline{override} и \lstinline{final}}
+  Спецификаторы \lstinline{override} и \lstinline{final} можно использовать в конце объявления метода.
+
+  \vspace{2em}
+
+  \lstinline{override} -- метод переопределяет унаследованный виртуальный метод.
+
+  \vspace{1em}
+
+  \lstinline{final} -- метод переопределяет унаследованный виртуальный метод и не может быть переопределён в наследниках.
+\end{frame}
+
+\begin{frame}[fragile]{Пример использования \lstinline{override}}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  struct A
+  {
+      virtual void f(const X &);
+      void g(int);
+  };
+
+  struct B : A
+  {
+      void f(const X);
+  };
+
+  struct C : A
+  {
+      void f(const X &) const override;
+      void g(int) override;
+  };
+
+  void call(A & a, const X & x)
+  {
+      a.f(x);
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Пример использования \lstinline{final}}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  struct A
+  {
+      virtual void f(const X &);
+  };
+
+  struct B : A
+  {
+      void f(const X &) final;
+  };
+
+  struct C : B
+  {
+      void f(const X &); // error
+  };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\lstinline{final} в наследовании}
+  \begin{lstlisting}
+  struct A
+  {
+  };
+
+  struct B final : A
+  {
+  };
+
+  struct C : B // error
+  {
+  };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Полиморфизм и деструкторы}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  class Base
+  {
+  public:
+      virtual int compute()
+      { return 0; }
+  };
+
+  class Derived : public Base
+  {
+      std::vector<int> m_data;
+
+      int compute()
+      { return std::accumulate(m_data.begin(), m_data.end(), 0); }
+  public:
+      Derived(const std::size_t size)
+          : m_data(size)
+      { std::iota(m_data.begin(), m_data.end(), 1); }
+  };
+
+  int main()
+  {
+      Base * b = new Derived(100);
+      int res = b->compute();
+      delete b;
+      return res;
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Корректное полиморфное удаление}
+  \begin{lstlisting}
+  class Base
+  {
+  public:
+      virtual ~Base() = default;
+  };
+
+  class Derived : public Base
+  { ... };
+
+  int main()
+  {
+      Base * b = new Derived;
+      delete b; // ~Derived() is called
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Чисто виртуальный метод и абстрактные классы}
+  \begin{lstlisting}
+  struct A
+  {
+      virtual void f() = 0;
+  };
+
+  struct B : A
+  {
+      void f();
+  };
+
+  int main()
+  {
+      A * a = new B; // OK
+      A * aa = new A; // error
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Больше чистой виртуальности}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  struct A
+  {
+      virtual void f() = 0;
+  }
+
+  void A::f() { ... }
+
+  struct B
+  {
+      void f()
+      { A::f(); }
+  };
+
+  struct C
+  {
+      virtual ~C() = 0;
+  };
+
+  C::~C() { ... } // mandatory
+
+  struct D : C
+  {
+      ~D(); // or else D is abstract
+  };
+
+  struct E
+  {
+      virtual void g() { ... }
+  };
+
+  struct F : E
+  {
+      void g() = 0;
+  };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Параметры по умолчанию в виртуальных методах}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  int m = 111;
+
+  struct A
+  {
+      virtual int f(int k = m) { return k; }
+  };
+
+  struct B : A
+  {
+      int f(int k = -13) { return k; }
+  };
+
+  int get_n(A & a)
+  {
+      return a.f();
+  }
+
+  int main()
+  {
+      B b;
+      return get_n(b);
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Рекомендации по использованию виртуальности}
+  \begin{itemize}
+    \item интерфейс (в базовом классе) делать не виртуальным \vspace{0.5em}
+    \item переопределяемую реализацию оформлять приватными виртуальными методами базового класса \vspace{0.5em}
+    \item методы интерфейса вызывают нужные виртуальные методы реализации \vspace{0.5em}
+    \item если предполагается полиморфное создание/удаление - сделать виртуальный деструктор в базовом классе \vspace{0.5em}
+    \item иначе рассмотреть возможность защищённого не виртуального деструктора
+  \end{itemize}
+\end{frame}
+
+\section{Технические аспекты наследования}
+
+\begin{frame}{Приведение типов по иерархии наследования}
+  Можно приводить указатели и ссылки на классы вверх и вниз по иерархии наследования.
+
+  \vspace{1em}
+
+  \begin{itemize}
+    \item Неявное приведение вверх: \textbf{Derived *} \rarr \textbf{Base *} \vspace{0.5em}
+    \item Явное приведение вниз: \textbf{Base *} \rarr \textbf{Derived *} \vspace{0.5em}
+    \item Типо-безопасное приведение по иерархии наследования
+  \end{itemize}
+
+  \vspace{1em}
+
+  При таком приведении сам объект \textbf{не меняется} -- меняется лишь указатель или ссылка для доступа к нему.
+\end{frame}
+
+\begin{frame}[fragile]{Пример иерархии наследования}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcsize]
+  struct LeftRoot
+  {
+      virtual void print() const
+      { std::cout << "LeftRoot" << std::endl; }
+  };
+
+  struct LeftMiddle : LeftRoot
+  {
+      void print() const
+      { std::cout << "LeftMiddle" << std::endl; }
+  };
+
+  struct LeftLeaf : LeftMiddle
+  {
+      void print() const
+      { std::cout << "LeftLeaf" << std::endl; }
+  };
+
+  struct RightRoot
+  {
+      virtual void another_print() const
+      { std::cout << "RightRoot" << std::endl; }
+  };
+
+  struct Middle : LeftMiddle, RightRoot
+  {
+      void print() const
+      { std::cout << "Middle" << std::endl; }
+      void another_print() const
+      { std::cout << "Middle" << std::endl; }
+  };
+
+  struct RightLeaf : Middle
+  {
+      void print() const
+      { std::cout << "RightLeaf" << std::endl; }
+      void another_print() const
+      { std::cout << "RightLeaf" << std::endl; }
+  };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Разные варианты приведения по иерархии}
+  \begin{center}
+    \begin{tabular}{ l | c | c | c }
+      & Неявное & static_cast & dynamic_cast \\
+      \hline
+      LeftLeaf \rarr LeftRoot & \cmark & \cmark & \cmark \\
+      RightLeaf \rarr LeftRoot & \cmark & \cmark & \cmark \\
+      RightLeaf \rarr RightRoot & \cmark & \cmark & \cmark \\
+      LeftRoot \rarr LeftLeaf & \xmark & \cmark (!) & \cmark \\
+      Middle \rarr LeftRoot \rarr LeftLeaf & \xmark & \textcolor{red}{\cmark} & \xmark \\
+      RightLeft \rarr LeftRoot \rarr RightRoot & \xmark & \xmark & \cmark \\
+      LeftRoot \rarr ... & \xmark & \xmark & \cmark \\
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Варианты использования \lstinline{dynamic_cast}}
+  \lstinline{X x = dynamic_cast<X>(y);}
+
+  \vspace{1em}
+
+  \begin{itemize}
+    \item \lstinline{X} $\equiv$ \lstinline{decltype(y)}
+    \item \lstinline{X} $\equiv$ \lstinline{const decltype(y)}
+    \item \lstinline{y == nullptr} \rarr \lstinline{x == nullptr}
+    \item \lstinline{X} -- однозначный, доступный предок \lstinline{decltype(y)}
+    \item \lstinline{X = void *}, \lstinline{decltype(y)} -- полиморфный
+    \item \lstinline{decltype(y)} -- полиморфный, \lstinline{X} -- ссылка или указатель на класс
+      \begin{itemize}
+        \item \lstinline{X} -- указывает/ссылается на однозначного, публично унаследованного потомка \lstinline{y}
+        \item \lstinline{y} -- публичный предок объекта класса \lstinline{Z}, а \lstinline{X} -- другой однозначный, доступный предок \lstinline{Z}
+        \item иначе,
+          \begin{itemize}
+            \item \lstinline{X} -- указатель, \lstinline{x == nullptr}
+            \item \lstinline{X} -- ссылка, \lstinline{std::bad_cast} исключение
+          \end{itemize}
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{RTTI}
+  Run-time type information
+
+  \vspace{2em}
+
+  \begin{itemize}
+    \item \lstinline{dynamic_cast} \vspace{1em}
+    \item \lstinline{typeid}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Множественное наследование}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  struct A
+  {
+      int a;
+
+      A(int a_ = 0) : a(a_) {}
+  };
+
+  struct B : A
+  {
+      B(int a_) : A(a_) {}
+
+      int b_get_a() const
+      { return a; }
+  };
+
+  struct C : A
+  {
+      C(int a_) : A(a_) {}
+
+      int c_get_a() const
+      { return a; }
+  };
+
+  struct D : B, C
+  {
+      D(int b, int c) : B(b), C(c) {}
+  };
+
+  int main()
+  {
+      D d(11, 22);
+      std::cout << d.a << std::endl; // error
+      std::cout << d.b_get_a() << std::endl; // OK
+      std::cout << d.c_get_a() << std::endl; // OK
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Множественное наследование и абстрактные классы}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  struct Interface
+  {
+      virtual void f() = 0;
+      virtual void g() = 0;
+  };
+
+  struct A : Interface
+  {
+      void f();
+  };
+
+  struct B : Interface
+  {
+      void g();
+  };
+
+  struct C : A, B
+  {};
+
+  int main()
+  {
+      C c; // error: C is abstract
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Виртуальное наследование}
+  При указании наследования используется ключевое слово \lstinline{virtual}
+
+  \vspace{2em}
+
+  \begin{itemize}
+    \item в каждом конкретном типе-наследнике виртуальный предок встречается как подобъект ровно один раз \vspace{0.5em}
+    \item конкретный тип-наследник создаёт подобъекты виртуальных предков (даже если в иерархии наследования между ними другие классы), причём до создания подобъектов
+      обычных предков \vspace{0.5em}
+    \item наследник должен иметь доступ к конструктору виртуального предка \vspace{0.5em}
+    \item в списке инициализации конструктора наследника можно явно вызвать конструктор виртуального предка \vspace{0.5em}
+    \item операция копирования конкретного наследника должна учитывать эти особенности \vspace{0.5em}
+    \item для приведения типов по иерархии наследования с виртуальным наследованием необходимо использовать \lstinline{dynamic_cast}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Решение проблемы неоднозначности с виртуальным наследование}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  struct A
+  {
+      int a;
+
+      A(int a_) : a(a_) {}
+  };
+
+  struct B : virtual A
+  {
+      B(int a_) : A(a_) {}
+
+      int b_get_a() const
+      { return a; }
+  };
+
+  struct C : virtual A
+  {
+      C(int a_) : A(a_) {}
+
+      int c_get_a() const
+      { return a; }
+  };
+
+  struct D : B, C
+  {
+      D(int b, int c) : A(b+c), B(b), C(c) {}
+  };
+
+  int main()
+  {
+      D d(11, 22);
+      std::cout << d.a << std::endl; // OK
+      std::cout << d.b_get_a() << std::endl; // OK
+      std::cout << d.c_get_a() << std::endl; // OK
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Решение проблемы частичной реализации интерфейса и объединения этих реализаций}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  struct Interface
+  {
+      virtual void f() = 0;
+      virtual void g() = 0;
+  };
+
+  struct A : virtual Interface
+  {
+      void f()
+      { g(); }
+  };
+
+  struct B : virtual Interface
+  {
+      void g();
+  };
+
+  struct C : A, B
+  {};
+
+  int main()
+  {
+      C c; // OK
+      c.f(); // call B::g()
+  }
+  \end{lstlisting}
+\end{frame}
+
+\end{document}
