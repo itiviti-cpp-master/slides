@@ -9,6 +9,10 @@
 \usepackage{url}
 \usepackage{textcomp}
 \usepackage{multirow}
+\usepackage{tabulary}
+
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
 
 % to not copy line numbers
 \usepackage{accsupp}
@@ -262,7 +266,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Особенности переопределения и вызова виртуальных методов}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  \begin{lstlisting}[basicstyle=\ttfamily\srcsize]
   class A
   {
   public:
@@ -298,7 +302,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Скрытие и переопределение методов при наследовании}
-  \lstinline{Base} \rarr ... \rarr \lstinline{Derived}
+  \lstinline{Base} \rarr $\cdots$ \rarr \lstinline{Derived}
 
   \vspace{0.5em}
 
@@ -307,14 +311,14 @@
   \vspace{1em}
 
   \begin{center}
-    \begin{tabular}{ l | c | c }
+    \begin{tabulary}{0.9\textwidth}{ p{3.5cm} | C | C }
       & не виртуальный & виртуальный \\
       \hline
-      T Derived::f(int) & скрывает & переопределяет \\
-      P Derived::f(int) & скрывает & переопределяет, если P ковариантен T \\
+      T Derived::f(int) & скрывает & \textcolor{blue}{переопределяет} \\
+      P Derived::f(int) & скрывает & \textcolor{blue}{переопределяет}, если P ковариантен T \\
       T Derived::f() & скрывает & скрывает \\
       T Derived::f() const & скрывает & скрывает \\
-    \end{tabular}
+    \end{tabulary}
   \end{center}
 \end{frame}
 
@@ -328,7 +332,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Пример с ковариантным типом}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
   struct Base
   {
       const Base * clone()
@@ -352,7 +356,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Пример без ковариантного типа}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
   struct Base
   {
       const Base * clone()
@@ -519,7 +523,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Больше чистой виртуальности}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  \begin{lstlisting}[basicstyle=\ttfamily\srcsize]
   struct A
   {
       virtual void f() = 0;
@@ -613,7 +617,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Пример иерархии наследования}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcsize]
+  \begin{lstlisting}[basicstyle=\ttfamily\srcsmallsize]
   struct LeftRoot
   {
       virtual void print() const
@@ -658,8 +662,9 @@
 
 \begin{frame}[fragile]{Разные варианты приведения по иерархии}
   \begin{center}
-    \begin{tabular}{ l | c | c | c }
-      & Неявное & static_cast & dynamic_cast \\
+  \renewcommand{\arraystretch}{1.4}
+    \begin{tabulary}{\textwidth}{ L | c | c | c }
+      & Неявное & \textcolor{blue}{static\_cast} & \textcolor{blue}{dynamic\_cast} \\
       \hline
       LeftLeaf \rarr LeftRoot & \cmark & \cmark & \cmark \\
       RightLeaf \rarr LeftRoot & \cmark & \cmark & \cmark \\
@@ -668,7 +673,7 @@
       Middle \rarr LeftRoot \rarr LeftLeaf & \xmark & \textcolor{red}{\cmark} & \xmark \\
       RightLeft \rarr LeftRoot \rarr RightRoot & \xmark & \xmark & \cmark \\
       LeftRoot \rarr ... & \xmark & \xmark & \cmark \\
-    \end{tabular}
+    \end{tabulary}
   \end{center}
 \end{frame}
 
@@ -708,7 +713,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Множественное наследование}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  \begin{lstlisting}[basicstyle=\ttfamily\srcsize]
   struct A
   {
       int a;
@@ -778,21 +783,19 @@
 \begin{frame}{Виртуальное наследование}
   При указании наследования используется ключевое слово \lstinline{virtual}
 
-  \vspace{2em}
-
   \begin{itemize}
-    \item в каждом конкретном типе-наследнике виртуальный предок встречается как подобъект ровно один раз \vspace{0.5em}
+    \item в каждом конкретном типе-наследнике виртуальный предок встречается как подобъект ровно один раз
     \item конкретный тип-наследник создаёт подобъекты виртуальных предков (даже если в иерархии наследования между ними другие классы), причём до создания подобъектов
-      обычных предков \vspace{0.5em}
-    \item наследник должен иметь доступ к конструктору виртуального предка \vspace{0.5em}
-    \item в списке инициализации конструктора наследника можно явно вызвать конструктор виртуального предка \vspace{0.5em}
-    \item операция копирования конкретного наследника должна учитывать эти особенности \vspace{0.5em}
+      обычных предков
+    \item наследник должен иметь доступ к конструктору виртуального предка
+    \item в списке инициализации конструктора наследника можно явно вызвать конструктор виртуального предка
+    \item операция копирования конкретного наследника должна учитывать эти особенности
     \item для приведения типов по иерархии наследования с виртуальным наследованием необходимо использовать \lstinline{dynamic_cast}
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Решение проблемы неоднозначности с виртуальным наследование}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+\begin{frame}[fragile]{Решение проблемы неоднозначности}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcsize]
   struct A
   {
       int a;
