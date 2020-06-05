@@ -1,0 +1,614 @@
+\documentclass[unknownkeysallowed,xcolor=table]{beamer}
+ 
+\usepackage [T2A,T1] {fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{pifont}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{multirow}
+\usepackage{tabulary}
+
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+% to not copy line numbers
+\usepackage{accsupp}
+% to not copy line numbers
+
+% to not copy line numbers
+\newcommand{\noncopynumber}[1]{%
+  \BeginAccSupp{method=escape,ActualText={}}%
+    \color{blue} #1%
+  \EndAccSupp{}%
+}
+% to not copy line numbers
+
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
+\definecolor{pblue}{rgb}{0.1, 0.2, 0.8}
+
+\newcommand{\rarr}{$\rightarrow$}
+
+\lstset{
+      basicstyle=\ttfamily\small,
+      commentstyle=\color{mygreen},
+      keywordstyle=\color{blue},
+%      numberstyle=\tiny\color{blue},
+      numberstyle=\noncopynumber,
+      stringstyle=\color{mymauve},
+      numbers=left,
+      stepnumber=1,
+      columns=fullflexible,
+      breaklines=true,
+      postbreak=\mbox{\textcolor{red}{\ensuremath{\hookrightarrow}\space}},
+      literate={~} {\textapprox}{1},
+      language={[11]C++}
+}
+
+\makeatletter
+\newcommand{\srcmediumsize}{\@setfontsize{\srcmediumsize}{7pt}{7pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcbigsize}{\@setfontsize{\srcbigsize}{8pt}{8pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsize}{\@setfontsize{\srcsize}{6pt}{6pt}}
+\makeatother
+
+\makeatletter
+\newcommand{\srcsmallsize}{\@setfontsize{\srcsmallsize}{5pt}{5pt}}
+\makeatother
+
+\title[C++]
+{Программирование на языке C++}
+ 
+\subtitle{Вводный курс}
+ 
+\author[А.~Б.~Морозов]
+{
+  \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
+  {Александр Морозов}
+}
+  
+\date[ITMO 2020]
+{ИТМО, весенний семестр 2020}
+ 
+\logo{%
+  \makebox[0.97\paperwidth]{%
+    \includegraphics[align=c,width=2cm,keepaspectratio]{itmo_logo.png}
+    \hfill
+    \includegraphics[align=c,width=1.5cm,keepaspectratio]{itiviti_logo.png}
+  }
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Содержание}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%-------------------------------------------------
+
+\section{Шаблоны и параметры шаблонов}
+
+\begin{frame}[fragile]{Шаблоны и параметры шаблонов}
+  \lstinline{template <} \emph{список шаблонных параметров} \lstinline{>} \emph{объявление}
+
+  \vspace{1em}
+
+  Параметры шаблонов:
+  \begin{itemize}
+    \item типы \lstinline{class Id} или \lstinline{typename Id} \vspace{0.5em}
+    \item шаблоны \lstinline{template <...> class Id} или \lstinline{template <...> typename Id} \vspace{0.5em}
+    \item значения \lstinline{type Id} или \lstinline{auto Id}
+  \end{itemize}
+
+  \vspace{1em}
+
+  Шаблонный идентификатор -- \emph{имя шаблона} \lstinline{< params list >}.
+\end{frame}
+
+\begin{frame}[fragile]{Пример шаблонов}
+  \begin{lstlisting}
+  template <class T>
+  class Queue { ... }; // template
+
+  Queue<int> q_int; // template-id
+
+  template <std::size_t Size>
+  class StackString { ... }; // template
+
+  void f(const StackString<10> & str); // template-id
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Параметры шаблонов со значением по умолчанию}
+  \begin{lstlisting}
+  template <class = int>
+  struct X {};
+
+  template <std::size_t Size = 10>
+  void f();
+
+  template <template <class> class T = X>
+  struct Y {};
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Переменное число шаблонных параметров}
+  \begin{lstlisting}
+  template <class... Args, class T = char>
+  void g(Args &&... args);
+
+  template <class... Args>
+  void f(Args &&... args)
+  {
+      g<Args...>(std::forward<Args>(args)...);
+  }
+  f();
+  f(1, 0.5);
+
+  template <bool... Flags>
+  struct S {};
+  S<> zero;
+  S<false> one;
+  S<false, true> two;
+
+  template <template <class...> class... Templates>
+  class C {};
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Раскрытие переменного параметра шаблона}
+  \emph{нечто} \lstinline{...}
+
+  \vspace{1em}
+
+  \emph{нечто} должно включать в себя хотя бы один переменный параметр.
+  Идентификатор переменного параметра должен встречаться там, где допустимо использовать идентификатор.
+
+  \vspace{0.5em}
+
+  \emph{нечто} \lstinline{...} \rarr \emph{нечто1}, \emph{нечто2}, ...
+
+  \vspace{0.5em}
+
+  При раскрытии переменный параметр в \emph{нечто} заменяется на очередное значение параметра.
+  Если параметров было указано несколько, то все их наборы должны иметь одинаковую длину.
+\end{frame}
+
+\begin{frame}[fragile]{Примеры раскрытий переменных параметров}
+  \begin{lstlisting}
+  template <class... Args>
+  void f(Args &&... args)
+  {
+      g(std::forward<Args>(args)...);
+  }
+
+  f(); // g();
+  f(1, 2, 3); // g(1, 2, 3);
+
+  template <class... Xs> struct Zip
+  {
+      template <class... Ys>
+      struct With
+      {
+          using type = std::tuple<std::pair<Xs, Ys>...>;
+      };
+  };
+
+  using X = Zip<int, double>::With<char, std::string>::type;
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Точки возможного раскрытия переменных параметров}
+  \begin{itemize}
+    \item список аргументов функции
+    \item список аргументов при вызове функции
+    \item список аргументов в скобочной инициализации
+    \item список параметров шаблонного идентификатора
+    \item список параметров шаблона
+    \item список наследования и список инициализации конструктора
+    \item специальная форма оператора \lstinline{sizeof}
+    \item операция свёртки
+    \item \lstinline{using}-объявление
+    \item список захвата лямбды
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Некоторые примеры раскрытия переменных параметров}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcsize]
+  template <int... Is>
+  void f()
+  {
+      std::tuple<decltype(Is)...> t(Is...); // direct initialization
+      std::initializer_list<int> i = { // list initialization
+          Is...
+      };
+  }
+
+  template<class... Ts, int... N>
+  void g(Ts (&...arr)[N]); // function parameters
+
+  g("Hello", "world");
+  // g(const char (&)[5], const char (&)[5])
+
+  template <class... T>
+  struct S
+  {
+      std::tuple<T...> data; // template-id
+
+      template <T... tt> // template parameters
+      struct Nested {};
+  };
+
+  template <class... Bases>
+  class Derived : Bases... // inheritance list
+  {
+  public:
+      Derived(const Bases & ...bases)
+        : Bases(bases)... // member initialization list
+      {}
+
+      using Bases::operator()...; // using declaration
+  };
+
+  template <class... T>
+  constexpr std::size_t count = sizeof...(T); // special sizeof
+
+  template <class... T>
+  constexpr std::size_t sum_sizes()
+  {
+      return (sizeof(T) + ...); // fold expression
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Шаблонные параметры-типы}
+  Имя параметра становится идентификатором типа внутри шаблона и ведёт себя, как псевдоним типа.
+
+  \vspace{1em}
+
+  При указании шаблонного параметра-типа это должен быть корректный идентификатор типа, в т.ч. неполного типа.
+\end{frame}
+
+\begin{frame}{Шаблонные параметры-значения}
+  Допустимые типы:
+  \begin{itemize}
+    \item lvalue ссылка \vspace{0.5em}
+    \item указатель \vspace{0.5em}
+    \item интегральный тип \vspace{0.5em}
+    \item \lstinline{enum} \vspace{0.5em}
+    \item \lstinline{std::nullptr_t}
+  \end{itemize}
+
+  \vspace{1em}
+
+  Значение при подстановке шаблонным параметром должно быть известно на этапе компиляции.
+  Параметр-указатель или параметр-ссылка не могут быть связаны со строковым литералом, подобъектом или временным объектом.
+
+  \vspace{1em}
+
+  Внутри шаблона такой параметр -- константное значение.
+\end{frame}
+
+\begin{frame}[fragile]{Шаблонные параметры-шаблоны}
+  Описание параметра имеет форму описания шаблона.
+
+  \vspace{1em}
+
+  Внутри шаблона такой параметр является шаблонным идентификатором.
+
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  template <template <class, bool> class X>
+  struct S {};
+
+  template <template <class K = void> class C>
+  void f()
+  {
+      C<> c;
+      C<int> cc;
+  }
+
+  template <class T>
+  struct S {};
+  f<S>();
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Виды шаблонов}
+  \begin{itemize}
+    \item переменные \vspace{0.5em}
+    \item функции \vspace{0.5em}
+    \item классы \vspace{0.5em}
+    \item псевдонимы типов
+  \end{itemize}
+
+  \vspace{1em}
+
+  Член класса может быть шаблонным (статическое поле, метод, вложенный класс или псевдоним типа).
+\end{frame}
+
+\begin{frame}[fragile]{Примеры шаблонов переменных}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  template <class T>
+  T t_value = T();
+
+  struct S
+  {
+      template <int I>
+      static int x;
+  };
+
+  template <int I>
+  int S::x = I;
+
+  template <class T>
+  constexpr int t_tag = 11;
+
+  int main()
+  {
+      return t_value<int> + S::x<1> + t_tag<double>;
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Примеры шаблонов функций}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  template <class T>
+  T max(const T & a, const T & b)
+  {
+      return a < b ? b : a;
+  }
+
+  template <class R, class T>
+  R convert(const T & t)
+  {
+      return t;
+  }
+
+  int main()
+  {
+      char a = '\n', b = '\t';
+      return convert<int>(max(a, b));
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Примеры шаблонов классов}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  template <class A, bool B>
+  struct S
+  {
+      A data;
+      static A s_data;
+
+      S();
+      bool get() const;
+      void set(const A & data_)
+      { data = data_; }
+  };
+
+  template <class A, bool B>
+  A S<A, B>::s_data = A();
+
+  template <class A, bool B>
+  S<A, B>::S()
+  {}
+
+  template <class A, bool B>
+  bool S<A, B>::get() const
+  { return B; }
+
+  int main()
+  {
+      S<int, false> s;
+      // s.set(11);
+      return s.data + s.s_data;
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Примеры шаблонов методов классов}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  struct S
+  {
+      template <class T>
+      operator T ();
+  };
+
+  template <class T>
+  S::operator T ()
+  { return {}; }
+
+  template <class A, class B>
+  class C
+  {
+      template <class X>
+      void f();
+  };
+
+  template <class A, class B>
+  template <class X>
+  void C<A, B>::f()
+  { }
+
+  int main()
+  {
+      C<int, char> c;
+      c.f<double>(); // ?
+      S s;
+      return s;
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Примеры шаблонов псевдонимов типов}
+  \begin{lstlisting}
+  template <class T>
+  using Map = std::map<T, T>;
+
+  template <class T>
+  using Identity = T;
+  \end{lstlisting}
+\end{frame}
+
+\section{Специализация шаблонов}
+
+\begin{frame}[fragile]{Полная специализация шаблонов}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  template <class T>
+  constexpr int t_tag = 11;
+
+  template <>
+  constexpr int t_tag<int> = 20;
+  template <>
+  constexpr int t_tag<char> = 30;
+  template <>
+  constexpr int t_tag<double> = 40;
+
+  template <class T>
+  T max(const T & a, const T & b)
+  { return a < b ? b : a; }
+
+  template <>
+  int max(const int & a, const int & b)
+  { return a - b; }
+
+  template <bool>
+  struct S;
+
+  template <>
+  struct S<false> {};
+
+  template <class T>
+  std::size_t check(const T & x)
+  { return sizeof(S<t_tag<T> == 20>); }
+
+  int main()
+  {
+      check('a'); // ?
+      check(1); // ?
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Частичная специализация шаблонов}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcmediumsize]
+  template <class T>
+  constexpr int t_tag = 11;
+
+  template <template <class...> class L, class... Ts>
+  constexpr int t_tag<L<Ts...>> = 111;
+
+  template <class T, bool = true>
+  struct MakeNonAbstract
+  {
+      template <class... Args>
+      static std::unique_ptr<T> make(Args &&... args)
+      { return {}; }
+  };
+  template <class T>
+  struct MakeNonAbstract<T, false>
+  {
+      template <class... Args>
+      static std::unique_ptr<T> make(Args &&... args)
+      { return std::make_unique<T>(std::forward<Args>(args)...); }
+  };
+
+  template <class T, class... Args>
+  auto make_non_abstract(Args &&... args)
+  {
+      return MakeNonAbstract<T, std::is_abstract_v<T>>::make(std::forward<Args>(args)...);
+  }
+
+  struct A { virtual void f() = 0; };
+
+  int main()
+  {
+      auto p_a = make_non_abstract<A>();
+      auto p_i = make_non_abstract<int>(1);
+      return t_tag<std::tuple<>>;
+  }
+  \end{lstlisting}
+\end{frame}
+
+\section{Особенности использования шаблонов}
+
+\begin{frame}[fragile]{Инстанциация шаблонов классов}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  template <class T>
+  struct A;
+
+  template <class T>
+  struct B
+  {
+      T create()
+      { return {}; }
+
+      void use(const T & x)
+      { x.use(); }
+  };
+
+  int main()
+  {
+      A<int> * p_a = nullptr;
+
+      B<int> b;
+      return b.create();
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Разрешение неоднозначности зависимых имён}
+  \begin{lstlisting}
+  template <class T>
+  struct S
+  {
+      using value_type = typename T::value_type;
+
+      void f(const T & x)
+      {
+          x.template f<int>();
+      }
+  };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{CRTP}
+  \begin{lstlisting}
+  template <class T>
+  class Base
+  {
+  public:
+      void f()
+      {
+          static_cast<T *>(this)->f_impl();
+      }
+  };
+
+  class Derived : public Base<Derived>
+  {
+      friend class Base<Derived>;
+
+      void f_impl();
+  };
+  \end{lstlisting}
+\end{frame}
+
+\end{document}
