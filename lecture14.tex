@@ -151,7 +151,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Переменное число шаблонных параметров}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
   template <class... Args, class T = char>
   void g(Args &&... args);
 
@@ -177,23 +177,23 @@
 \begin{frame}[fragile]{Раскрытие переменного параметра шаблона}
   \emph{нечто} \lstinline{...}
 
-  \vspace{1em}
+  \vspace{2em}
 
   \emph{нечто} должно включать в себя хотя бы один переменный параметр.
   Идентификатор переменного параметра должен встречаться там, где допустимо использовать идентификатор.
 
-  \vspace{0.5em}
+  \vspace{1em}
 
   \emph{нечто} \lstinline{...} \rarr \emph{нечто1}, \emph{нечто2}, ...
 
-  \vspace{0.5em}
+  \vspace{1em}
 
   При раскрытии переменный параметр в \emph{нечто} заменяется на очередное значение параметра.
   Если параметров было указано несколько, то все их наборы должны иметь одинаковую длину.
 \end{frame}
 
 \begin{frame}[fragile]{Примеры раскрытий переменных параметров}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
   template <class... Args>
   void f(Args &&... args)
   {
@@ -232,7 +232,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Некоторые примеры раскрытия переменных параметров}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcsize]
+  \begin{lstlisting}[basicstyle=\ttfamily\srcsmallsize]
   template <int... Is>
   void f()
   {
@@ -282,7 +282,7 @@
 \begin{frame}{Шаблонные параметры-типы}
   Имя параметра становится идентификатором типа внутри шаблона и ведёт себя, как псевдоним типа.
 
-  \vspace{1em}
+  \vspace{2em}
 
   При указании шаблонного параметра-типа это должен быть корректный идентификатор типа, в т.ч. неполного типа.
 \end{frame}
@@ -290,10 +290,10 @@
 \begin{frame}{Шаблонные параметры-значения}
   Допустимые типы:
   \begin{itemize}
-    \item lvalue ссылка \vspace{0.5em}
-    \item указатель \vspace{0.5em}
-    \item интегральный тип \vspace{0.5em}
-    \item \lstinline{enum} \vspace{0.5em}
+    \item lvalue ссылка \vspace{0.3em}
+    \item указатель \vspace{0.3em}
+    \item интегральный тип \vspace{0.3em}
+    \item \lstinline{enum} \vspace{0.3em}
     \item \lstinline{std::nullptr_t}
   \end{itemize}
 
@@ -326,8 +326,8 @@
   }
 
   template <class T>
-  struct S {};
-  f<S>();
+  struct SS {};
+  f<SS>();
   \end{lstlisting}
 \end{frame}
 
@@ -391,7 +391,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Примеры шаблонов классов}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  \begin{lstlisting}[basicstyle=\ttfamily\srcmediumsize]
   template <class A, bool B>
   struct S
   {
@@ -425,7 +425,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Примеры шаблонов методов классов}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  \begin{lstlisting}[basicstyle=\ttfamily\srcmediumsize]
   struct S
   {
       template <class T>
@@ -471,7 +471,7 @@
 \section{Специализация шаблонов}
 
 \begin{frame}[fragile]{Полная специализация шаблонов}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  \begin{lstlisting}[basicstyle=\ttfamily\srcsize]
   template <class T>
   constexpr int t_tag = 11;
 
@@ -509,7 +509,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Частичная специализация шаблонов}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcmediumsize]
+  \begin{lstlisting}[basicstyle=\ttfamily\srcsize]
   template <class T>
   constexpr int t_tag = 11;
 
