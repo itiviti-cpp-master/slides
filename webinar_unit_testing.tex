@@ -7,8 +7,14 @@
 \usepackage{pifont}
 \usepackage{listings}
 \usepackage{url}
+\usepackage{textcomp}
 
 \setbeamertemplate{navigation symbols}{}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+\colorlet{mygreen}{green!60!blue}
+\colorlet{mymauve}{red!60!blue}
 
 \lstset{
       basicstyle=\ttfamily\small,
@@ -51,6 +57,9 @@
   \texorpdfstring{Александр Морозов\newline\href{mailto:gelu.speculum@gmail.com}{gelu.speculum@gmail.com}}
   {Александр Морозов}
 }
+
+\date[ITMO 2020]
+{ИТМО, осенний семестр 2020}
   
 \logo{%
   \makebox[0.97\paperwidth]{%
@@ -88,19 +97,19 @@
 \end{frame}
 
 \begin{frame}{Монолит}
-  \includegraphics[align=c,width=5cm,keepaspectratio]{images/unit_testing/monolith.png}
+  \includegraphics[align=c,width=7cm,keepaspectratio]{images/unit_testing/monolith.png}
 \end{frame}
 
 \begin{frame}{Полносвязная система}
-  \includegraphics[align=c,width=5cm,keepaspectratio]{images/unit_testing/interconnected.png}
+  \includegraphics[align=c,width=7cm,keepaspectratio]{images/unit_testing/interconnected.png}
 \end{frame}
 
 \begin{frame}{Полносвязная система}
-  \includegraphics[align=c,width=5cm,keepaspectratio]{images/unit_testing/interconnected_caption.png}
+  \includegraphics[align=c,width=7cm,keepaspectratio]{images/unit_testing/interconnected_caption.png}
 \end{frame}
 
 \begin{frame}{Неопределённо связная система}
-  \includegraphics[align=c,width=5cm,keepaspectratio]{images/unit_testing/unknown.png}
+  \includegraphics[align=c,width=7cm,keepaspectratio]{images/unit_testing/unknown.png}
 \end{frame}
 
 \begin{frame}{Комбинаторная сложность}
@@ -176,7 +185,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Использование в тестах}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcsize]
   #include <gmock/gmock.h>
   #include <gtest/gtest.h>
 
@@ -340,7 +349,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Вариант решения - шаблонная реализация}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
   template <class ComponentT, class ServiceT>
   class HandlerImpl
   {
