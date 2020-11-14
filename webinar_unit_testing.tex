@@ -298,6 +298,35 @@
 
 \begin{frame}[fragile]{Actions}
   \begin{lstlisting}
+  class Error : public std::exception
+  { ... };
+
+  TEST(Foo, bar)
+  {
+    Mock mock;
+    X x;
+    EXPECT_CALL(mock, process(_))
+        .WillOnce(ReturnRef(x));
+    EXPECT_CALL(mock, extract(_))
+        .WillOnce(SetArgReferee<0>(x));
+    EXPECT_CALL(mock, send(x))
+        .WillOnce(Throw(Error{}));
+  }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Лямбды как действия}
+  \begin{lstlisting}
+  TEST(Foo, bar)
+  {
+    Mock mock;
+    EXPECT_CALL(mock, process(_))
+        .WillOnce([] { return 1; });
+    EXPECT_CALL(mock, handle(_, NotNull()))
+        .WillOnce([] (const auto & first, auto * second) {
+            *second = first;
+        });
+  }
   \end{lstlisting}
 \end{frame}
 
