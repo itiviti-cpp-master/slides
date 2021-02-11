@@ -93,8 +93,8 @@
   {Александр Морозов}
 }
   
-\date[ITMO 2020]
-{ИТМО, весенний семестр 2020}
+\date[ITMO 2021]
+{ИТМО, весенний семестр 2021}
  
 \logo{%
   \makebox[0.97\paperwidth]{%
@@ -120,81 +120,44 @@
 \section{Вступление}
 
 \begin{frame}{О чём этот курс?}
-\begin{itemize}
-  \item Основные элементы языка C++ \vspace{3em}
-  \item Некоторые инструменты для разработки программ на C++ \vspace{3em}
-  \item Базовые навыки программирования
-\end{itemize}
+  \begin{itemize}
+    \item Основные элементы языка C++ \vspace{3em}
+    \item Некоторые инструменты для разработки программ на C++ \vspace{3em}
+    \item Базовые навыки программирования
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Почему C++?}
-\begin{itemize}
-  \item Язык сочетает черты низкоуровневого и высокоуровневого \vspace{1em}
-  \item Позволяет как использовать сложные абстракции, так и прибегать к низкоуровневым оптимизациям и ручному управлению ресурсами \vspace{1em}
-  \item Zero overhead abstractions \vspace{1em}
-  \item Значительно более высокоуровневый, чем C, но в то же время может быть настолько же эффективным \vspace{1em}
-  \item Один из самых распространенных прикладных языков
-\end{itemize}
+  \begin{itemize}
+    \item Язык сочетает черты низкоуровневого и высокоуровневого \vspace{1em}
+    \item Позволяет как использовать сложные абстракции, так и прибегать к низкоуровневым оптимизациям и ручному управлению ресурсами \vspace{1em}
+    \item Zero overhead abstractions \vspace{1em}
+    \item Значительно более высокоуровневый, чем C, но в то же время может быть настолько же эффективным \vspace{1em}
+    \item Один из самых распространенных прикладных языков
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Формат курса}
   \begin{itemize}
     \item Лекции \vspace{1em}
+    \item Дополнительные вебинары \vspace{1em}
     \item Небольшие примеры-иллюстрации к лекциям \vspace{1em}
-    \item Задачи по мотивам примеров (предположительно 12 штук)\vspace{1em}
-    \item Большие задачи (выбор из 10-12 задач)\vspace{1em}
-    \item Сдача задач через code review на github.com
+    \item Задачи по мотивам примеров \vspace{1em}
+    \item Большие задачи \vspace{1em}
+    \item Соревнование по скорости для 2-й большой задачи \vspace{1em}
+    \item Сдача задач через code review на github.com \vspace{1em}
+    \item Экзамен
   \end{itemize}
-\end{frame}
-
-\begin{frame}{Формула успеха}
-  \begin{itemize}
-    \item Маленькая задача = 4 балла \vspace{1em}
-    \item Большие задачи: 1-я = 15, 2-я = 15, 3-я = 20, 4-я = 30, 5-я = 35 баллов \vspace{1em}
-    \item Допуск к экзамену: $Z \geq 70$ баллов \vspace{1em}
-    \item Экзамен: $E = 0 \dotso 30$ баллов \vspace{1em}
-    \item Итоговый балл: $\Gamma = \frac{(Z-60) + E}{2}$ \vspace{1em}
-    \item Пересчёт в оценки: $\lfloor\Gamma \div 7\rfloor$ \vspace{1em}
-    \item $0$: \textbf{F}, $1$: \textbf{E}, $2$: \textbf{D}, $3$: \textbf{C}, $4$: \textbf{B}, $\geq 5$: \textbf{A}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Примеры с баллами}
-  \begin{itemize}
-    \item 12 маленьких задач + 2 больших = 78 баллов. Итоговая оценка от \textbf{E} до \textbf{C}. \textbf{E} автоматом. \vspace{1em}
-    \item 5 маленьких задач + 4 больших = 100 баллов. Итоговая оценка от \textbf{D} до \textbf{A}. \textbf{D} автоматом. \vspace{1em}
-    \item 5 больших задач = 115 баллов. Итоговая оценка от \textbf{C} до \textbf{A}. \textbf{C} автоматом. \vspace{1em}
-    \item 4 маленьких задач + 5 больших задач = 131 балл. \textbf{A} автоматом.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Дедлайны}
-  \begin{itemize}
-    \item 2 недели на оформление PR
-    \item 2 недели на одобрение PR
-  \end{itemize}
-  \vspace{3em}
-  Дедлайны на оформление больших задач:
-  \begin{enumerate}
-    \item 6 апреля
-    \item 20 апреля
-    \item 4 мая
-    \item 18 мая
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}{Дедлайны: пример}
-  \includegraphics[align=c,width=12cm,keepaspectratio]{images/deadlines.png}
 \end{frame}
 
 \begin{frame}{Некоторая литература}
-\begin{itemize}
-  \item Bjarne Stroustrup: Programming: Principles and Practice Using C++, 2014\\Программирование Принципы и практика использования С++
-  \item Bjarne Stroustrup: The C++ Programming Language (Special edition), 2000\\Язык программирования C++ Специальное издание
-  \item Bjarne Stroustrup: The Design and Evolution of C++, 1994\\Дизайн и эволюция C++
-  \item Stanley Lippman: C++ Primer (5th Edition), 2012\\Язык программирования C++. Базовый курс
-  \item Herb Sutter: Exceptional C++, 1999; More Exceptional C++, 2001\\Решение сложных задач на С++
-\end{itemize}
+  \begin{itemize}
+    \item Bjarne Stroustrup: Programming: Principles and Practice Using C++, 2014\\Программирование Принципы и практика использования С++
+    \item Bjarne Stroustrup: The C++ Programming Language (Special edition), 2000\\Язык программирования C++ Специальное издание
+    \item Bjarne Stroustrup: The Design and Evolution of C++, 1994\\Дизайн и эволюция C++
+    \item Stanley Lippman: C++ Primer (5th Edition), 2012\\Язык программирования C++. Базовый курс
+    \item Herb Sutter: Exceptional C++, 1999; More Exceptional C++, 2001\\Решение сложных задач на С++
+  \end{itemize}
 \end{frame}
 
 %-------------------------------------------------
@@ -210,208 +173,208 @@
 \end{frame}
 
 \begin{frame}{Предшественники C++}
-\begin{itemize}
-  \item FORTRAN: язык математических вычислений, 1954 \vspace{3em}
-  \item Simula: объектно-ориентированный язык, 1965 \vspace{3em}
-  \item C: эффективный процедурный язык, 1972
-\end{itemize}
+  \begin{itemize}
+    \item FORTRAN: язык математических вычислений, 1954 \vspace{3em}
+    \item Simula: объектно-ориентированный язык, 1965 \vspace{3em}
+    \item C: эффективный процедурный язык, 1972
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Классификация языков программирования}
-\begin{itemize}
-  \item Компилируемые / интерпретируемые \vspace{1em}
-  \item Императивные / декларативные \vspace{1em}
-  \item Поддержка различных парадигм: ООП, функциональные, логические \vspace{1em}
-  \item Статическая типизация / динамическая типизация \vspace{1em}
-  \item Сильная типизация / слабая типизация \vspace{1em}
-  \item Энергичные / ленивые
-\end{itemize}
+  \begin{itemize}
+    \item Компилируемые / интерпретируемые \vspace{1em}
+    \item Императивные / декларативные \vspace{1em}
+    \item Поддержка различных парадигм: ООП, функциональные, логические \vspace{1em}
+    \item Статическая типизация / динамическая типизация \vspace{1em}
+    \item Сильная типизация / слабая типизация \vspace{1em}
+    \item Энергичные / ленивые
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Появление C++: цели создателя}
-Бьярне Страуструп занимался моделированием распределенных аспектов операционных систем и ему нужен был язык:
-\begin{itemize}
-  \item ООП
-  \item пользовательские абстракции
-  \item сильная типизация
-  \item эффективность
-  \item отсутствие <<необоснованной стоимости>> возможностей
-  \item простота реализации (использование уже существующих инструментов)
-  \item отсутствие излишних ограничений на стиль программирования
-\end{itemize}
+  Бьярне Страуструп занимался моделированием распределенных аспектов операционных систем и ему нужен был язык:
+  \begin{itemize}
+    \item ООП
+    \item пользовательские абстракции
+    \item сильная типизация
+    \item эффективность
+    \item отсутствие <<необоснованной стоимости>> возможностей
+    \item простота реализации (использование уже существующих инструментов)
+    \item отсутствие излишних ограничений на стиль программирования
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Краткая история C++}
-1979 - C with classes (расширение языка C классами, наследованием, более сильной типизацией, встраиваемыми функциями).
+  1979 - C with classes (расширение языка C классами, наследованием, более сильной типизацией, встраиваемыми функциями).
 
-1983 - C++ (перегрузка функций и операторов, виртуальные функции, ссылки, типобезопасное управление памятью).
+  1983 - C++ (перегрузка функций и операторов, виртуальные функции, ссылки, типобезопасное управление памятью).
 
-1985 - The C++ Programming Language (первое описание языка).
+  1985 - The C++ Programming Language (первое описание языка).
 
-1989 - C++ 2.0 (множественное наследование, абстрактные классы, статические члены классов).
+  1989 - C++ 2.0 (множественное наследование, абстрактные классы, статические члены классов).
 
-1990 - The Annotated C++ Reference Manual (шаблоны, исключения, пространства имен).
+  1990 - The Annotated C++ Reference Manual (шаблоны, исключения, пространства имен).
 
-1992 - STL (обобщенная реализация различных структур данных и типовых алгоритмов).
+  1992 - STL (обобщенная реализация различных структур данных и типовых алгоритмов).
 
-1998 - C++98, первый ISO стандарт языка.
+  1998 - C++98, первый ISO стандарт языка.
 \end{frame}
 
 \begin{frame}{Краткая история C++, продолжение}
-1999 - Boost.
+  1999 - Boost.
 
-2003 - C++03, второй ISO стандарт, незначительные изменения.
+  2003 - C++03, второй ISO стандарт, незначительные изменения.
 
-2011 - С++11, новый стандарт, большие изменения и модернизация.
+  2011 - С++11, новый стандарт, большие изменения и модернизация.
 
-2013 - 4-е издание The C++ Programming Language.
+  2013 - 4-е издание The C++ Programming Language.
 
-2014 - C++14, дальнейшее развитие нового стандарта.
+  2014 - C++14, дальнейшее развитие нового стандарта.
 
-2017 - C++17, текущий стандарт языка.
+  2017 - C++17, текущий стандарт языка.
 \end{frame}
 
 \begin{frame}{Место C++ в современном мире}
-\begin{itemize}
-  \item Графические оболочки (MS Windows UI, Aqua, KDE)
-  \item Офисные пакеты (MS Office, OpenOffice)
-  \item Графические редакторы и среды 3D моделирования (Photoshop, Maya)
-  \item Компьютерные игры (CryEngine, Frostbite, Gamebryo, id Tech 4-, Source, Unreal Engine)
-  \item CAD (Autodesk, Catia)
-  \item Браузеры и Javascript движки (Chrome, Firefox, V8, SpiderMonkey)
-  \item Базы данных (MongoDB, частично MariaDB, MS SQL, Oracle, SAP DB)
-  \item Системы информационного поиска, интернет поисковики (Google, Яндекс)
-  \item Финтех (Bloomberg, Morgan Stanley, Itiviti)
-\end{itemize}
+  \begin{itemize}
+    \item Графические оболочки (MS Windows UI, Aqua, KDE)
+    \item Офисные пакеты (MS Office, OpenOffice)
+    \item Графические редакторы и среды 3D моделирования (Photoshop, Maya)
+    \item Компьютерные игры (CryEngine, Frostbite, Gamebryo, id Tech 4-, Source, Unreal Engine)
+    \item CAD (Autodesk, Catia, FreeCAD)
+    \item Браузеры и Javascript движки (Chrome, Firefox, V8, SpiderMonkey)
+    \item Базы данных (MongoDB, частично MariaDB, MS SQL, Oracle, SAP DB, ScyllaDB)
+    \item Системы информационного поиска, интернет поисковики (Google, Яндекс)
+    \item Финтех (Bloomberg, Morgan Stanley, Itiviti)
+  \end{itemize}
 \end{frame}
 
 %-------------------------------------------------
 \section{Абстрактная вычислительная машина}
 
 \begin{frame}[t]{Абстрактная машина vs Настоящее железо}
-\scriptsize
-\begin{columns}[t]
-\begin{column}{0.5\textwidth}
-  \begin{itemize}
-    \item Архитектура фон Неймана: общая память, АЛУ, УУ
-    \item Последовательное исполнение
-    \item Линейная непрерывная память
-    \item Числа определяются в человеческих понятиях (целые, рациональные и т.п.)
-  \end{itemize}
-\end{column}
-\begin{column}{0.5\textwidth}
-  \begin{itemize}
-    \item Особенности конкретной архитектуры, например, big-ending vs little-endian; битность процессора
-    \item Целые и дробные числа представляются по-разному
-    \item Много уровней памяти: регистры, кеш нескольких уровней, RAM
-    \item Реальный и защищенный режим
-    \item Виртуальная память
-    \item Прерывания, системные вызовы, переключение контекста
-    \item Параллелизм: внутри ядра процессора, между несколькими ядрами, между процессорами; разные гарантии синхронизации на разных архитектурах
-    \item Инструкции различной сложности: RISC, CISC, векторные инструкции, сопроцессоры (“математический”, GPU)
-  \end{itemize}
-\end{column}
-\end{columns}
-\normalsize
+  \scriptsize
+  \begin{columns}[t]
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item Архитектура фон Неймана: общая память, АЛУ, УУ
+        \item Последовательное исполнение
+        \item Линейная непрерывная память
+        \item Числа определяются в человеческих понятиях (целые, рациональные и т.п.)
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item Особенности конкретной архитектуры, например, big-ending vs little-endian; битность процессора
+        \item Целые и дробные числа представляются по-разному
+        \item Много уровней памяти: регистры, кеш нескольких уровней, RAM
+        \item Реальный и защищенный режим
+        \item Виртуальная память
+        \item Прерывания, системные вызовы, переключение контекста
+        \item Параллелизм: внутри ядра процессора, между несколькими ядрами, между процессорами; разные гарантии синхронизации на разных архитектурах
+        \item Инструкции различной сложности: RISC, CISC, векторные инструкции, сопроцессоры (“математический”, GPU)
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \normalsize
 \end{frame}
 
 \begin{frame}{Абстракции до C++11}
-\begin{itemize}
-  \item Последовательное исполнение в рамках observable behaviour
-  \item Параллелизм отсутствует
-  \item Целые числа подчиняются определенным правилам, без подробностей реализации
-  \item Беззнаковые целые числа немного ближе к аппаратным подробностям
-  \item Дробные числа имеют определенную точность и диапазон
-  \item Исключения заданы лишь высокоуровневым поведением, без особенностей реализации
-  \item Есть понятие упаковки сложных объектов в памяти, padding, требования к размещению в памяти заданы обтекаемо, в стандарте нет возможностей на это влиять
-\end{itemize}
+  \begin{itemize}
+    \item Последовательное исполнение в рамках observable behaviour
+    \item Параллелизм отсутствует
+    \item Целые числа подчиняются определенным правилам, без подробностей реализации
+    \item Беззнаковые целые числа немного ближе к аппаратным подробностям
+    \item Дробные числа имеют определенную точность и диапазон
+    \item Исключения заданы лишь высокоуровневым поведением, без особенностей реализации
+    \item Есть понятие упаковки сложных объектов в памяти, padding, требования к размещению в памяти заданы обтекаемо, в стандарте нет возможностей на это влиять
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Что изменилось в C++11}
-\begin{itemize}
-  \item Появилась модель памяти, учитывающая параллельное исполнение \vspace{3em}
-  \item Управление многопоточностью добавлено в стандартную библиотеку \vspace{3em}
-  \item Конструкции для высокоуровневого управления параллелизмом \vspace{3em}
-\end{itemize}
+  \begin{itemize}
+    \item Появилась модель памяти, учитывающая параллельное исполнение \vspace{3em}
+    \item Управление многопоточностью добавлено в стандартную библиотеку \vspace{3em}
+    \item Конструкции для высокоуровневого управления параллелизмом \vspace{3em}
+  \end{itemize}
 \end{frame}
 
 %-------------------------------------------------
 \section{Пример программы на C++}
 
 \begin{frame}[fragile]{Пример программы на C++}
-\lstinputlisting[basicstyle=\ttfamily\srcmediumsize]{examples/hello_world.cpp}
+  \lstinputlisting[basicstyle=\ttfamily\srcmediumsize]{examples/hello_world.cpp}
 \end{frame}
 
 %-------------------------------------------------
 \section{Инструментарий}
 
 \begin{frame}{3 этапа трансляции C++}
-\begin{figure}
-\begin{tikzpicture}[node distance=2.5cm, auto,>=latex', thick]
+  \begin{figure}
+    \begin{tikzpicture}[node distance=2.5cm, auto,>=latex', thick]
 
-\node (src) [file] {\tiny .cpp};
-\node (cpp) [tool, below of=src] {\hspace{0pt}\tiny Препроцессор};
-\node (tmp) [file, below of=cpp] {\tiny tmp};
-\node (c++) [tool, right of=tmp] {\hspace{0pt}\tiny Компилятор};
-\node (asm) [file, above of=c++] {\tiny .s};
-\node (as) [tool, above of=asm] {\hspace{0pt}\tiny Ассемблер};
-\node (obj) [file, right of=as] {\tiny .o};
-\node (linker) [tool, below of=obj] {\hspace{0pt}\tiny Компоновщик};
-\node (exe) [file, below of=linker] {\hspace{0pt}\tiny executable};
-\node (lib) [file, right of=linker] {\hspace{0pt}\tiny Библиотеки};
+      \node (src) [file] {\tiny .cpp};
+      \node (cpp) [tool, below of=src] {\hspace{0pt}\tiny Препроцессор};
+      \node (tmp) [file, below of=cpp] {\tiny tmp};
+      \node (c++) [tool, right of=tmp] {\hspace{0pt}\tiny Компилятор};
+      \node (asm) [file, above of=c++] {\tiny .s};
+      \node (as) [tool, above of=asm] {\hspace{0pt}\tiny Ассемблер};
+      \node (obj) [file, right of=as] {\tiny .o};
+      \node (linker) [tool, below of=obj] {\hspace{0pt}\tiny Компоновщик};
+      \node (exe) [file, below of=linker] {\hspace{0pt}\tiny executable};
+      \node (lib) [file, right of=linker] {\hspace{0pt}\tiny Библиотеки};
 
-\draw[vecArrow] (src) -- (cpp);
-\draw[innerWhite] (src) -- (cpp);
+      \draw[vecArrow] (src) -- (cpp);
+      \draw[innerWhite] (src) -- (cpp);
 
-\draw[vecArrow] (cpp) -- (tmp);
-\draw[innerWhite] (cpp) -- (tmp);
+      \draw[vecArrow] (cpp) -- (tmp);
+      \draw[innerWhite] (cpp) -- (tmp);
 
-\draw[vecArrow] (tmp) -- (c++);
-\draw[innerWhite] (tmp) -- (c++);
+      \draw[vecArrow] (tmp) -- (c++);
+      \draw[innerWhite] (tmp) -- (c++);
 
-\draw[vecArrow] (c++) -- (asm);
-\draw[innerWhite] (c++) -- (asm);
+      \draw[vecArrow] (c++) -- (asm);
+      \draw[innerWhite] (c++) -- (asm);
 
-\draw[vecArrow] (asm) -- (as);
-\draw[innerWhite] (asm) -- (as);
+      \draw[vecArrow] (asm) -- (as);
+      \draw[innerWhite] (asm) -- (as);
 
-\draw[vecArrow] (as) -- (obj);
-\draw[innerWhite] (as) -- (obj);
+      \draw[vecArrow] (as) -- (obj);
+      \draw[innerWhite] (as) -- (obj);
 
-\draw[vecArrow] (obj) -- (linker);
-\draw[innerWhite] (obj) -- (linker);
+      \draw[vecArrow] (obj) -- (linker);
+      \draw[innerWhite] (obj) -- (linker);
 
-\draw[vecArrow] (linker) -- (exe);
-\draw[innerWhite] (linker) -- (exe);
+      \draw[vecArrow] (linker) -- (exe);
+      \draw[innerWhite] (linker) -- (exe);
 
-\draw[vecArrow] (lib) -- (linker);
-\draw[innerWhite] (lib) -- (linker);
+      \draw[vecArrow] (lib) -- (linker);
+      \draw[innerWhite] (lib) -- (linker);
 
-\end{tikzpicture}
-\end{figure}
+    \end{tikzpicture}
+  \end{figure}
 \end{frame}
 
 \begin{frame}[fragile]{Трансляция C++ на примере gcc}
-Трансляция программы из одного файла:
-\begin{cmdlinelarge}
-g++ -std=c++17 -o prog prog.cpp
-\end{cmdlinelarge}
-Результат препроцессора:
-\begin{cmdlinelarge}
-g++ -std=c++17 -E prog.cpp
-\end{cmdlinelarge}
-Ассемблерный код:
-\begin{cmdlinelarge}
-g++ -std=c++17 -S prog.cpp
-\end{cmdlinelarge}
-Объектный файл:
-\begin{cmdlinelarge}
-g++ -std=c++17 -c prog.cpp
-\end{cmdlinelarge}
-Дизассемблирование:
-\begin{cmdlinelarge}
-objdump -dS prog
-\end{cmdlinelarge}
+  Трансляция программы из одного файла:
+  \begin{cmdlinelarge}
+    g++ -std=c++17 -o prog prog.cpp
+  \end{cmdlinelarge}
+  Результат препроцессора:
+  \begin{cmdlinelarge}
+    g++ -std=c++17 -E prog.cpp
+  \end{cmdlinelarge}
+  Ассемблерный код:
+  \begin{cmdlinelarge}
+    g++ -std=c++17 -S prog.cpp
+  \end{cmdlinelarge}
+  Объектный файл:
+  \begin{cmdlinelarge}
+    g++ -std=c++17 -c prog.cpp
+  \end{cmdlinelarge}
+  Дизассемблирование:
+  \begin{cmdlinelarge}
+    objdump -dS prog
+  \end{cmdlinelarge}
 \end{frame}
 
 \begin{frame}[fragile]{Сложности грамматики C++}
@@ -428,31 +391,94 @@ objdump -dS prog
 \end{frame}
 
 \begin{frame}{Гарантии языка и undefined behaviour}
-\begin{itemize}
-  \item Некоторые вещи язык гарантирует - вне зависимости от платформы, компилятора и иных внешних факторов. Например, \lstinline{sizeof(int) <= sizeof(long)}.
-  \item \emph{Observable behaviour}: компилятор может менять программу, если её внешнее поведение не меняется.
-  \item \emph{Implementation defined behaviour}: поведение программы может различаться в зависимости от реализации компилятора (но это должно быть задокументировано).
-  \item \emph{Unspecified behaviour}: поведение зависит от реализации, но это не требуется документировать; каждый возможный вариант поведение должен быть корректным.
-  \item \emph{Undefined behaviour}: стандарт не накладывает никаких ограничений на поведение в этом случае.
-\end{itemize}
+  \begin{itemize}
+    \item Некоторые вещи язык гарантирует - вне зависимости от платформы, компилятора и иных внешних факторов. Например, \lstinline{sizeof(int) <= sizeof(long)}.
+    \item \emph{Observable behaviour}: компилятор может менять программу, если её внешнее поведение не меняется.
+    \item \emph{Implementation defined behaviour}: поведение программы может различаться в зависимости от реализации компилятора (но это должно быть задокументировано).
+    \item \emph{Unspecified behaviour}: поведение зависит от реализации, но это не требуется документировать; каждый возможный вариант поведение должен быть корректным.
+    \item \emph{Undefined behaviour}: стандарт не накладывает никаких ограничений на поведение в этом случае.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Объектные файлы}
-Объектные файлы обычно состоят из различных секций. Например: заголовок, секция кода, секция данных, отладочная информация.
+  Объектные файлы обычно состоят из различных секций. Например: заголовок, секция кода, секция данных, отладочная информация.
 
-Сущности ссылаются по именам, адреса в памяти не назначены.
+  Сущности ссылаются по именам, адреса в памяти не назначены.
 
-Mangling: имена сущностей из текста программы не всегда могут быть перенесены в имена в объектном файле. Для C обычно соответствие точное (хотя некоторые реализации добавляют к имени дополнительную информацию). В C++ структура имен более сложная и они приводятся к уникальным строковым именам по определенному алгоритму (зависит от реализации).\\
-Например, имя \lstinline{Space::Outer::Inner::code} может быть преобразовано в \lstinline{_ZN5Space5Outer5Inner4codeE}.
+  Mangling: имена сущностей из текста программы не всегда могут быть перенесены в имена в объектном файле. Для C обычно соответствие точное (хотя некоторые реализации добавляют к имени дополнительную информацию). В C++ структура имен более сложная и они приводятся к уникальным строковым именам по определенному алгоритму (зависит от реализации).\\
+  Например, имя \lstinline{Space::Outer::Inner::code} может быть преобразовано в \lstinline{_ZN5Space5Outer5Inner4codeE}.
 \end{frame}
 
 \begin{frame}{Online компиляторы}
-\begin{itemize}
-  \item Coliru  \href{https://coliru.stacked-crooked.com/}{https://coliru.stacked-crooked.com/} \vspace{3em}
-  \item Wandbox  \href{https://wandbox.org/}{https://wandbox.org/} \vspace{3em}
-  \item Godbolt  \href{https://godbolt.org/}{https://godbolt.org/} \vspace{3em}
-  \item CPP Insights \href{https://cppinsights.io/}{https://cppinsights.io/}
-\end{itemize}
+  \begin{itemize}
+    \item Coliru  \href{https://coliru.stacked-crooked.com/}{https://coliru.stacked-crooked.com/} \vspace{3em}
+    \item Wandbox  \href{https://wandbox.org/}{https://wandbox.org/} \vspace{3em}
+    \item Godbolt  \href{https://godbolt.org/}{https://godbolt.org/} \vspace{3em}
+    \item CPP Insights \href{https://cppinsights.io/}{https://cppinsights.io/}
+  \end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\section{Организационные вопросы}
+
+\begin{frame}{Практические задания}
+  \begin{itemize}
+    \item Маленькие задачи -- 4 варианта по мотивам примера из лекции
+    \item Большие задачи
+      \begin{itemize}
+        \item 4 набора по 3 задачи
+        \item наборы в целом сбалансированы
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Дедлайны}
+  \begin{itemize}
+    \item Маленькие задачи: март -- апрель \vspace{2em}
+    \item Большие задачи: апрель -- начало июня \vspace{2em}
+    \item Финальный дедлайн -- экзамен, в первой половине сессии
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Работа над задачей}
+  \begin{itemize}
+    \item 1-й дедлайн -- дедлайн оформления \vspace{1em}
+    \item 2-й дедлайн -- дедлайн приёмки \vspace{1em}
+    \item 2 недели между двумя дедлайнами \vspace{1em}
+    \item code review -- несколько итераций \vspace{1em}
+    \item работа \textbf{строго индивидуальная} \vspace{1em}
+    \item по одной из больших задач -- собеседование \vspace{1em}
+    \item 14 ``поздних'' дней
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Соревнование по скорости}
+  \begin{itemize}
+    \item параллельно с процессом ревью \vspace{1em}
+    \item 2 прогона, можно внести изменения после 1-го \vspace{1em}
+    \item места распределяются по перцентилям \vspace{1em}
+    \item множитель оценки $1 \dotso 3$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Оценивание задач}
+  \begin{itemize}
+    \item базовая стоимость маленьких задач -- 5-10 баллов \vspace{1em}
+    \item базовая стоимость больших задач -- 15-40 баллов \vspace{1em}
+    \item суммарная базовая стоимость 3 больших задач -- 75 баллов \vspace{1em}
+    \item штрафные баллы начиная со второго ревью \vspace{1em}
+    \item соревнование по скорости -- коэффициент масштабирования оценки за задачу
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Экзамен и финальная оценка}
+  \begin{itemize}
+    \item допуск к экзамену -- 50 баллов
+    \item без прихода на экзамен: $E \geq 65; D \geq 85; C \geq 100; B \geq 125; A \geq 150$
+    \item первая часть экзамена -- блиц-опрос; $+ 1$ к финальной оценке
+    \item вторая часть экзамена (по желанию) -- 2 теоретических вопроса
+    \item результат второй части экзамена -- $-2 \dotso +2$ к финальной оценке
+  \end{itemize}
 \end{frame}
 
 \end{document}
