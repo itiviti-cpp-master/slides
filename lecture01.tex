@@ -137,6 +137,20 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Место C++ в современном мире}
+  \begin{itemize}
+    \item Графические оболочки (MS Windows UI, Aqua, KDE)
+    \item Офисные пакеты (MS Office, OpenOffice)
+    \item Графические редакторы и среды 3D моделирования (Photoshop, Maya)
+    \item Компьютерные игры (CryEngine, Frostbite, Gamebryo, id Tech 4-, Source, Unreal Engine)
+    \item CAD (Autodesk, Catia, FreeCAD)
+    \item Браузеры и Javascript движки (Chrome, Firefox, V8, SpiderMonkey)
+    \item Базы данных (MongoDB, частично MariaDB, MS SQL, Oracle, SAP DB, ScyllaDB)
+    \item Системы информационного поиска, интернет поисковики (Google, Яндекс)
+    \item Финтех (Bloomberg, Morgan Stanley, Itiviti)
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{Формат курса}
   \begin{itemize}
     \item Лекции \vspace{1em}
@@ -157,6 +171,7 @@
     \item Bjarne Stroustrup: The Design and Evolution of C++, 1994\\Дизайн и эволюция C++
     \item Stanley Lippman: C++ Primer (5th Edition), 2012\\Язык программирования C++. Базовый курс
     \item Herb Sutter: Exceptional C++, 1999; More Exceptional C++, 2001\\Решение сложных задач на С++
+    \item Nicolai Josuttis
   \end{itemize}
 \end{frame}
 
@@ -231,21 +246,9 @@
 
   2014 - C++14, дальнейшее развитие нового стандарта.
 
-  2017 - C++17, текущий стандарт языка.
-\end{frame}
+  2017 - C++17, текущий \emph{устоявшийся} стандарт языка.
 
-\begin{frame}{Место C++ в современном мире}
-  \begin{itemize}
-    \item Графические оболочки (MS Windows UI, Aqua, KDE)
-    \item Офисные пакеты (MS Office, OpenOffice)
-    \item Графические редакторы и среды 3D моделирования (Photoshop, Maya)
-    \item Компьютерные игры (CryEngine, Frostbite, Gamebryo, id Tech 4-, Source, Unreal Engine)
-    \item CAD (Autodesk, Catia, FreeCAD)
-    \item Браузеры и Javascript движки (Chrome, Firefox, V8, SpiderMonkey)
-    \item Базы данных (MongoDB, частично MariaDB, MS SQL, Oracle, SAP DB, ScyllaDB)
-    \item Системы информационного поиска, интернет поисковики (Google, Яндекс)
-    \item Финтех (Bloomberg, Morgan Stanley, Itiviti)
-  \end{itemize}
+  2020 - C++20, текущий \emph{опубликованный} стандарт языка.
 \end{frame}
 
 %-------------------------------------------------
@@ -298,11 +301,51 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Гарантии языка и undefined behaviour}
+  \begin{itemize}
+    \item Некоторые вещи язык гарантирует - вне зависимости от платформы, компилятора и иных внешних факторов. Например, \lstinline{sizeof(int) <= sizeof(long)}.
+    \item \emph{Observable behaviour}: компилятор может менять программу, если её внешнее поведение не меняется.
+    \item \emph{Implementation defined behaviour}: поведение программы может различаться в зависимости от реализации компилятора (но это должно быть задокументировано).
+    \item \emph{Unspecified behaviour}: поведение зависит от реализации, но это не требуется документировать; каждый возможный вариант поведение должен быть корректным.
+    \item \emph{Undefined behaviour}: стандарт не накладывает никаких ограничений на поведение в этом случае.
+  \end{itemize}
+\end{frame}
+
 %-------------------------------------------------
 \section{Пример программы на C++}
 
 \begin{frame}[fragile]{Пример программы на C++}
   \lstinputlisting[basicstyle=\ttfamily\srcmediumsize]{examples/hello_world.cpp}
+\end{frame}
+
+\begin{frame}[fragile]{Сложности грамматики C++}
+  \begin{lstlisting}
+    // variables 'x', 'y', 'z'
+    int(x), y, *const z;
+
+    // expression '(int(x)), (y), (new int))'
+    int(x), y, new int;
+
+    // ??
+    B b(A());
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Эволюционные сложности C++}
+  \begin{lstlisting}
+    static vs static vs static
+
+    struct vs class vs typename
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Сложности правил языка}
+  \begin{itemize}
+    \item 9 различных видов инициализации переменных \vspace{2em}
+    \item 21 правило упорядочивания исполнения \vspace{2em}
+    \item 13 правил выбора лучшего кандидата при перегрузке функций \vspace{2em}
+    \item и ещё больше веселья в шаблонах
+  \end{itemize}
 \end{frame}
 
 %-------------------------------------------------
@@ -375,29 +418,6 @@
   \begin{cmdlinelarge}
     objdump -dS prog
   \end{cmdlinelarge}
-\end{frame}
-
-\begin{frame}[fragile]{Сложности грамматики C++}
-  \begin{lstlisting}
-    // variables 'x', 'y', 'z'
-    int(x), y, *const z;
-
-    // expression '(int(x)), (y), (new int))'
-    int(x), y, new int;
-
-    // ??
-    B b(A());
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}{Гарантии языка и undefined behaviour}
-  \begin{itemize}
-    \item Некоторые вещи язык гарантирует - вне зависимости от платформы, компилятора и иных внешних факторов. Например, \lstinline{sizeof(int) <= sizeof(long)}.
-    \item \emph{Observable behaviour}: компилятор может менять программу, если её внешнее поведение не меняется.
-    \item \emph{Implementation defined behaviour}: поведение программы может различаться в зависимости от реализации компилятора (но это должно быть задокументировано).
-    \item \emph{Unspecified behaviour}: поведение зависит от реализации, но это не требуется документировать; каждый возможный вариант поведение должен быть корректным.
-    \item \emph{Undefined behaviour}: стандарт не накладывает никаких ограничений на поведение в этом случае.
-  \end{itemize}
 \end{frame}
 
 \begin{frame}{Объектные файлы}
