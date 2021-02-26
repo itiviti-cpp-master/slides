@@ -80,8 +80,8 @@
   {Александр Морозов}
 }
   
-\date[ITMO 2020]
-{ИТМО, весенний семестр 2020}
+\date[ITMO 2021]
+{ИТМО, весенний семестр 2021}
  
 \logo{%
   \makebox[0.97\paperwidth]{%
@@ -484,7 +484,7 @@
   \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
     int a = f();
     switch (a) {
-      case 11: [[fallthrough]];
+      case 11:
       case 3+5:
         ++x;
         y = a;
@@ -492,12 +492,12 @@
     }
 
     switch (int a = f()) {
-      case 11: [[fallthrough]];
+      case 11: ++a; [[fallthrough]];
       case 8: { ++x; y = a; } break;
     }
 
     switch(int a = f(); a) {
-      case 8: [[fallthrough]];
+      case 8: ++a;
       case 11: ++x; y = a; break;
     }
 
