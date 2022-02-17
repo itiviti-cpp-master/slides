@@ -93,8 +93,8 @@
   {Александр Морозов}
 }
   
-\date[ITMO 2021]
-{ИТМО, весенний семестр 2021}
+\date[ITMO 2022]
+{ИТМО, весенний семестр 2022}
  
 \logo{%
   \makebox[0.97\paperwidth]{%
@@ -151,15 +151,97 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Что не так с Java?}
+  \includegraphics[align=c,width=10cm,keepaspectratio]{images/JVM.png}
+\end{frame}
+
+\begin{frame}{Что не так с другими компилируемыми языками?}
+\end{frame}
+
+\begin{frame}{Интероперабельность C++ с другими языками}
+  \begin{itemize}
+    \item с JVM -- так себе, JNI \vspace{1em}
+    \item с .NET -- Managed/Unmanaged C++, есть подводные камни \vspace{1em}
+    \item с различными интерпретируемыми -- ? \vspace{1em}
+    \item с различными компилируемыми -- FFI (обычно, C интерфейс)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Что не так с C++?}
+  \begin{itemize}
+    \item катастрофически сложен \vspace{1em}
+    \item иногда слишком примитивен \vspace{1em}
+    \item иногда недостаточно современен \vspace{1em}
+    \item эволюция путём добавления элементов и механизмов
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Сложности грамматики C++}
+  \begin{lstlisting}
+    // variables 'x', 'y', 'z'
+    int(x), y, *const z;
+
+    // expression '(int(x)), (y), (new int))'
+    int(x), y, new int;
+
+    // ??
+    B b(A());
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Тонкости и нюансы в C++ важны}
+  \begin{lstlisting}
+    int a; // type of 'a' = int
+    decltype(a) b; // type of 'b' = int
+    decltype((a)) c; // type of 'c' = int &
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{В C тоже были весёлые моменты}
+  \begin{lstlisting}
+    int n = sizeof(0)["abcdef"];
+    // n == ??
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Эволюционные сложности C++}
+  \begin{lstlisting}
+    static vs static vs static
+
+    struct vs class vs typename
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Сложности правил языка}
+  \begin{itemize}
+    \item 9 различных видов инициализации переменных \vspace{2em}
+    \item 21 правило упорядочивания исполнения \vspace{2em}
+    \item 13 правил выбора лучшего кандидата при перегрузке функций \vspace{2em}
+    \item и ещё больше веселья в шаблонах
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Ещё больше веселья с инициализацией в C++20}
+  \begin{lstlisting}
+    struct A
+    {
+      int && r;
+    };
+
+    A a1{7}; // lifetime is extended
+    A a2(7); // lifetime is NOT extended
+  \end{lstlisting}
+\end{frame}
+
 \begin{frame}{Формат курса}
   \begin{itemize}
     \item Лекции \vspace{1em}
-    \item Дополнительные вебинары \vspace{1em}
     \item Небольшие примеры-иллюстрации к лекциям \vspace{1em}
     \item Задачи по мотивам примеров \vspace{1em}
     \item Большие задачи \vspace{1em}
     \item Соревнование по скорости для 2-й большой задачи \vspace{1em}
     \item Сдача задач через code review на github.com \vspace{1em}
+    \item Коллоквиум в середине семестра \vspace{1em}
     \item Экзамен
   \end{itemize}
 \end{frame}
@@ -167,42 +249,21 @@
 \begin{frame}{Некоторая литература}
   \begin{itemize}
     \item Bjarne Stroustrup: Programming: Principles and Practice Using C++, 2014\\Программирование Принципы и практика использования С++
-    \item Bjarne Stroustrup: The C++ Programming Language (Special edition), 2000\\Язык программирования C++ Специальное издание
+    \item Bjarne Stroustrup: The C++ Programming Language (4th edition), 2013
     \item Bjarne Stroustrup: The Design and Evolution of C++, 1994\\Дизайн и эволюция C++
     \item Stanley Lippman: C++ Primer (5th Edition), 2012\\Язык программирования C++. Базовый курс
     \item Herb Sutter: Exceptional C++, 1999; More Exceptional C++, 2001\\Решение сложных задач на С++
-    \item Nicolai Josuttis
+    \item и другие: Meyers, Josuttis, Alexandrescu, Vandevoorde
   \end{itemize}
 \end{frame}
 
 %-------------------------------------------------
 \section{История}
 
-\begin{frame}[fragile]{Первые языки программирования}
-  \begin{minipage}{.45\textwidth}
-    \lstinputlisting[language={[x86masm]Assembler},caption=Машинный код,basicstyle=\ttfamily\srcsize]{history/hw.i}
-  \end{minipage}\hfill
-  \begin{minipage}{.45\textwidth}
-    \lstinputlisting[language={[x86masm]Assembler},caption=Ассемблер,basicstyle=\ttfamily\srcsize]{history/hw.asm}
-  \end{minipage}
-\end{frame}
-
 \begin{frame}{Предшественники C++}
   \begin{itemize}
-    \item FORTRAN: язык математических вычислений, 1954 \vspace{3em}
     \item Simula: объектно-ориентированный язык, 1965 \vspace{3em}
     \item C: эффективный процедурный язык, 1972
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Классификация языков программирования}
-  \begin{itemize}
-    \item Компилируемые / интерпретируемые \vspace{1em}
-    \item Императивные / декларативные \vspace{1em}
-    \item Поддержка различных парадигм: ООП, функциональные, логические \vspace{1em}
-    \item Статическая типизация / динамическая типизация \vspace{1em}
-    \item Сильная типизация / слабая типизация \vspace{1em}
-    \item Энергичные / ленивые
   \end{itemize}
 \end{frame}
 
@@ -213,7 +274,7 @@
     \item пользовательские абстракции
     \item сильная типизация
     \item эффективность
-    \item отсутствие <<необоснованной стоимости>> возможностей
+    \item отсутствие ``необоснованной стоимости'' возможностей
     \item простота реализации (использование уже существующих инструментов)
     \item отсутствие излишних ограничений на стиль программирования
   \end{itemize}
@@ -251,53 +312,43 @@
   2020 - C++20, текущий \emph{опубликованный} стандарт языка.
 \end{frame}
 
-%-------------------------------------------------
-\section{Абстрактная вычислительная машина}
-
-\begin{frame}[t]{Абстрактная машина vs Настоящее железо}
-  \scriptsize
-  \begin{columns}[t]
-    \begin{column}{0.5\textwidth}
-      \begin{itemize}
-        \item Архитектура фон Неймана: общая память, АЛУ, УУ
-        \item Последовательное исполнение
-        \item Линейная непрерывная память
-        \item Числа определяются в человеческих понятиях (целые, рациональные и т.п.)
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \begin{itemize}
-        \item Особенности конкретной архитектуры, например, big-ending vs little-endian; битность процессора
-        \item Целые и дробные числа представляются по-разному
-        \item Много уровней памяти: регистры, кеш нескольких уровней, RAM
-        \item Реальный и защищенный режим
-        \item Виртуальная память
-        \item Прерывания, системные вызовы, переключение контекста
-        \item Параллелизм: внутри ядра процессора, между несколькими ядрами, между процессорами; разные гарантии синхронизации на разных архитектурах
-        \item Инструкции различной сложности: RISC, CISC, векторные инструкции, сопроцессоры (“математический”, GPU)
-      \end{itemize}
-    \end{column}
-  \end{columns}
-  \normalsize
-\end{frame}
-
-\begin{frame}{Абстракции до C++11}
+\begin{frame}{Классификация языков программирования}
   \begin{itemize}
-    \item Последовательное исполнение в рамках observable behaviour
-    \item Параллелизм отсутствует
-    \item Целые числа подчиняются определенным правилам, без подробностей реализации
-    \item Беззнаковые целые числа немного ближе к аппаратным подробностям
-    \item Дробные числа имеют определенную точность и диапазон
-    \item Исключения заданы лишь высокоуровневым поведением, без особенностей реализации
-    \item Есть понятие упаковки сложных объектов в памяти, padding, требования к размещению в памяти заданы обтекаемо, в стандарте нет возможностей на это влиять
+    \item Компилируемые / интерпретируемые \vspace{1em}
+    \item Императивные / декларативные \vspace{1em}
+    \item Поддержка различных парадигм: ООП, функциональные, логические \vspace{1em}
+    \item Статическая типизация / динамическая типизация \vspace{1em}
+    \item Сильная типизация / слабая типизация \vspace{1em}
+    \item Энергичные / ленивые
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Что изменилось в C++11}
+%-------------------------------------------------
+\section{Абстрактная вычислительная машина}
+
+\begin{frame}{Нижний уровень языка}
   \begin{itemize}
-    \item Появилась модель памяти, учитывающая параллельное исполнение \vspace{3em}
-    \item Управление многопоточностью добавлено в стандартную библиотеку \vspace{3em}
-    \item Конструкции для высокоуровневого управления параллелизмом \vspace{3em}
+    \item целые числа и операции над ними в рамках двоичного представления
+    \item дробные числа имеют определённую точность и диапазон
+    \item типы данных вместо битов и байтов в памяти
+    \item линейная непрерывная память
+    \item по умолчанию -- последовательное исполнение (в рамках observable behaviour)
+    \item начиная с C++11 модель памяти учитывает параллельное исполнение
+    \item управление параллельным исполнением в стандартной библиотеке
+    \item исключения заданы высокоуровневым поведением
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Ниже этих абстракций}
+  \begin{itemize}
+    \item Особенности конкретной архитектуры, например, big-ending vs little-endian; битность процессора
+    \item Целые и дробные числа представляются по-разному
+    \item Много уровней памяти: регистры, кеш нескольких уровней, RAM
+    \item Реальный и защищенный режим
+    \item Виртуальная память
+    \item Прерывания, системные вызовы, переключение контекста
+    \item Параллелизм: внутри ядра процессора, между несколькими ядрами, между процессорами; разные гарантии синхронизации на разных архитектурах
+    \item Инструкции различной сложности: RISC, CISC, векторные инструкции, сопроцессоры (“математический”, GPU)
   \end{itemize}
 \end{frame}
 
@@ -312,44 +363,17 @@
 \end{frame}
 
 %-------------------------------------------------
-\section{Пример программы на C++}
+\section{Трансляция программ на языке C++}
 
-\begin{frame}[fragile]{Пример программы на C++}
-  \lstinputlisting[basicstyle=\ttfamily\srcmediumsize]{examples/hello_world.cpp}
-\end{frame}
-
-\begin{frame}[fragile]{Сложности грамматики C++}
-  \begin{lstlisting}
-    // variables 'x', 'y', 'z'
-    int(x), y, *const z;
-
-    // expression '(int(x)), (y), (new int))'
-    int(x), y, new int;
-
-    // ??
-    B b(A());
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{Эволюционные сложности C++}
-  \begin{lstlisting}
-    static vs static vs static
-
-    struct vs class vs typename
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}{Сложности правил языка}
+\begin{frame}[fragile]{Структура программ на языке C++}
   \begin{itemize}
-    \item 9 различных видов инициализации переменных \vspace{2em}
-    \item 21 правило упорядочивания исполнения \vspace{2em}
-    \item 13 правил выбора лучшего кандидата при перегрузке функций \vspace{2em}
-    \item и ещё больше веселья в шаблонах
+    \item набор текстовых файлов \vspace{1em}
+    \item соглашение: заголовочные файлы и файлы кода \vspace{1em}
+    \item соглашение: расширения \textbf{.h} и \textbf{.cpp} \vspace{1em}
+    \item набор определений \vspace{1em}
+    \item одно определение функции main
   \end{itemize}
 \end{frame}
-
-%-------------------------------------------------
-\section{Инструментарий}
 
 \begin{frame}{3 этапа трансляции C++}
   \begin{figure}
@@ -431,22 +455,44 @@
 
 \begin{frame}{Online компиляторы}
   \begin{itemize}
-    \item Coliru  \href{https://coliru.stacked-crooked.com/}{https://coliru.stacked-crooked.com/} \vspace{3em}
-    \item Wandbox  \href{https://wandbox.org/}{https://wandbox.org/} \vspace{3em}
-    \item Godbolt  \href{https://godbolt.org/}{https://godbolt.org/} \vspace{3em}
-    \item CPP Insights \href{https://cppinsights.io/}{https://cppinsights.io/}
+    \item Coliru  \href{https://coliru.stacked-crooked.com/}{https://coliru.stacked-crooked.com/} \vspace{2em}
+    \item Wandbox  \href{https://wandbox.org/}{https://wandbox.org/} \vspace{2em}
+    \item Godbolt  \href{https://godbolt.org/}{https://godbolt.org/} \vspace{2em}
+    \item CPP Insights \href{https://cppinsights.io/}{https://cppinsights.io/} \vspace{2em}
+    \item Quick Bench \href{https://quick-bench.com/}{https://quick-bench.com/}
   \end{itemize}
 \end{frame}
 
 %-------------------------------------------------
 \section{Организационные вопросы}
 
+\begin{frame}{План лекций}
+  \scriptsize
+  \begin{enumerate}
+    \item Вводная
+    \item Основы языка
+    \item Препроцессор, единицы трансляции, макросы
+    \item Сложные типы данных
+    \item Специальные методы классов
+    \item Работа с памятью
+    \item Предварительный обзор поздних тем
+    \item Коллекции и итераторы
+    \item \emph{Коллоквиум}
+    \item Пространства имён
+    \item Перегрузка функций
+    \item ООП
+    \item Шаблоны
+    \item Исключения и безопасность
+  \end{enumerate}
+\end{frame}
+
 \begin{frame}{Практические задания}
   \begin{itemize}
     \item Маленькие задачи -- 4 варианта по мотивам примера из лекции \vspace{2em}
     \item Большие задачи
       \begin{itemize}
-        \item 4 набора по 3 задачи \vspace{1em}
+        \item 4 набора по 3 задачи \vspace{0.5em}
+        \item все задачи стоят по-разному \vspace{0.5em}
         \item наборы в целом сбалансированы
       \end{itemize}
   \end{itemize}
@@ -454,7 +500,7 @@
 
 \begin{frame}{Дедлайны}
   \begin{itemize}
-    \item Маленькие задачи: март -- апрель \vspace{2em}
+    \item Маленькие задачи: март -- май \vspace{2em}
     \item Большие задачи: апрель -- начало июня \vspace{2em}
     \item Финальный дедлайн -- экзамен, в первой половине сессии
   \end{itemize}
@@ -467,7 +513,7 @@
     \item 2 недели между двумя дедлайнами \vspace{1em}
     \item code review -- несколько итераций \vspace{1em}
     \item работа \textbf{строго индивидуальная} \vspace{1em}
-    \item по одной из больших задач -- собеседование \vspace{1em}
+    \item по одной из больших задач возможно собеседование \vspace{1em}
     \item 14 ``поздних'' дней
   \end{itemize}
 \end{frame}
@@ -483,21 +529,62 @@
 
 \begin{frame}{Оценивание задач}
   \begin{itemize}
-    \item базовая стоимость маленьких задач -- 5-10 баллов \vspace{1em}
+    \item базовая стоимость маленьких задач -- 5-12 баллов \vspace{1em}
     \item базовая стоимость больших задач -- 15-40 баллов \vspace{1em}
-    \item суммарная базовая стоимость 3 больших задач -- 75 баллов \vspace{1em}
-    \item штрафные баллы начиная со второго ревью \vspace{1em}
+    \item суммарная базовая стоимость 3 больших задач -- 80 баллов \vspace{1em}
+    \item штрафные баллы: число ревью, число существенных замечаний, число ``пушей'' на Github \vspace{1em}
     \item соревнование по скорости -- коэффициент масштабирования оценки за задачу
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Экзамен и финальная оценка}
+\begin{frame}{Теоретическая аттестация}
   \begin{itemize}
-    \item допуск к экзамену -- 50 баллов \vspace{1em}
-    \item без прихода на экзамен: $E \geq 65; D \geq 85; C \geq 100; B \geq 125; A \geq 150$ \vspace{1em}
-    \item первая часть экзамена -- блиц-опрос; $+ 1$ к финальной оценке \vspace{1em}
-    \item вторая часть экзамена (по желанию) -- 2 теоретических вопроса \vspace{1em}
-    \item результат второй части экзамена -- $-2 \dotso +2$ к финальной оценке
+    \item Коллоквиум в середине семестра \vspace{2em}
+    \item Экзамен в конце \vspace{0.5em}
+      \begin{itemize}
+        \item блиц \vspace{1em}
+        \item основная часть
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Итоговая аттестация}
+  \begin{itemize}
+    \item Финальная оценка = оценка за экзамен
+    \item Блиц
+      \begin{itemize}
+        \item провал = \textbf{F}
+        \item успех = \textbf{E} или переход к основной части экзамена
+      \end{itemize}
+    \item Основная часть экзамена = оценка от \textbf{F} до \textbf{A}
+    \item Успешно сданный коллоквиум заменяет блиц
+    \item Допуск к экзамену -- порог баллов за задачи
+      \begin{itemize}
+        \item 70 баллов для блиц части
+        \item 90 баллов для основной части
+      \end{itemize}
+    \item Автомат
+      \begin{itemize}
+        \item 125 баллов = \textbf{B}
+        \item 150 баллов = \textbf{A}
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Иные источники баллов}
+  \begin{itemize}
+    \item улучшения тестов к задачам \vspace{2em}
+    \item оформление конспекта
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Сложности курса}
+  \begin{itemize}
+    \item язык сложный \vspace{1em}
+    \item материала много \vspace{1em}
+    \item студенты недооценивают сложность \vspace{1em}
+    \item студенты переоценивают свои силы \vspace{1em}
+    \item язык не похож на Java
   \end{itemize}
 \end{frame}
 
