@@ -189,11 +189,11 @@
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Сложности правил C++}
+\begin{frame}[fragile]{Тонкости и нюансы в C++ важны}
   \begin{lstlisting}
     int a; // type of 'a' = int
-    decltype(c) b; // type of 'b' = int
-    decltype((c)) c; // type of 'c' = int &
+    decltype(a) b; // type of 'b' = int
+    decltype((a)) c; // type of 'c' = int &
   \end{lstlisting}
 \end{frame}
 
