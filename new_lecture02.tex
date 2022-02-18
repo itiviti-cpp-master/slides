@@ -175,11 +175,11 @@
       moredelim={**[is][\btHL<2>]{@2}{@}},
       moredelim={**[is][\btHL<3>]{@3}{@}},
       moredelim={**[is][\btHL<4>]{@4}{@}},
-      moredelim={**[is][\btHL<5>]{@4}{@}},
-      moredelim={**[is][\btHL<6>]{@4}{@}},
-      moredelim={**[is][\btHL<7>]{@4}{@}},
-      moredelim={**[is][\btHL<8>]{@4}{@}},
-      moredelim={**[is][\btHL<9>]{@4}{@}}
+      moredelim={**[is][\btHL<5>]{@5}{@}},
+      moredelim={**[is][\btHL<6>]{@6}{@}},
+      moredelim={**[is][\btHL<7>]{@7}{@}},
+      moredelim={**[is][\btHL<8>]{@8}{@}},
+      moredelim={**[is][\btHL<9>]{@9}{@}}
   ]
   int main(int argc, char ** argv)
   {
@@ -199,7 +199,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Область видимости}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
   int a = 11;
 
   void foo()
@@ -422,7 +422,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{Инструкции}
-  \begin{lstlisting}
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
   int main(int argc, char ** argv)
   {
     int a = argc + 2;
@@ -512,14 +512,14 @@
 \end{frame}
 
 \begin{frame}[fragile]{Объявления и тело \lstinline{switch}}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+  \begin{lstlisting}
   int main(int argc, char ** argv)
   {
     switch (argc) {
       case 1:
         int a = 1;
         break;
-      default:
+      default: // error!
         return argc;
     }
   }
