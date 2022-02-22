@@ -80,8 +80,8 @@
   {Александр Морозов}
 }
   
-\date[ITMO 2021]
-{ИТМО, весенний семестр 2021}
+\date[ITMO 2022]
+{ИТМО, весенний семестр 2022}
  
 \logo{%
   \makebox[0.97\paperwidth]{%
@@ -104,647 +104,629 @@
 \frame{\titlepage}
 
 %-------------------------------------------------
-\section{Приведение базовых типов}
+\section{Единицы трансляции}
 
-\begin{frame}[fragile]{Числовые расширения}
-  \[
-    T1 \triangleright T2 \implies \mathbf{value}(1) \equiv \mathbf{value}(2)
-  \]
-  
-  \vspace{1em}
-
-  \begin{itemize}
-    \item \lstinline{signed char}, \lstinline{short} \rarr \lstinline{int} \vspace{1em}
-    \item \lstinline{unsigned char}, \lstinline{unsigned short} \rarr \lstinline{int} или \lstinline{unsigned int} \vspace{1em}
-    \item \lstinline{char} \rarr \lstinline{int} или \lstinline{unsigned int} \vspace{1em}
-    \item \lstinline{float} \rarr \lstinline{double}
-  \end{itemize}
+\begin{frame}{Единица трансляции}
+  \includegraphics[align=c,width=11cm,keepaspectratio]{images/translation_unit.png}
 \end{frame}
 
-\begin{frame}[fragile]{Интегральные преобразования}
+\begin{frame}[fragile]{Объявление и определение}
   \[
-    \forall T1, T2: T1 \in \mathbb{I}, T2 \in \mathbb{I}, T1 \mapsto T2
+    \mathbf{declaration} \neq \mathbf{definition}
   \]
 
-  \vspace{0.5em}
+  \vspace{0.3em}
 
   \begin{itemize}
-    \item $T2 \in \mathbb{U}, \mathbf{sizeof}(T1) > \mathbf{sizeof}(T2) \implies$ результат -- младшие биты исходного представления \vspace{0.5em}
-    \item $T2 \in \mathbb{U}, T1 \in \mathbb{S}, \mathbf{sizeof}(T1) \leq \mathbf{sizeof}(T2) \implies$ результат -- знаковое дополнение \vspace{0.5em}
-    \item $T2 \in \mathbb{U}, T1 \in \mathbb{U}, \mathbf{sizeof}(T1) \leq \mathbf{sizeof}(T2) \implies$ результат -- дополнение нулями \vspace{0.5em}
-    \item $T2 \in \mathbb{S}$ и исходное значение помещается в $T2 \implies$ значение не меняется \vspace{0.5em}
-    \item $T2 \in \mathbb{S}$ и исходное значение \textbf{не} помещается в $T2 \implies$ implementation defined
+    \item объявление функций
+    \item предварительное объявление классов
+    \item предварительное объявление \lstinline{enum}
+    \item объявление внешней (\lstinline{extern}) переменной
+    \item объявление статического члена класса
+    \item объявление шаблонного параметра
+    \item объявление псевдонима типа
+    \item \lstinline{using} объявление
+    \item явное объявление инстанциации шаблона
+    \item специализация шаблона без определения
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Дробные преобразования}
-  \[
-    \forall T1, T2: T1 \in \mathbb{F}, T2 \in \mathbb{F}, T1 \mapsto T2
-  \]
-
-  \vspace{1em}
-
-  \begin{itemize}
-    \item если исходное значение \emph{точно} представимо в целевом типе, оно не меняется \vspace{1em}
-    \item если исходное значение попадает между двумя корректными значениями целевого типа, то результат -- одно из этих значений (implementation defined) \vspace{1em}
-    \item иначе -- \textbf{UB}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Преобразования между дробными и интегральными типами}
-  \begin{itemize}
-    \item дробное $\mapsto$ целое путём отбрасывания дробной части, если целая часть помещается в целевой тип, иначе -- \textbf{UB} \vspace{2em}
-    \item целое $\mapsto$ дробное, возможно, с округлением (implementation defined); если исходное значение слишком велико -- \textbf{UB}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Преобразования с \lstinline{bool}}
-  \[
-    \forall T: T \in \mathbb{I} \lor \mathbb{F} \lor \mathbb{E} \lor \mathbb{P}, T \mapsto \mathtt{bool}
-  \]
-
-  \[
-    \forall T: T \in \mathbb{I} \lor \mathbb{F}, \mathtt{bool} \mapsto T
-  \]
-
-  \vspace{1em}
-
-  Преобразования к \lstinline{bool}
-  \begin{itemize}
-    \item $value \neq 0 \implies$ \lstinline{true} \vspace{0.5em}
-    \item $value = 0 \implies$ \lstinline{false}
-  \end{itemize}
-
-  \vspace{1em}
-  Преобразования из \lstinline{bool}
-  \begin{itemize}
-    \item \lstinline{false} \rarr \lstinline{0} \vspace{0.5em}
-    \item \lstinline{true} \rarr \lstinline{1}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Стандартные арифметические преобразования}
-  \begin{enumerate}
-    \item расширение операндов интегрального типа \vspace{0.5em}
-    \item приведение к общему типу
-      \begin{itemize}
-        \item если один операнд \lstinline{long double}, второй приводится к \lstinline{long double}
-        \item если один операнд \lstinline{double}, второй приводится к \lstinline{double}
-        \item если один операнд \lstinline{float}, второй приводится к \lstinline{float}
-        \item если знаковость одинакова, то подтягивается ранг
-        \item если ранг беззнакового $\geq$ ранга знакового, то знаковый \rarr тип беззнакового
-        \item если тип знакового может представить все значения типа беззнакового, то беззнаковый \rarr тип знакового
-        \item иначе оба \rarr беззнаковый вариант типа знакового
-      \end{itemize}
-  \end{enumerate}
-
-  \vspace{0.5em}
-
-  Ранг: \lstinline{bool} < \lstinline{signed char} < \lstinline{short} < \lstinline{int} < \lstinline{long} < \lstinline{long long}
-\end{frame}
-
-\begin{frame}[fragile]{Унарные плюс и минус}
-  \begin{itemize}
-    \item \lstinline{+x} -- числовое расширение \vspace{2em}
-    \item \lstinline{-x}
-      \begin{itemize}
-        \item числовое расширение \vspace{1em}
-        \item для беззнаковых целых -- $-x = 2^n-x$ \vspace{1em}
-        \item для остальных -- инвертирование знака
-      \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Целочисленное переполнение}
-  \begin{itemize}
-    \item беззнаковая целочисленная арифметика -- по модулю $2^n$ \vspace{2em}
-    \item знаковое переполнение -- \textbf{UB}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Контекст преобразования к \lstinline{bool}}
-  \begin{itemize}
-    \item условие \lstinline{if}, \lstinline{while}, \lstinline{for} \vspace{1em}
-    \item операнды встроенных \lstinline{!}, \lstinline{&&}, \lstinline{||} \vspace{1em}
-    \item первый операнд \lstinline{?:} \vspace{1em}
-    \item предикат \lstinline{static_assert} \vspace{1em}
-    \item выражение в \lstinline{noexcept}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Old-style cast}
-  \begin{minipage}{.45\textwidth}
-    \begin{itemize}
-      \item \lstinline{(T) x}
-      \item \lstinline{T(x)}
-    \end{itemize}
-  \end{minipage}\hfill
-  \begin{minipage}{.45\textwidth}
-    \begin{itemize}
-      \item \lstinline{const_cast<T>(x)} \vspace{0.5em}
-      \item \lstinline{static_cast<T>(x)}* \vspace{0.5em}
-      \item \lstinline{static_cast}* + \lstinline{const_cast} \vspace{0.5em}
-      \item \lstinline{reinterpret_cast<T>(x)}
-      \item \lstinline{reinterpret_cast} + \lstinline{const_cast}
-    \end{itemize}
-  \end{minipage}
-\end{frame}
-
-%-------------------------------------------------
-\section{Объекты}
-
-\begin{frame}{Объекты}
-  Характеризуется:
-  \begin{itemize}
-    \item размер (\lstinline{sizeof})
-    \item выравнивание (\lstinline{alignof})
-    \item тип размещения
-    \item размещение
-    \item время жизни
-    \item тип
-    \item значение (возможно, неопределенное)
-    \item имя (не обязательно)
-  \end{itemize}
-
-  \vspace{1em}
-
-  \textbf{Не} является объектом: значение, ссылка, функция, не статический член класса, \lstinline{this}.
-\end{frame}
-
-\begin{frame}{Представление объекта}
-  \begin{itemize}
-    \item объектное представление $B_1 \dotso B_n, n = \mathtt{sizeof(T)}$ \vspace{0.5em}
-    \item представление значения $b_1 \dotso b_m, \frac{m}{8} \leq n$
-  \end{itemize}
-
-  \vspace{2em}
-
-  Подобъекты -- члены классов, представления базовых классов в наследнике, элементы массивов.
-
-  \vspace{2em}
-
-  Размер любого полного объекта $\geq 1$.
-
-  \vspace{2em}
-
-  $\forall a, b: L_1 \cap L_2 \implies \mathbf{addr}(a) \neq \mathbf{add}(b)$
-\end{frame}
-
-\begin{frame}{Типы размещения}
-  \begin{itemize}
-    \item автоматический \vspace{1em}
-    \item статический \vspace{1em}
-    \item тред-локальный \vspace{1em}
-    \item динамический
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Размещение и инициализация}
-  \begin{lstlisting}
-    int a = 9, aa;
-    thread_local double b = 0.5;
-    C c(1, 2);
-
-    void f()
-    {
-      static C cc;
-      thread_local double d = -1.5;
-      {
-        ...
-        int e = 101;
-        ...
-      }
-    }
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{Временные объекты}
-  \begin{itemize}
-    \item автоматическое размещение в рамках исполнения выражения \vspace{0.5em}
-    \item удаляются в конце исполнения полного выражения \vspace{0.5em}
-    \item порядок удаления = обратный порядок создания \vspace{0.5em}
-    \item время жизни может быть продлено ссылкой
-  \end{itemize}
-
-  \vspace{1em}
-
-  \begin{lstlisting}
-    x = process(std::string("a = b + c").substr(4, 5));
-  \end{lstlisting}
-\end{frame}
-
-%-------------------------------------------------
-\section{Выражения}
-
-\begin{frame}[fragile]{Невычисляемый контекст}
-  \begin{itemize}
-    \item \lstinline{typeid} \vspace{1em}
-    \item \lstinline{sizeof} \vspace{1em}
-    \item \lstinline{noexcept} \vspace{1em}
-    \item \lstinline{decltype}
-  \end{itemize}
-  \begin{lstlisting}
-    decltype(a + b) c = a + b;
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{Контекст игнорирования результата}
-  \begin{itemize}
-    \item инструкция выражения \vspace{1em}
-    \item левый операнд \lstinline{,} \vspace{1em}
-    \item приведение к типу \lstinline{void}
-  \end{itemize}
-  \begin{lstlisting}
-    a + b;
-    f();
-    x = f(), g();
-    auto y = f(), g(); // error
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{Константные выражения}
-  \begin{lstlisting}
-    char str[50];
-
-    const std::size_t size = 50;
-    std::array<int, size * 10> arr;
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}{Категории значений}
-  \includegraphics[width = \textwidth,align=c,keepaspectratio]{images/value_categories.png}
-\end{frame}
-
-\begin{frame}[fragile]{Пример материализации}
-  \begin{lstlisting}
-    const int a = 2 + 3;
-
-    const int & b = 2 + 3;
-  \end{lstlisting}
-\end{frame}
-
-%-------------------------------------------------
-\section{Сложные инструкции}
-
-\begin{frame}[fragile]{Ветвления}
-  \lstinline{if} [\lstinline{constexpr}] \lstinline{(} [\emph{иниц.}] \emph{условие} \lstinline{)} \emph{инструкция}
-
-  \vspace{0.5em}
-
-  \lstinline{if} [\lstinline{constexpr}] \lstinline{(} [\emph{иниц.}] \emph{условие} \lstinline{)} \emph{инструкция} \lstinline{else} \emph{инструкция}
-
-  \vspace{0.5em}
-
-  \begin{itemize}
-    \item \emph{иниц.}
-      \begin{itemize}
-        \item инструкция выражения \vspace{0.5em}
-        \item инструкция объявления \vspace{1em}
-      \end{itemize}
-    \item \emph{условие}
-      \begin{itemize}
-        \item выражение, приводимое к \lstinline{bool} \vspace{0.5em}
-        \item объявление единственной переменной
-      \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Примеры ветвлений}
+\begin{frame}[fragile]{Объявления}
   \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
-    int a = f();
-    if (a) return x;
+    int f(double);
+    class C;
+    enum class E;
+    extern int a;
+    extern int a;
 
-    if (int a = f(); a)
-      return x;
-
-    int a;
-    if (a = f(); a) {
-      return x;
-    }
-
-    if (int a = f()) {
-      return x;
-    }
-
-    if (T t; !t.empty()) return y;
-
-    if (auto a = g(); std::size_t b = a.size()) {
-      std::cout << a << ":" << b << std::endl;
-    }
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{Примеры \lstinline{constexpr} ветвлений}
-  \begin{lstlisting}
-    auto f()
+    struct S
     {
-      if constexpr (true) {
-        return "Hi!";
-      } else {
-        return 101;
-      }
-    }
+      static S s;
+    };
+
+    using T = int;
+    using std::cout;
 
     template <class T>
-    std::string f(const T & t)
-    {
-      if constexpr (std::is_same_v<T, std::string>) {
-        return t.substr(3, 4);
-      } else {
-        return std::to_string(t);
-      }
-    }
+    int g();
+    template <>
+    int g<double>();
+
+    template <class T> class X;
+    template <> class X<int>;
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{\lstinline{switch}}
-  \lstinline{switch (} [\emph{иниц.}] \emph{условие} \lstinline{)} \emph{инструкция}
+\begin{frame}{Уникальность определений}
+  One definition rule (\textbf{ODR})
 
-  \vspace{0.5em}
+  \vspace{2em}
 
-  \begin{itemize}
-    \item \emph{иниц.}
-      \begin{itemize}
-        \item инструкция выражения \vspace{0.5em}
-        \item инструкция объявления \vspace{1em}
-      \end{itemize}
-    \item \emph{условие}
-      \begin{itemize}
-        \item выражение, неявно приводимое к интегральному типу или \lstinline{enum} \vspace{0.5em}
-        \item объявление единственной переменной
-      \end{itemize}
-  \end{itemize}
+  В одной единице трансляции допустимо лишь одно определение любой переменной, функции, класса, \lstinline{enum} или шаблона.
 
-  \vspace{1em}
+  \vspace{2em}
 
-  В инструкции разрешены метки \lstinline{case} и \lstinline{default}, а \lstinline{break} имеет специальное значение.
+  Во всей программе допустимо лишь одно определение функции или переменной, которая ODR-используется (иначе -- \textbf{UB}).
 \end{frame}
 
-\begin{frame}[fragile]{Примеры \lstinline{switch}}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
-    int a = f();
-    switch (a) {
-      case 11:
-      case 3+5:
-        ++x;
-        y = a;
-        break;
-    }
-
-    switch (int a = f()) {
-      case 11: ++a; [[fallthrough]];
-      case 8: { ++x; y = a; } break;
-    }
-
-    switch(int a = f(); a) {
-      case 8: ++a;
-      case 11: ++x; y = a; break;
-    }
-
-    switch (std::string s = get_line(); s.size());
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{Объявления и тело \lstinline{switch}}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
-    switch (x) {
-      case 31: {
-        int a = x * 20;
-        std::cout << a;
-        break;
-      }
-      case 99: {
-        const auto l = get_line;
-        std::cout << l;
-      }
-      break;
-    }
-
-    switch (x) {
-      case 31:
-        int a = x * 20;
-        std::cout << a;
-        break;
-      default:            // error
-        std::cout << x;
-    }
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{Ещё более странные вещи с \lstinline{switch}}
-  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
-    void g(const std::size_t count, char * to, const char * from)
-    {
-      std::size_t n = (count + 7) / 8;
-      switch (count % 8) {
-      case 0: do {  *to = *from++; [[fallthrough]];
-      case 7:       *to = *from++; [[fallthrough]];
-      case 6:       *to = *from++; [[fallthrough]];
-      case 5:       *to = *from++; [[fallthrough]];
-      case 4:       *to = *from++; [[fallthrough]];
-      case 3:       *to = *from++; [[fallthrough]];
-      case 2:       *to = *from++; [[fallthrough]];
-      case 1:       *to = *from++;
-              } while (--n);
-      }
-    }
-  \end{lstlisting}
-  \url{https://en.wikipedia.org/wiki/Duff's_device}
-\end{frame}
-
-\begin{frame}[fragile]{Цикл \lstinline{while}}
-  \lstinline{while (} \emph{условие} \lstinline{)} \emph{инструкция}
+\begin{frame}{Повторение определений}
+  Во всей программе может быть более одного определения класса, \lstinline{enum}, шаблона, если:
 
   \vspace{1em}
 
   \begin{itemize}
-    \item \emph{условие}
-      \begin{itemize}
-        \item выражение, приводимое к \lstinline{bool} \vspace{0.5em}
-        \item объявление единственной переменной
-      \end{itemize}
+    \item каждый вариант определения состоит из одинаковой последовательности токенов \vspace{1em}
+    \item поиск имени, связанного с каждым таким определением, во всех случаях дает ту же сущность \vspace{1em}
+    \item любые связанные операторы и методы должны давать вызов одной и той же функции в каждом случае
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Примеры \lstinline{while}}
+\begin{frame}{ODR-использование}
+  \begin{itemize}
+    \item объект ODR-используется, если его значение читается (если только это не константа с известным на момент компиляции значением), записывается, его адрес берётся или с ним связывается ссылка \vspace{2em}
+    \item функция ODR-используется, если она вызывается или её адрес берётся
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Пример ODR-использования}
   \begin{lstlisting}
-    while (!q.empty()) {
-      std::cout << q.front() << std::endl;
-      q.pop_front();
-    }
+    struct S
+    {
+      static const int x = 0; // declaration
+    };
 
-    while (int a = f()) {
-      std::cout << a << std::endl;
-    }
+    const int S::x; // definition
 
-    while (x)
-      int y = 111;
-    std::cout << y << std::endl; // error
+    int main(int argc, char ** argv)
+    {
+      const int & x = S::x; // S::x is ODR-used
+      return S::x; // S::x is not ODR-used
+    }
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Цикл \lstinline{do while}}
-  \lstinline{do} \emph{инструкция} \lstinline{while (} \emph{условие} \lstinline{);}
-
-  \vspace{1em}
-
-  \begin{lstlisting}
-    do x++; while (x);
-
-    do {
-      int a = f();
-      x = a % 2;
-    } while (x > 5);
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{Цикл \lstinline{for}}
-  \lstinline{for (} \emph{иниц.} [\emph{условие}] \lstinline{;} \emph{итер.} \lstinline{)} \emph{инструкция}
-
-  \vspace{0.5em}
-
-  \begin{itemize}
-    \item \emph{иниц.}
-      \begin{itemize}
-        \item инструкция выражения \vspace{0.5em}
-        \item инструкция объявления \vspace{1em}
-      \end{itemize}
-    \item \emph{условие}
-      \begin{itemize}
-        \item выражение, приводимое к \lstinline{bool} \vspace{0.5em}
-        \item объявление единственной переменной \vspace{1em}
-      \end{itemize}
-    \item \emph{итер.}
-      \begin{itemize}
-        \item выражение
-      \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Примеры с \lstinline{for}}
+\begin{frame}[fragile]{\lstinline{inline}}
   \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
-    for (;;) {
-      std::cout << "Forever failure" << std::endl;
-    }
-
-    for (; !q.empty(); ) {
-      std::cout << q.front() << std::endl;
-      q.pop_front();
-    }
-
-    for (int i = 0; i < f(); ++i) {
-      if (i % 2) {
-        std::cout << "Odd" << std::endl;
-        continue;
-      }
-      std::cout << "Even" << std::endl;
-    }
-
-    for (int i = 0, end = f(); i < end; ++i) {
+    inline void f()
+    {
       // ...
     }
+
+    inline int x = 0;
+
+    struct S
+    {
+      bool empty()
+      {
+        return true;
+      }
+
+      friend bool operator == (const S & lhs, const S & rhs)
+      { return true; }
+
+      static constexpr double pi = 3.14;
+    };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Linkage}
+  Имя, обозначающее объект, ссылку, функцию, тип, шаблон, пространство имен или значение, может иметь linkage (связывание).
+
+  \vspace{0.5em}
+
+  \begin{itemize}
+    \item отсутствие связывания: имя является локальным для своей области видимости  \vspace{0.5em}
+    \item внешнее связывание: имя в разных единицах трансляции ссылается на одну и ту же сущность \vspace{0.5em}
+    \item внутреннее связывание: имя в любых областях видимости данной единицы трансляции ссылается на одну и ту же сущность
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Назначение связывания по умолчанию}
+  \begin{itemize}
+    \item отсутствие связывания
+      \begin{itemize}
+        \item локальные переменные без \lstinline{extern}
+        \item локальные классы
+        \item иные имена, объявленные на уровне блока
+      \end{itemize}
+    \item внешнее связывание
+      \begin{itemize}
+        \item глобальные не-\lstinline{const} не-\lstinline{inline} переменные
+        \item глобальные \lstinline{inline} переменные
+        \item функции
+        \item классы
+        \item шаблоны
+      \end{itemize}
+    \item внутреннее связывание
+      \begin{itemize}
+        \item глобальные \lstinline{const} не-\lstinline{inline} переменные
+        \item члены анонимных \lstinline{union}
+        \item сущности, объявленные в анонимном пространстве имён
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Явное назначение связывания}
+  \begin{itemize}
+    \item \lstinline{extern} -- спецификатор объявления переменных, позволяющий явно задать внешнее связывание \vspace{0.5em}
+    \item \lstinline{static} -- спецификатор определения глобальных переменных или функций, явно задающий внутреннее связывание
+  \end{itemize}
+  \begin{lstlisting}
+    extern int x; // external, declaration
+    extern int y = 101; // external, definition
+    int z = 111; // external
+    static int u = -1; // internal
+    const int v = 9; // internal
+    static const int w = 3; // internal
+    inline const int s = 3; // external
+    extern const int t = 1; // external
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Language linkage}
+  Имена переменных и функций с внешним связыванием обладают свойством ``language linkage''.
+
+  \vspace{1em}
+
+  Можно задать явно: \\
+
+  \vspace{0.7em}
+
+  \lstinline{extern} \emph{string-literal} \lstinline|{ ... }|
+
+  \lstinline{extern} \emph{string-literal} \emph{declaration}
+
+  \vspace{1em}
+
+  где \emph{string-literal}:
+
+  \begin{itemize}
+    \item \lstinline{"C++"}
+    \item \lstinline{"C"}
+  \end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\section{Этапы трансляции}
+
+\begin{frame}[fragile]{Основные этапы трансляции}
+  \begin{enumerate}
+    \item Склейка строк через \lstinline{\} \vspace{1em}
+    \item Предварительная токенизация (комментарии, пробелы, базовые токены) \vspace{1em}
+    \item Препроцессор ($\forall I \rightleftharpoons 1\dotso3$) \vspace{1em}
+    \item Склейка смежных строковых литералов \vspace{1em}
+    \item Компиляция \vspace{1em}
+    \item Компоновка
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Базовые токены}
+  \begin{itemize}
+    \item идентификаторы
+    \item числовые токены
+    \item символьные, строковые литералы и аргументы \lstinline{#include}
+    \item операторы и символы пунктуации
+    \item иное
+  \end{itemize}
+  \vspace{1em}
+  \begin{lstlisting}
+    a+++++b   // a ++ ++ + b
+    a++ + ++b // a ++ + ++ b
+    1E+12 // OK
+    0x1E+12 // bad
+    0x1E +12 // OK
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Комментарии}
+  \begin{lstlisting}
+  /* Comment */
+
+  /*
+   * Multi-line comment
+   */
+
+  // Single-line comment
+
+  //
+  //
+  // Fancy comment formatting
+  //
   \end{lstlisting}
 \end{frame}
 
 %-------------------------------------------------
-\section{Функции}
+\section{Препроцессор}
 
-\begin{frame}{Функции}
-  \begin{itemize}
-    \item имя \vspace{0.5em}
-    \item тип возвращаемого значения \vspace{0.5em}
-    \item список аргументов \vspace{0.5em}
-    \item тип \lstinline{ret(params)} \vspace{0.5em}
-    \item тело
-  \end{itemize}
+\begin{frame}[fragile]{Директивы препроцессора}
+  \lstinline{#} \emph{директива [аргументы]}
 
   \vspace{1em}
 
+  Директива должна размещаться на одной строке, занимает всю строку.
+
   \begin{itemize}
-    \item объявление -- задание типа и связывание с именем \vspace{0.5em}
-    \item определение -- задание тела и связывание с именем
+    \item \lstinline{define}
+    \item \lstinline{undef}
+    \item \lstinline{include}
+    \item \lstinline{if}, \lstinline{ifdef}, \lstinline{ifndef}, \lstinline{else}, \lstinline{elif}, \lstinline{endif}
+    \item \lstinline{error}
+    \item \lstinline{pragma}
+    \item \lstinline{line}
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Форма объявления функции}
-  \emph{T имя} \lstinline{(} \emph{параметры} \lstinline{);}
+\begin{frame}[fragile]{\lstinline{pragma}}
+  \lstinline{#pragma} \emph{params}
 
-  \vspace{1em}
+  \begin{lstlisting}
+    #pragma once
 
-  \lstinline{auto} \emph{имя} \lstinline{(} \emph{параметры} \lstinline{)} \lstinline{->} \emph{T} \lstinline{;}
+    #pragma pack(1)
+    struct S
+    {
+      char a;
+      int b;
+      short c;
+    };
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\lstinline{error}}
+  \lstinline{#error} \emph{message}
+
+  \begin{lstlisting}
+    #if defined(__clang__)
+    // clang
+    #elif defined(__GNUC__) || defined(__GNUG__)
+    // gcc
+    #elif defined(_MSC_VER)
+    // MSVC
+    #else
+    #  error "Unsupported compiler"
+    #endif
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\lstinline{line}}
+  \begin{itemize}
+    \item \lstinline{#line} \emph{lineno}
+    \item \lstinline{#line} \emph{lineno} \lstinline{"}\emph{filename}\lstinline{"}
+  \end{itemize}
+  \begin{lstlisting}
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  #line 333 "foo.def"
+    std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Условные директивы}
+  \begin{lstlisting}
+    #ifdef identifier
+    #ifndef identifier
+    #if expression
+    #elif expression
+    #else
+    #endif
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Условные директивы, конструкция}
+  \begin{lstlisting}
+    #ifdef / ifndef / if
+    // main case
+    ...
+    #elif ...
+    // alternative case
+    ...
+    #else
+    // else case
+    ...
+    #endif
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Условные директивы, выражения}
+  \begin{enumerate}
+    \item подстановка макросов \vspace{1em}
+    \item оператор \lstinline{defined id} или \lstinline{defined(id)} \rarr \lstinline{1} или \lstinline{0} \vspace{1em}
+    \item оператор \lstinline{__has_include(...)} \rarr \lstinline{1} или \lstinline{0} \vspace{1em}
+    \item прочие идентификаторы \rarr \lstinline{0} (кроме \lstinline{true}/\lstinline{false}) \vspace{1em}
+    \item базовые токены \rarr токены \vspace{1em}
+    \item вычисление выражения, как константного
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Условные директивы, пример}
+  \begin{lstlisting}
+    //#define FOO
+    //#define X 3 * 1 + 0
+    #if !defined(FOO)
+        std::cout << "First" << std::endl;
+    #elif X == 3
+        std::cout << "Second" << std::endl;
+    #else
+    #  ifndef BAR
+        std::cout << "Third" << std::endl;
+    #  endif
+    #endif
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{\lstinline{include}}
+  \begin{itemize}
+    \item \lstinline{#include <} \emph{файл} \lstinline{>} -- ``стандартные'' или ``глобальные'' файлы \vspace{1em}
+    \item \lstinline{#include "} \emph{файл} \lstinline{"} -- ``локальные'' файлы
+  \end{itemize}
 
   \vspace{2em}
 
-  \begin{lstlisting}
-    int a = 5, f();
-  \end{lstlisting}
+  Выражение для \lstinline{__has_include} имеет такую же форму и смысл.
 \end{frame}
 
-\begin{frame}[fragile]{Объявление аргументов}
-  \emph{параметры} : $p_1, \dotso , p_n$
-
-  \vspace{1em}
-
-  \begin{itemize}
-    \item \lstinline{type name} \vspace{0.5em}
-    \item \lstinline{type name = init} \vspace{0.5em}
-    \item \lstinline{type} \vspace{0.5em}
-    \item \lstinline{type = init}
-  \end{itemize}
-
-  \vspace{1em}
-
-  Variadic functions
-  \begin{lstlisting}
-    int printf(const char * fmt, ...);
-    int print(...);
-  \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{Примеры объявлений функций}
+\begin{frame}[fragile]{Заголовочные файлы}
+  \textbf{a.h}:
   \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
-    // declare the same function of type void(int, char *)
-    void bar(const int x, char[]);
-    void bar(const volatile int x, char[3]);
-    void bar(int x, char * p);
+    int max(int a, int b);
+    inline const double pi = 3.14;
+  \end{lstlisting}
 
-    void g(int, int);
-    void g(int, int = 5);
-    void g(int = 1, int);
-    void g(int, int = 5); // error
+  \vspace{0.5em}
 
-    int a = 1;
-    int f(int = a);
-    void b()
-    {
-      g(); // calls g(1, 5)
-      a = 2;
-      {
-        int a = 3;
-        f(); // calls f(2)
-      }
+  \textbf{a.cpp}:
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+    void f() {}
+    #include "a.h"
+    #include "a.h"
+    int x = max(10, 100);
+  \end{lstlisting}
+
+  \vspace{0.5em}
+
+  \textbf{a.i}:
+  \begin{lstlisting}[basicstyle=\ttfamily\srcbigsize]
+    void f() {}
+    int max(int a, int b);
+    inline const double pi = 3.14;
+    int max(int a, int b);
+    inline const double pi = 3.14;
+    int x = max(10, 100);
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Защита от повторного включения}
+  ``Include guards'':
+  \begin{lstlisting}
+    #ifndef SOME_UNIQUE_HEADER_NAME
+    #define SOME_UNIQUE_HEADER_NAME
+
+    ...
+    #endif
+  \end{lstlisting}
+
+  \vspace{2em}
+
+  Альтернатива:
+  \begin{lstlisting}
+    #pragma once
+  \end{lstlisting}
+\end{frame}
+
+%-------------------------------------------------
+\section{Макросы}
+
+\begin{frame}[fragile]{Макросы}
+  \begin{lstlisting}
+    #define identifier
+    #define identifier replacement
+    #define identifier(parameters) replacement
+    #define identifier(parameters, ...) replacement
+    #define identifier(...) replacement
+    #undef identifier
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Сложные макросы}
+  \begin{lstlisting}
+    #define MAX(a, b) a < b ? b : a
+
+    if (MAX(x, y) == 0) {
+      ...
+    }
+
+    ->
+
+    if (x < y ? y : x == 0) {
+      ...
+    }
+
+    ->
+
+    if ((x < y) ? (y) : (x == 0)) {
+      ...
     }
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Определение функции}
-  \emph{объявление} \emph{тело}
+\begin{frame}[fragile]{Ограничения макросов}
+  Рекурсия запрещена
+
+  \begin{lstlisting}
+    #define foo foo
+
+    foo
+    ->
+    foo
+  \end{lstlisting}
+
+  \vspace{2em}
+
+  Вложенные вызовы разрешены
+
+  \begin{lstlisting}
+    #define foo(x) x
+
+    foo(foo(foo(1)))
+    ->
+    1
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Особенности подстановки параметров}
+  В подстановке сложных макросов параметры дополнительно раскрываются.
 
   \vspace{1em}
 
+  Этапы подстановки:
+
+  \vspace{0.5em}
+
+  \begin{enumerate}
+    \item Определение мест вхождения параметров в строке замены и их первичная подстановка \vspace{0.7em}
+    \item Раскрытие параметров в местах их подстановки \vspace{0.7em}
+    \item В строке замены обрабатываются макросы (при этом явно запрещена рекурсия)
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Специальные операции подстановки}
+  В подстановке сложных макросов \lstinline{#} и \lstinline{##} играют особую роль:
+
+  \vspace{2em}
+
   \begin{itemize}
-    \item блок \vspace{0.7em}
-    \item try блок \vspace{0.7em}
-    \item \lstinline{= delete} \vspace{0.7em}
-    \item \lstinline{= default}
+    \item stringification (литерация): \lstinline{#a}, где \lstinline{a} -- параметр макроса; вместо обычной подстановки параметра, параметр превращается в корректный строковый литерал (с обрамляющими \lstinline{""}) и подставляется в строку замены \vspace{1em}
+    \item concatenation (склейка): \lstinline{##} между любыми двумя параметрами или между параметром и другим токеном вызывает конкатенацию результатов их подстановки (препроцессор проверит корректность полученного токена)
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Инструкция \lstinline{return}}
-  \begin{itemize}
-    \item \lstinline{return} \emph{выражение} \lstinline{;} \vspace{1em}
-    \item \lstinline|return {| \emph{список инициализации} \lstinline|};|
-  \end{itemize}
+\begin{frame}[fragile]{Примеры stringification и concatenation}
+  \begin{lstlisting}
+    #define show(a, b, c) #a #b #c
+
+    show(x, 10, "hello\n")
+    ->
+    "x10\"hello\\n\""
+
+
+    #define print(type) void print_ ## type (type x) { ... }
+
+    print(char)
+    ->
+    void print_char(char x) { ... }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Особенности stringification и concatenation}
+  При этом \lstinline{#} и \lstinline{##} оказывает влияние на обработку параметров макросов: литерация или склейка производятся \textbf{до} возможного раскрытия параметров.
+
+  \vspace{1em}
+
+  \begin{lstlisting}
+    #define foo ABC
+    #define concat(a) foo ## a
+
+    concat(__LINE__)
+    ->
+    foo__LINE__
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Обход особенностей stringification и concatenation}
+  Обойти раннюю обработку операций \lstinline{#} и \lstinline{##} можно двойным перенаправлением:
+
+  \begin{lstlisting}
+    #define show(x) do_show(x)
+    #define do_show(x) #a
+
+    show(__LINE__)
+    ->
+    "123"
+
+    #define concat(a, b) do_concat(a, b)
+    #define do_concat(a, b) a ## b
+
+    concat(0x, __LINE__)
+    ->
+    0x123
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Защита параметров макросов}
+  \begin{lstlisting}
+    #define MAX(a, b) a < b ? b : a
+
+    MAX(0, x & 0xFF)
+    ->
+    0 < x & 0xFF ? x & 0xFF : 0
+  \end{lstlisting}
+
+  \vspace{1em}
+
+  \begin{lstlisting}
+    #define MAX(a, b) (a) < (b) ? (b) : (a)
+    MAX(0, x & 0xFF)
+    ->
+    (0) < (x & 0xFF) ? (x & 0xFF) : (0)
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Защита тела макросов}
+  \begin{lstlisting}
+    #define MAX(a, b) (a < b ? b : a)
+
+    if (MAX(x, y) == 0) {
+      ...
+    }
+    ->
+    if ((x < y ? y : x) == 0) {
+      ...
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Защита места вставки}
+  \begin{lstlisting}
+    #define PRINT(x) do { \
+      ...; \
+      ...; \
+    } while (false)
+
+    // Now this is OK:
+    if (...)
+      PRINT(...);
+    else
+      ...;
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Побочные эффекты в макросах}
+  \begin{lstlisting}
+    #define MAX(a, b) (a) < (b) ? (b) : (a)
+
+    MAX(x++, --y);
+    ->
+    (x++) < (--y) < (--y) : (x++);
+  \end{lstlisting}
 \end{frame}
 
 \end{document}
